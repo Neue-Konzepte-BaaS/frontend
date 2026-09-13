@@ -4,6 +4,9 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  // Public plot search. Open to everyone (no guard) — the same <PlotSearch />
+  // component also backs the customer dashboard below.
+  route("search", "routes/search.tsx"),
   // Role dashboards. admin/customer are TEMPORARY placeholders (Issue #8).
   route("admin", "routes/admin.tsx"),
   route("customer", "routes/customer.tsx"),

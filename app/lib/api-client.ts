@@ -85,9 +85,10 @@ export function forceLogout() {
     // Ignore storage errors (e.g. privacy mode); the redirect still logs out.
   }
 
-  const onPublicPage = PUBLIC_PATHS.some((p) =>
-    window.location.pathname.startsWith(p),
-  );
+  // "/" is the landing page — public, but checked exactly: it can't go in
+  // PUBLIC_PATHS because startsWith("/") would match every path in the app.
+  const path = window.location.pathname;
+  const onPublicPage = path === "/" || PUBLIC_PATHS.some((p) => path.startsWith(p));
   if (!onPublicPage) {
     window.location.href = "/login";
   }
