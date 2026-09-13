@@ -45,6 +45,17 @@ export default function App() {
   return <Outlet />;
 }
 
+// In SPA mode, HydrateFallback is only allowed on the root route. It renders in
+// the build-time index.html and shows while the client hydrates and route
+// clientLoaders (auth checks, redirects) run.
+export function HydrateFallback() {
+  return (
+    <main className="flex min-h-screen items-center justify-center p-8 text-gray-500">
+      Loading…
+    </main>
+  );
+}
+
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
   let details = "An unexpected error occurred.";
