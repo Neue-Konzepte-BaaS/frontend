@@ -1,23 +1,29 @@
 import { useState } from "react";
-import { Link, redirect, useNavigate } from "react-router";
+import { Link, redirect, useNavigate, useSearchParams } from "react-router";
+import type { Route } from "./+types/register";
 import { register, me, dashboardPath, type RegisterableRole } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
+import { safeRedirectTarget } from "~/lib/guards";
+import { Field, FormError, inputClass, submitClass } from "~/components/form";
 
 export function meta() {
   return [{ title: "Create account · BaaS" }];
 }
 
-// Signed-in users don't register again — send them to their dashboard.
-export async function clientLoader() {
+// Signed-in users don't register again — send them to their dashboard, or
+// wherever ?redirect= points (e.g. "Log in to rent" from /customer).
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const account = await me();
   if (account) {
-    throw redirect(dashboardPath(account.role));
+    const redirectTo = safeRedirectTarget(new URL(request.url).searchParams.get("redirect"));
+    throw redirect(redirectTo ?? dashboardPath(account.role));
   }
   return null;
 }
 
 export default function Register() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [role, setRole] = useState<RegisterableRole>("customer");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -48,7 +54,8 @@ export default function Register() {
         farmName:
           role === "farmer" ? String(form.get("farm_name") ?? "").trim() : undefined,
       });
-      navigate(dashboardPath(account.role), { replace: true });
+      const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
+      navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -79,14 +86,7 @@ export default function Register() {
       </div>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
-          >
-            {error}
-          </p>
-        )}
+        {error && <FormError message={error} />}
 
         <div className="grid grid-cols-2 gap-4">
           <Field label="First name" htmlFor="first_name">
@@ -129,19 +129,16 @@ export default function Register() {
 
       <p className="mt-6 text-sm text-gray-600 dark:text-gray-300">
         Already have an account?{" "}
-        <Link to="/login" className="font-medium text-emerald-700 underline dark:text-emerald-400">
+        <Link
+          to={{ pathname: "/login", search: searchParams.toString() }}
+          className="font-medium text-emerald-700 underline dark:text-emerald-400"
+        >
           Sign in
         </Link>
       </p>
     </main>
   );
 }
-
-const inputClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white";
-
-const submitClass =
-  "w-full rounded-lg bg-emerald-600 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60";
 
 function RoleTab({
   active,
@@ -166,27 +163,5 @@ function RoleTab({
     >
       {children}
     </button>
-  );
-}
-
-function Field({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={htmlFor}
-        className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-      >
-        {label}
-      </label>
-      {children}
-    </div>
   );
 }
