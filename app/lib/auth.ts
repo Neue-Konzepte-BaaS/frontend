@@ -4,9 +4,9 @@ import { apiClient, ApiError } from "~/lib/api-client";
  * Auth helpers, thin wrappers over the api client. These mirror the backend's
  * auth endpoints (see backend openapi.yml):
  *
- *   POST /api/auth/register  -> sets cookies, returns { id, role }
- *   POST /api/auth/login     -> sets cookies, returns { id, role }
- *   GET  /api/auth/me        -> returns { id, role } for the cookie
+ *   POST /api/auth/register  -> sets cookies, returns { id, role, postal_code }
+ *   POST /api/auth/login     -> sets cookies, returns { id, role, postal_code }
+ *   GET  /api/auth/me        -> returns { id, role, postal_code } for the cookie
  *
  * The tokens live in HttpOnly cookies the browser can't read; we keep only a
  * minimal `auth_user` in localStorage for fast client-side role checks/redirects.
@@ -18,7 +18,24 @@ export type Role = "admin" | "farmer" | "customer";
 export type Account = {
   id: string;
   role: Role;
+  /**
+   * 0 for admins (no subtype postal_code column) and for any Account cached
+   * in localStorage from before this field existed — treat 0 as "unknown",
+   * not literally postal code zero.
+   */
+  postalCode: number;
 };
+
+/** Wire shape returned by the backend's auth endpoints (snake_case). */
+type SessionAccountResponse = {
+  id: string;
+  role: Role;
+  postal_code: number;
+};
+
+function fromResponse(res: SessionAccountResponse): Account {
+  return { id: res.id, role: res.role, postalCode: res.postal_code };
+}
 
 /** Roles a user may pick when registering. Admins are seeded in the DB. */
 export type RegisterableRole = "farmer" | "customer";
@@ -48,20 +65,25 @@ function rememberUser(account: Account) {
 export function getStoredUser(): Account | null {
   try {
     const raw = localStorage.getItem(AUTH_USER_KEY);
-    return raw ? (JSON.parse(raw) as Account) : null;
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Account;
+    // A stale entry cached before `postalCode` existed on this type would
+    // otherwise carry `undefined` at runtime despite the type saying `number`.
+    return { ...parsed, postalCode: parsed.postalCode ?? 0 };
   } catch {
     return null;
   }
 }
 
 export async function login(email: string, password: string): Promise<Account> {
-  const account = await apiClient.post<Account>("/auth/login", { email, password });
+  const res = await apiClient.post<SessionAccountResponse>("/auth/login", { email, password });
+  const account = fromResponse(res);
   rememberUser(account);
   return account;
 }
 
 export async function register(input: RegisterInput): Promise<Account> {
-  const account = await apiClient.post<Account>("/auth/register", {
+  const res = await apiClient.post<SessionAccountResponse>("/auth/register", {
     first_name: input.firstName,
     last_name: input.lastName,
     email: input.email,
@@ -70,6 +92,7 @@ export async function register(input: RegisterInput): Promise<Account> {
     postal_code: input.postalCode,
     farm_name: input.farmName ?? "",
   });
+  const account = fromResponse(res);
   rememberUser(account);
   return account;
 }
@@ -80,7 +103,8 @@ export async function register(input: RegisterInput): Promise<Account> {
  */
 export async function me(): Promise<Account | null> {
   try {
-    const account = await apiClient.get<Account>("/auth/me");
+    const res = await apiClient.get<SessionAccountResponse>("/auth/me");
+    const account = fromResponse(res);
     rememberUser(account);
     return account;
   } catch (err) {

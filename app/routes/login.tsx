@@ -1,23 +1,30 @@
 import { useState } from "react";
-import { Link, redirect, useNavigate } from "react-router";
+import { Link, redirect, useNavigate, useSearchParams } from "react-router";
+import type { Route } from "./+types/login";
 import { login, me, dashboardPath } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
+import { safeRedirectTarget } from "~/lib/guards";
+import { Field, FormError, inputClass, submitClass } from "~/components/form";
 
 export function meta() {
   return [{ title: "Sign in · BaaS" }];
 }
 
-// If already signed in, skip the form and go to the role dashboard.
-export async function clientLoader() {
+// If already signed in, skip the form. Honor ?redirect= (e.g. the "Log in to
+// rent" link from /customer) so a logged-in visitor bounces back to where
+// they came from, same as a fresh login below.
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const account = await me();
   if (account) {
-    throw redirect(dashboardPath(account.role));
+    const redirectTo = safeRedirectTarget(new URL(request.url).searchParams.get("redirect"));
+    throw redirect(redirectTo ?? dashboardPath(account.role));
   }
   return null;
 }
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -32,7 +39,8 @@ export default function Login() {
 
     try {
       const account = await login(email, password);
-      navigate(dashboardPath(account.role), { replace: true });
+      const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
+      navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
     } catch (err) {
       setError(
         err instanceof ApiError
@@ -51,14 +59,7 @@ export default function Login() {
       </p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
-          >
-            {error}
-          </p>
-        )}
+        {error && <FormError message={error} />}
 
         <Field label="Email" htmlFor="email">
           <input
@@ -89,7 +90,10 @@ export default function Login() {
 
       <p className="mt-6 text-sm text-gray-600 dark:text-gray-300">
         No account yet?{" "}
-        <Link to="/register" className="font-medium text-emerald-700 underline dark:text-emerald-400">
+        <Link
+          to={{ pathname: "/register", search: searchParams.toString() }}
+          className="font-medium text-emerald-700 underline dark:text-emerald-400"
+        >
           Create one
         </Link>
       </p>
@@ -97,30 +101,3 @@ export default function Login() {
   );
 }
 
-const inputClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white";
-
-const submitClass =
-  "w-full rounded-lg bg-emerald-600 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60";
-
-function Field({
-  label,
-  htmlFor,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <label
-        htmlFor={htmlFor}
-        className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
-      >
-        {label}
-      </label>
-      {children}
-    </div>
-  );
-}
