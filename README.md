@@ -7,9 +7,14 @@ The backend (Go + PostgreSQL) lives in a separate repo:
 
 ## Status
 
-Empty. No app scaffolded yet — build tool, routing, styling and API client are all
-still to be decided.
+Scaffolded: React Router v8 (framework mode, **SPA**) + Tailwind v4 + TypeScript.
+See `AGENT.md`, `context.md`, and `architecture.md` for product and code context.
 
 ## Getting started
 
-Nothing to run yet. Once the app is scaffolded, document the setup and dev commands here.
+```sh
+npm install
+npm run dev        # start the dev server
+npm run typecheck  # type-check the app
+npm run build      # production build
+```

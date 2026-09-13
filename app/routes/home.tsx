@@ -1,13 +1,19 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { redirect } from "react-router";
+import { me, dashboardPath } from "~/lib/auth";
 
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
+/**
+ * The index route has no UI of its own: it sends the visitor to the right place
+ * based on auth state. Authenticated → their role dashboard; otherwise → /login.
+ */
+export async function clientLoader() {
+  const account = await me();
+  if (account) {
+    throw redirect(dashboardPath(account.role));
+  }
+  throw redirect("/login");
 }
 
 export default function Home() {
-  return <Welcome />;
+  // Never rendered — clientLoader always redirects.
+  return null;
 }
