@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { redirect } from "react-router";
+import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
 import { listFields, createPlot, type FieldWithPlots } from "~/lib/fields";
@@ -8,9 +9,10 @@ import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-ma
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
 import { ringToCorners, subdivideIntoGrid, toBbox } from "~/lib/geo";
 import type { LatLon } from "~/lib/geocode";
+import i18n from "~/i18n";
 
 export function meta() {
-  return [{ title: "Field · BaaS" }];
+  return [{ title: i18n.t("farmer:fieldDetailMetaTitle") }];
 }
 
 /**
@@ -37,6 +39,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const { t } = useTranslation(["farmer", "common"]);
 
   const hasPlots = field.plots.length > 0;
 
@@ -47,7 +50,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     const r = Number(rows);
     const c = Number(cols);
     if (!Number.isInteger(r) || !Number.isInteger(c) || r < 1 || c < 1) {
-      setError("Rows and columns must both be whole numbers of at least 1.");
+      setError(t("farmer:invalidRowsColumns"));
       return;
     }
 
@@ -69,11 +72,8 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         setField((prev) => ({ ...prev, plots: [...prev.plots, plot] }));
         setProgress({ done: created, total: cells.length });
       } catch (err) {
-        const message = err instanceof ApiError ? err.message : "Something went wrong.";
-        setError(
-          `${message} — ${created} of ${cells.length} plots were created before this failed. ` +
-            "The plots already created cannot be removed from here.",
-        );
+        const message = err instanceof ApiError ? err.message : t("common:genericError");
+        setError(t("farmer:plotGenerationFailed", { message, created, total: cells.length }));
         break;
       }
     }
@@ -98,9 +98,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     <main className="mx-auto max-w-5xl p-4">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{field.name}</h1>
       <p className="mt-1 text-gray-600 dark:text-gray-300">
-        {hasPlots
-          ? `${field.plots.length} plot${field.plots.length === 1 ? "" : "s"}`
-          : "This field has no plots yet."}
+        {hasPlots ? t("farmer:plot", { count: field.plots.length }) : t("farmer:fieldHasNoPlotsYet")}
       </p>
 
       {error && (
@@ -120,12 +118,9 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
       {!hasPlots ? (
         <form onSubmit={handleGenerate} className="mt-4 max-w-sm space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            Set how many rows and columns of equal-sized plots to lay out across this field. This can only be
-            done once — there's no way to change it afterwards yet.
-          </p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t("farmer:gridInstructions")}</p>
           <div className="flex gap-4">
-            <FormField label="Rows" htmlFor="rows">
+            <FormField label={t("farmer:rowsLabel")} htmlFor="rows">
               <input
                 id="rows"
                 type="number"
@@ -138,7 +133,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
                 className={inputClass}
               />
             </FormField>
-            <FormField label="Columns" htmlFor="cols">
+            <FormField label={t("farmer:columnsLabel")} htmlFor="cols">
               <input
                 id="cols"
                 type="number"
@@ -153,12 +148,14 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
             </FormField>
           </div>
           <button type="submit" disabled={generating} className={submitClass}>
-            {generating && progress ? `Creating plot ${progress.done + 1} of ${progress.total}…` : "Generate plots"}
+            {generating && progress
+              ? t("farmer:creatingPlotProgress", { done: progress.done + 1, total: progress.total })
+              : t("farmer:generatePlots")}
           </button>
         </form>
       ) : (
         <div className="mt-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Plots</p>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:plotsLabel")}</p>
           <ul className="mt-1 space-y-1 text-sm text-gray-600 dark:text-gray-300">
             {field.plots.map((p) => (
               <li key={p.id}>{p.name}</li>

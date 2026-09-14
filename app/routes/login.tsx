@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, redirect, useNavigate, useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/login";
 import { login, me, dashboardPath } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
 import { safeRedirectTarget } from "~/lib/guards";
 import { Field, FormError, inputClass, submitClass } from "~/components/form";
+import i18n from "~/i18n";
 
 export function meta() {
-  return [{ title: "Sign in · BaaS" }];
+  return [{ title: i18n.t("auth:loginMetaTitle") }];
 }
 
 // If already signed in, skip the form. Honor ?redirect= (e.g. the "Log in to
@@ -27,6 +29,7 @@ export default function Login() {
   const [searchParams] = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation(["auth", "common"]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -42,26 +45,20 @@ export default function Login() {
       const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
       navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
+      setError(err instanceof ApiError ? err.message : t("common:genericError"));
       setSubmitting(false);
     }
   }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Sign in</h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">
-        Welcome back. Sign in to your account.
-      </p>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("auth:loginTitle")}</h1>
+      <p className="mt-1 text-gray-600 dark:text-gray-300">{t("auth:loginSubtitle")}</p>
 
       <form onSubmit={onSubmit} className="mt-6 space-y-4" noValidate>
         {error && <FormError message={error} />}
 
-        <Field label="Email" htmlFor="email">
+        <Field label={t("auth:emailLabel")} htmlFor="email">
           <input
             id="email"
             name="email"
@@ -72,7 +69,7 @@ export default function Login() {
           />
         </Field>
 
-        <Field label="Password" htmlFor="password">
+        <Field label={t("auth:passwordLabel")} htmlFor="password">
           <input
             id="password"
             name="password"
@@ -84,17 +81,17 @@ export default function Login() {
         </Field>
 
         <button type="submit" disabled={submitting} className={submitClass}>
-          {submitting ? "Signing in…" : "Sign in"}
+          {submitting ? t("auth:signingIn") : t("common:signIn")}
         </button>
       </form>
 
       <p className="mt-6 text-sm text-gray-600 dark:text-gray-300">
-        No account yet?{" "}
+        {t("auth:noAccountYet")}{" "}
         <Link
           to={{ pathname: "/register", search: searchParams.toString() }}
           className="font-medium text-emerald-700 underline dark:text-emerald-400"
         >
-          Create one
+          {t("auth:createOne")}
         </Link>
       </p>
     </main>
