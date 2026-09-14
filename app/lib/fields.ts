@@ -8,6 +8,8 @@ import type { PolygonGeometry } from "~/lib/geo";
  *   GET  /api/fields                    -> FieldWithPlots[]
  *   POST /api/fields                    -> Field
  *   POST /api/fields/{fieldID}/plots    -> Plot
+ *   GET  /api/crops                     -> Crop[]          (public, no auth)
+ *   PUT  /api/plots/{plotID}/crops      -> Crop[]
  *
  * Unlike auth.ts, no camelCase<->snake_case mapping is needed: the backend
  * already uses flat lowercase JSON keys (id, name, farmer, field,
@@ -30,11 +32,24 @@ export type Plot = {
   coordinates: PolygonGeometry;
 };
 
-export type FieldWithPlots = Field & { plots: Plot[] };
+/**
+ * A crop in the catalog. Renting a plot books it for `durationMonths`
+ * starting immediately — see rentals.ts's `rentPlot`.
+ */
+export type Crop = {
+  id: string;
+  name: string;
+  durationMonths: number;
+};
+
+export type PlotWithCrops = Plot & { crops: Crop[] };
+
+export type FieldWithPlots = Field & { plots: PlotWithCrops[] };
 
 /**
- * All fields owned by the authenticated farmer, each with its plots. Returns
- * `[]` (never null) for a farmer with no fields yet.
+ * All fields owned by the authenticated farmer, each with its plots and the
+ * crops each plot offers. Returns `[]` (never null) for a farmer with no
+ * fields yet.
  */
 export function listFields(): Promise<FieldWithPlots[]> {
   return apiClient.get<FieldWithPlots[]>("/fields");
@@ -49,4 +64,17 @@ export function createPlot(
   input: { name: string; coordinates: PolygonGeometry },
 ): Promise<Plot> {
   return apiClient.post<Plot>(`/fields/${fieldId}/plots`, input);
+}
+
+/** The full crop catalog, ordered by name. Public endpoint — no auth required. */
+export function listCrops(): Promise<Crop[]> {
+  return apiClient.get<Crop[]>("/crops");
+}
+
+/**
+ * Replaces the full set of crops the plot offers, returning that set after
+ * the update. The plot's field must be owned by the authenticated farmer.
+ */
+export function setPlotCrops(plotId: string, cropIds: string[]): Promise<Crop[]> {
+  return apiClient.put<Crop[]>(`/plots/${plotId}/crops`, { cropIds });
 }

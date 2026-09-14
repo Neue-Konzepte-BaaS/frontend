@@ -35,6 +35,17 @@ export const farmer = {
   creatingPlotProgress: "Creating plot {{done}} of {{total}}…",
   generatePlots: "Generate plots",
   plotsLabel: "Plots",
+  selectPlotsInstructions: "Select one or more plots on the map or in this list, then choose what they should offer below.",
+  noCropsForPlot: "No crops offered yet",
+
+  offeredCropsLabel: "Crops for the selected plots",
+  plotsSelected_one: "{{count}} plot selected.",
+  plotsSelected_other: "{{count}} plots selected.",
+  noPlotsSelected: "Select a plot above to set what it offers.",
+  noCropsInCatalog: "No crops exist in the catalog yet — ask an admin to add some.",
+  cropDuration: "{{name}} ({{months}}-month rental)",
+  savingCrops: "Saving…",
+  saveCrops: "Save",
 
   mapAriaLabel: "Field map",
 } as const;
