@@ -1,13 +1,15 @@
 import { apiClient } from "~/lib/api-client";
-import type { Plot } from "~/lib/fields";
+import type { Crop, Plot } from "~/lib/fields";
 import type { PolygonGeometry } from "~/lib/geo";
+
+export type { Crop } from "~/lib/fields";
 
 /**
  * Plot search + rental API wrappers. See backend/openapi.yml for the
  * authoritative contract:
  *
- *   GET  /api/plots/nearest   -> NearbyPlot[]   (public, no auth)
- *   POST /api/rentals         -> Rental          (customer only)
+ *   GET  /api/plots/nearest   -> NearbyPlot[]     (public, no auth)
+ *   POST /api/rentals         -> Rental           (customer only)
  *   GET  /api/rentals         -> RentalWithPlot[] (customer only)
  *
  * Unlike fields.ts, these endpoints use camelCase JSON keys (`plotId`,
@@ -27,18 +29,21 @@ export type NearbyPlot = {
   coordinates: PolygonGeometry;
   /** Distance from the search point to the plot's centroid, in meters. */
   distanceMeters: number;
+  /** The crops this plot's field currently offers — the valid choices for `rentPlot`. */
+  crops: Crop[];
 };
 
 export type Rental = {
   id: string;
   plotId: string;
+  cropId: string;
   /** ISO 8601. Parse with `new Date(...)` at render time. */
   startAt: string;
   /** ISO 8601, exclusive. */
   endAt: string;
 };
 
-export type RentalWithPlot = Rental & { plot: Plot };
+export type RentalWithPlot = Rental & { plot: Plot; crop: Crop };
 
 export type NearestPlotsQuery =
   | { lat: number; lon: number; limit?: number }
@@ -69,14 +74,15 @@ export function findNearestPlots(query: NearestPlotsQuery): Promise<NearbyPlot[]
 }
 
 /**
- * Books a plot for the authenticated customer, starting now for a fixed
- * (currently 6-month) period. Throws ApiError(409, "plot is already
+ * Books a plot for the authenticated customer with the given crop, starting
+ * now for that crop's fixed duration. Throws ApiError(409, "plot is already
  * rented") on an overlapping booking — a real race (the backend enforces
- * this with a DB exclusion constraint), not just a theoretical error path;
- * callers must handle it as an expected outcome.
+ * this with a DB exclusion constraint) — or ApiError(409, "crop is not
+ * offered by this plot's field") when the crop isn't one the plot's field
+ * offers. Callers must handle both as expected outcomes, not generic errors.
  */
-export function rentPlot(plotId: string): Promise<Rental> {
-  return apiClient.post<Rental>("/rentals", { plotId });
+export function rentPlot(plotId: string, cropId: string): Promise<Rental> {
+  return apiClient.post<Rental>("/rentals", { plotId, cropId });
 }
 
 /** The authenticated customer's own rentals, newest first, expired included. */

@@ -40,9 +40,16 @@ export const PUBLIC_PATHS = ["/login", "/register", "/search", "/customer"] as c
  * (see field-map.tsx) are the only visual reference a farmer has for where
  * they are on the map — keep their fill/outline readable against varied
  * imagery (the current emerald tones already are).
+ *
+ * `glyphs` points at MapLibre's own public demo glyph server so the plot
+ * number labels (see field-map.tsx's symbol layer) have fonts to render —
+ * this bare raster style otherwise ships no font source at all. Same spirit
+ * as the Esri tiles and Nominatim lookups elsewhere: a free, keyless, public
+ * endpoint the MapLibre project provides for exactly this purpose.
  */
 export const MAP_STYLE_URL: StyleSpecification = {
   version: 8,
+  glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
   sources: {
     "esri-world-imagery": {
       type: "raster",
