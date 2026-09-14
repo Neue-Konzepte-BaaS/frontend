@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { redirect } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
-import { listFields, createPlot, type FieldWithPlots } from "~/lib/fields";
+import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots } from "~/lib/fields";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-map";
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
@@ -21,24 +21,33 @@ export function meta() {
  * picks the one the route asked for. Simpler than adding a backend endpoint
  * for what's still a small per-farmer list. If a farmer's field count ever
  * grows large enough for this to matter, that's the point to add one.
+ *
+ * The crop catalog is loaded alongside it — the field only carries the crops
+ * it *already* offers, but the picker below needs every crop that exists to
+ * offer as a choice.
  */
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   await requireRole("farmer");
-  const fields = await listFields();
+  const [fields, catalog] = await Promise.all([listFields(), listCrops()]);
   const field = fields.find((f) => f.id === params.fieldId);
   if (!field) {
     throw redirect("/farmer/fields");
   }
-  return { field };
+  return { field, catalog };
 }
 
 export default function FieldDetail({ loaderData }: Route.ComponentProps) {
+  const { catalog } = loaderData;
   const [field, setField] = useState<FieldWithPlots>(loaderData.field);
   const [rows, setRows] = useState("");
   const [cols, setCols] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [generating, setGenerating] = useState(false);
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
+  const [selectedPlotIds, setSelectedPlotIds] = useState<Set<string>>(new Set());
+  const [selectedCropIds, setSelectedCropIds] = useState<Set<string>>(new Set());
+  const [savingCrops, setSavingCrops] = useState(false);
+  const [cropsError, setCropsError] = useState<string | null>(null);
   const { t } = useTranslation(["farmer", "common"]);
 
   const hasPlots = field.plots.length > 0;
@@ -69,7 +78,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
       try {
         const plot = await createPlot(field.id, { name: `Plot ${i + 1}`, coordinates: cells[i] });
         created++;
-        setField((prev) => ({ ...prev, plots: [...prev.plots, plot] }));
+        setField((prev) => ({ ...prev, plots: [...prev.plots, { ...plot, crops: [] }] }));
         setProgress({ done: created, total: cells.length });
       } catch (err) {
         const message = err instanceof ApiError ? err.message : t("common:genericError");
@@ -80,10 +89,101 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     setGenerating(false);
   }
 
+  function togglePlotSelection(plotId: string) {
+    setCropsError(null);
+    setSelectedPlotIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(plotId)) {
+        next.delete(plotId);
+      } else {
+        next.add(plotId);
+      }
+      return next;
+    });
+  }
+
+  function toggleCrop(cropId: string) {
+    setSelectedCropIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(cropId)) {
+        next.delete(cropId);
+      } else {
+        next.add(cropId);
+      }
+      return next;
+    });
+  }
+
+  const selectedPlots = field.plots.filter((p) => selectedPlotIds.has(p.id));
+  // Re-key on the sorted id list (not the Set or selectedPlots itself) so this
+  // only re-runs when *which* plots are selected changes — not on every field
+  // update (e.g. right after handleSaveCrops writes the new crops back).
+  const selectedPlotsKey = [...selectedPlotIds].sort().join(",");
+
+  // Prefill the checkboxes with whatever the selected plots already offer in
+  // common, so selecting a single plot shows exactly its current crops, and
+  // selecting several shows only what they already share.
+  useEffect(() => {
+    if (selectedPlots.length === 0) {
+      setSelectedCropIds(new Set());
+      return;
+    }
+    const [first, ...rest] = selectedPlots;
+    const common = first.crops
+      .map((c) => c.id)
+      .filter((id) => rest.every((p) => p.crops.some((c) => c.id === id)));
+    setSelectedCropIds(new Set(common));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on selectedPlotsKey intentionally, see above.
+  }, [selectedPlotsKey]);
+
+  async function handleSaveCrops() {
+    setCropsError(null);
+    setSavingCrops(true);
+
+    const cropIds = [...selectedCropIds];
+    const updatedByPlot = new Map<string, Crop[]>();
+    let failure: string | null = null;
+
+    // Sequential, same reasoning as handleGenerate: no bulk endpoint, and a
+    // failure partway through should still keep the plots before it updated.
+    for (const plot of selectedPlots) {
+      try {
+        updatedByPlot.set(plot.id, await setPlotCrops(plot.id, cropIds));
+      } catch (err) {
+        failure = err instanceof ApiError ? err.message : t("common:genericError");
+        break;
+      }
+    }
+
+    if (updatedByPlot.size > 0) {
+      setField((prev) => ({
+        ...prev,
+        plots: prev.plots.map((p) => (updatedByPlot.has(p.id) ? { ...p, crops: updatedByPlot.get(p.id)! } : p)),
+      }));
+    }
+    if (failure) {
+      setCropsError(failure);
+    } else {
+      setSelectedPlotIds(new Set());
+    }
+    setSavingCrops(false);
+  }
+
   const mapShapes: MapShape[] = [
     { id: field.id, polygon: field.coordinates, variant: "field" as const },
-    ...field.plots.map((p) => ({ id: p.id, polygon: p.coordinates, variant: "plot" as const })),
+    ...field.plots.map((p, i) => ({
+      id: p.id,
+      polygon: p.coordinates,
+      variant: "plot" as const,
+      label: String(i + 1),
+      selected: selectedPlotIds.has(p.id),
+    })),
   ];
+
+  function handleMapShapeClick(id: string) {
+    if (id === field.id) return;
+    togglePlotSelection(id);
+  }
 
   // FieldMap requires an initial `center` before it can fitTo the field's
   // real bounds on the next tick — the bbox midpoint is good enough since
@@ -112,6 +212,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
           center={initialCenter}
           shapes={mapShapes}
           drawMode={null}
+          onShapeClick={handleMapShapeClick}
           fitTo={fitToPolygon(field.coordinates)}
         />
       </div>
@@ -156,11 +257,81 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
       ) : (
         <div className="mt-4">
           <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:plotsLabel")}</p>
-          <ul className="mt-1 space-y-1 text-sm text-gray-600 dark:text-gray-300">
-            {field.plots.map((p) => (
-              <li key={p.id}>{p.name}</li>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t("farmer:selectPlotsInstructions")}</p>
+          <ul className="mt-3 divide-y divide-gray-200 dark:divide-gray-800">
+            {field.plots.map((p, i) => (
+              <li key={p.id}>
+                <label className="flex cursor-pointer items-start gap-3 py-3">
+                  <input
+                    type="checkbox"
+                    checked={selectedPlotIds.has(p.id)}
+                    onChange={() => togglePlotSelection(p.id)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                  />
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    aria-hidden
+                  >
+                    {i + 1}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-medium text-gray-900 dark:text-white">{p.name}</span>
+                    <span className="block text-sm text-gray-500">
+                      {p.crops.length > 0 ? p.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
+                    </span>
+                  </span>
+                </label>
+              </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {hasPlots && (
+        <div className="mt-8 max-w-sm">
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:offeredCropsLabel")}</p>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            {selectedPlots.length > 0
+              ? t("farmer:plotsSelected", { count: selectedPlots.length })
+              : t("farmer:noPlotsSelected")}
+          </p>
+
+          {cropsError && (
+            <div className="mt-3">
+              <FormError message={cropsError} />
+            </div>
+          )}
+
+          {catalog.length === 0 ? (
+            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("farmer:noCropsInCatalog")}</p>
+          ) : (
+            <>
+              <ul className="mt-3 space-y-2">
+                {catalog.map((crop: Crop) => (
+                  <li key={crop.id}>
+                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                      <input
+                        type="checkbox"
+                        checked={selectedCropIds.has(crop.id)}
+                        onChange={() => toggleCrop(crop.id)}
+                        disabled={selectedPlots.length === 0}
+                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                      />
+                      {t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                disabled={savingCrops || selectedPlots.length === 0}
+                onClick={handleSaveCrops}
+                className={`${submitClass} mt-4 w-auto px-4 py-2 text-sm`}
+              >
+                {savingCrops ? t("farmer:savingCrops") : t("farmer:saveCrops")}
+              </button>
+            </>
+          )}
         </div>
       )}
     </main>

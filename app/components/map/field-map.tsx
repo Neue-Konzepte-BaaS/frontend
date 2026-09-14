@@ -34,6 +34,10 @@ export type MapShape = {
   id: string;
   polygon: PolygonGeometry;
   variant: "field" | "plot";
+  /** Text label rendered at the shape's centroid, e.g. a plot's number. */
+  label?: string;
+  /** Rendered with a highlighted outline/fill, e.g. the plot(s) currently picked. */
+  selected?: boolean;
 };
 
 export type FieldMapProps = {
@@ -45,6 +49,8 @@ export type FieldMapProps = {
   drawMode: DrawKind;
   /** Fires once per finished rectangle, already normalized to a true envelope. */
   onRectangleDrawn?: (polygon: PolygonGeometry) => void;
+  /** Fires with a shape's id when a read-only shape is clicked. */
+  onShapeClick?: (id: string) => void;
   /** Bbox to fit the viewport to (e.g. on mount, or when shapes change). */
   fitTo?: Bbox | null;
   className?: string;
@@ -53,6 +59,7 @@ export type FieldMapProps = {
 const SHAPES_SOURCE_ID = "field-map-shapes";
 const FIELD_FILL_COLOR = "#059669"; // emerald-600
 const PLOT_FILL_COLOR = "#6ee7b7"; // emerald-300
+const SELECTED_COLOR = "#f59e0b"; // amber-500
 
 /**
  * Terra Draw only knows the mode names actually registered with it below
@@ -72,7 +79,12 @@ function applyShapesData(map: MapLibreMap, shapes: MapShape[]) {
     type: "FeatureCollection",
     features: shapes.map((shape) => ({
       type: "Feature",
-      properties: { variant: shape.variant },
+      properties: {
+        id: shape.id,
+        variant: shape.variant,
+        label: shape.label ?? "",
+        selected: shape.selected ?? false,
+      },
       geometry: shape.polygon,
     })),
   });
@@ -84,6 +96,7 @@ export function FieldMap({
   shapes,
   drawMode,
   onRectangleDrawn,
+  onShapeClick,
   fitTo,
   className,
 }: FieldMapProps) {
@@ -97,6 +110,9 @@ export function FieldMap({
   const sourceReadyRef = useRef(false);
   const onRectangleDrawnRef = useRef(onRectangleDrawn);
   onRectangleDrawnRef.current = onRectangleDrawn;
+  // Same async-"load"-closure problem as onRectangleDrawnRef above.
+  const onShapeClickRef = useRef(onShapeClick);
+  onShapeClickRef.current = onShapeClick;
   // Latest shapes, readable from the async "load" handler below so the very
   // first paint (once the source exists) reflects whatever shapes were
   // passed in by then, not a stale empty array captured at mount.
@@ -140,11 +156,13 @@ export function FieldMap({
         paint: {
           "fill-color": [
             "case",
+            ["get", "selected"],
+            SELECTED_COLOR,
             ["==", ["get", "variant"], "field"],
             FIELD_FILL_COLOR,
             PLOT_FILL_COLOR,
           ],
-          "fill-opacity": 0.25,
+          "fill-opacity": ["case", ["get", "selected"], 0.45, 0.25],
         },
       });
       map.addLayer({
@@ -154,12 +172,40 @@ export function FieldMap({
         paint: {
           "line-color": [
             "case",
+            ["get", "selected"],
+            SELECTED_COLOR,
             ["==", ["get", "variant"], "field"],
             FIELD_FILL_COLOR,
             PLOT_FILL_COLOR,
           ],
-          "line-width": 2,
+          "line-width": ["case", ["get", "selected"], 3, 2],
         },
+      });
+      map.addLayer({
+        id: `${SHAPES_SOURCE_ID}-label`,
+        type: "symbol",
+        source: SHAPES_SOURCE_ID,
+        layout: {
+          "text-field": ["get", "label"],
+          "text-font": ["Noto Sans Regular"],
+          "text-size": 14,
+        },
+        paint: {
+          "text-color": "#111827",
+          "text-halo-color": "#ffffff",
+          "text-halo-width": 1.5,
+        },
+      });
+
+      map.on("click", `${SHAPES_SOURCE_ID}-fill`, (e) => {
+        const id = e.features?.[0]?.properties?.id;
+        if (typeof id === "string") onShapeClickRef.current?.(id);
+      });
+      map.on("mouseenter", `${SHAPES_SOURCE_ID}-fill`, () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", `${SHAPES_SOURCE_ID}-fill`, () => {
+        map.getCanvas().style.cursor = "";
       });
 
       sourceReadyRef.current = true;

@@ -74,12 +74,17 @@ export default function CustomerPage({ loaderData }: Route.ComponentProps) {
         <PlotSearch
           account={account}
           rentedPlotIds={new Set(rentals.map((r) => r.plotId))}
-          onRented={(plot, rental) =>
+          onRented={(plot, rental, crop) =>
             setRentals((prev) => [
               // NearbyPlot carries every Plot field (id, name, field,
-              // coordinates) plus distanceMeters, so the rented plot can be
-              // folded into a RentalWithPlot without another round trip.
-              { ...rental, plot: { id: plot.id, name: plot.name, field: plot.field, coordinates: plot.coordinates } },
+              // coordinates) plus distanceMeters, and the crop the customer
+              // picked is already in hand, so the rented plot can be folded
+              // into a RentalWithPlot without another round trip.
+              {
+                ...rental,
+                plot: { id: plot.id, name: plot.name, field: plot.field, coordinates: plot.coordinates },
+                crop,
+              },
               ...prev,
             ])
           }
@@ -97,7 +102,7 @@ export default function CustomerPage({ loaderData }: Route.ComponentProps) {
                   <PlotCard
                     key={rental.id}
                     name={rental.plot.name}
-                    meta={formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}
+                    meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                     action={<span className="text-sm text-gray-500">{t("search:booked")}</span>}
                   />
                 ))}

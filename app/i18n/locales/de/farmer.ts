@@ -39,6 +39,17 @@ export const farmer: Shape = {
   creatingPlotProgress: "Parzelle {{done}} von {{total}} wird erstellt…",
   generatePlots: "Parzellen erstellen",
   plotsLabel: "Parzellen",
+  selectPlotsInstructions: "Wähle eine oder mehrere Parzellen auf der Karte oder in dieser Liste aus und lege dann unten fest, was sie anbieten sollen.",
+  noCropsForPlot: "Noch keine Pflanzen angeboten",
+
+  offeredCropsLabel: "Pflanzen für die ausgewählten Parzellen",
+  plotsSelected_one: "{{count}} Parzelle ausgewählt.",
+  plotsSelected_other: "{{count}} Parzellen ausgewählt.",
+  noPlotsSelected: "Wähle oben eine Parzelle aus, um festzulegen, was sie anbietet.",
+  noCropsInCatalog: "Es gibt noch keine Pflanzen im Katalog — bitte einen Admin, welche anzulegen.",
+  cropDuration: "{{name}} ({{months}} Monate Mietdauer)",
+  savingCrops: "Wird gespeichert…",
+  saveCrops: "Speichern",
 
   mapAriaLabel: "Feldkarte",
 };
