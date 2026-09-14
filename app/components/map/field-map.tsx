@@ -1,6 +1,16 @@
 import { useEffect, useRef } from "react";
-import { Map as MapLibreMap, type LngLatLike, type GeoJSONSource } from "maplibre-gl";
+import { Map as MapLibreMap, setWorkerUrl, type LngLatLike, type GeoJSONSource } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+// MapLibre 6 is ESM-only and locates its worker via `import.meta.url`, which
+// Vite rewrites to the hashed chunk URL at build time — that request 404s in
+// the production build (dev serves node_modules directly, so it works there
+// by accident). `?worker&url` routes the worker through Vite's own worker
+// pipeline so it's emitted as a real, self-contained asset in both modes.
+// The failure is silent: MapLibre swallows the failed worker load, so tiles
+// still decode via the raster path, but anything that depends on the worker
+// (Terra Draw's live draw-feedback layers) never paints and logs nothing.
+// See https://maplibre.org/maplibre-gl-js/docs/guides/v5-to-v6-migration-guide/
+import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
 import { TerraDraw, TerraDrawAngledRectangleMode, TerraDrawRenderMode } from "terra-draw";
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
 import { useTranslation } from "react-i18next";
@@ -55,6 +65,8 @@ export type FieldMapProps = {
   fitTo?: Bbox | null;
   className?: string;
 };
+
+setWorkerUrl(workerUrl);
 
 const SHAPES_SOURCE_ID = "field-map-shapes";
 const FIELD_FILL_COLOR = "#059669"; // emerald-600
