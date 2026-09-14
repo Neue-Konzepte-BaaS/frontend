@@ -3,6 +3,7 @@ import { Map as MapLibreMap, type LngLatLike, type GeoJSONSource } from "maplibr
 import "maplibre-gl/dist/maplibre-gl.css";
 import { TerraDraw, TerraDrawAngledRectangleMode, TerraDrawRenderMode } from "terra-draw";
 import { TerraDrawMapLibreGLAdapter } from "terra-draw-maplibre-gl-adapter";
+import { useTranslation } from "react-i18next";
 import { MAP_STYLE_URL } from "~/lib/constants";
 import {
   normalizeRotatedRectangle,
@@ -269,12 +270,14 @@ export function FieldMap({
     }
   }, [fitKey]);
 
+  const { t } = useTranslation("farmer");
+
   return (
     <div
       ref={containerRef}
       className={className ?? "h-[60vh] w-full rounded-lg"}
       role="application"
-      aria-label="Field map"
+      aria-label={t("mapAriaLabel")}
     />
   );
 }

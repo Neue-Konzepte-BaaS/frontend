@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Link, redirect, useNavigate, useSearchParams } from "react-router";
+import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/register";
 import { register, me, dashboardPath, type RegisterableRole } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
 import { safeRedirectTarget } from "~/lib/guards";
 import { Field, FormError, inputClass, submitClass } from "~/components/form";
+import i18n from "~/i18n";
 
 export function meta() {
-  return [{ title: "Create account · BaaS" }];
+  return [{ title: i18n.t("auth:registerMetaTitle") }];
 }
 
 // Signed-in users don't register again — send them to their dashboard, or
@@ -27,6 +29,7 @@ export default function Register() {
   const [role, setRole] = useState<RegisterableRole>("customer");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation(["auth", "common"]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,7 +41,7 @@ export default function Register() {
     const postalCode = Number(postalCodeRaw);
 
     if (!Number.isInteger(postalCode) || postalCode <= 0) {
-      setError("Please enter a valid postal code.");
+      setError(t("auth:invalidPostalCode"));
       setSubmitting(false);
       return;
     }
@@ -57,31 +60,23 @@ export default function Register() {
       const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
       navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
     } catch (err) {
-      setError(
-        err instanceof ApiError
-          ? err.message
-          : "Something went wrong. Please try again.",
-      );
+      setError(err instanceof ApiError ? err.message : t("common:genericError"));
       setSubmitting(false);
     }
   }
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-        Create your account
-      </h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">
-        Choose how you want to use the platform.
-      </p>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("auth:registerTitle")}</h1>
+      <p className="mt-1 text-gray-600 dark:text-gray-300">{t("auth:registerSubtitle")}</p>
 
       {/* Role toggle. Admins are seeded in the database, so they aren't offered. */}
-      <div className="mt-6 grid grid-cols-2 gap-2" role="group" aria-label="Account type">
+      <div className="mt-6 grid grid-cols-2 gap-2" role="group" aria-label={t("auth:accountType")}>
         <RoleTab active={role === "customer"} onClick={() => setRole("customer")}>
-          Customer
+          {t("auth:roleCustomer")}
         </RoleTab>
         <RoleTab active={role === "farmer"} onClick={() => setRole("farmer")}>
-          Farmer
+          {t("auth:roleFarmer")}
         </RoleTab>
       </div>
 
@@ -89,29 +84,29 @@ export default function Register() {
         {error && <FormError message={error} />}
 
         <div className="grid grid-cols-2 gap-4">
-          <Field label="First name" htmlFor="first_name">
+          <Field label={t("auth:firstNameLabel")} htmlFor="first_name">
             <input id="first_name" name="first_name" required autoComplete="given-name" className={inputClass} />
           </Field>
-          <Field label="Last name" htmlFor="last_name">
+          <Field label={t("auth:lastNameLabel")} htmlFor="last_name">
             <input id="last_name" name="last_name" required autoComplete="family-name" className={inputClass} />
           </Field>
         </div>
 
-        <Field label="Email" htmlFor="email">
+        <Field label={t("auth:emailLabel")} htmlFor="email">
           <input id="email" name="email" type="email" required autoComplete="email" className={inputClass} />
         </Field>
 
-        <Field label="Password" htmlFor="password">
+        <Field label={t("auth:passwordLabel")} htmlFor="password">
           <input id="password" name="password" type="password" required autoComplete="new-password" className={inputClass} />
         </Field>
 
         {role === "farmer" && (
-          <Field label="Farm name" htmlFor="farm_name">
+          <Field label={t("auth:farmNameLabel")} htmlFor="farm_name">
             <input id="farm_name" name="farm_name" required className={inputClass} />
           </Field>
         )}
 
-        <Field label="Postal code" htmlFor="postal_code">
+        <Field label={t("auth:postalCodeLabel")} htmlFor="postal_code">
           <input
             id="postal_code"
             name="postal_code"
@@ -123,17 +118,17 @@ export default function Register() {
         </Field>
 
         <button type="submit" disabled={submitting} className={submitClass}>
-          {submitting ? "Creating account…" : "Create account"}
+          {submitting ? t("auth:creatingAccount") : t("common:createAccount")}
         </button>
       </form>
 
       <p className="mt-6 text-sm text-gray-600 dark:text-gray-300">
-        Already have an account?{" "}
+        {t("auth:alreadyHaveAccount")}{" "}
         <Link
           to={{ pathname: "/login", search: searchParams.toString() }}
           className="font-medium text-emerald-700 underline dark:text-emerald-400"
         >
-          Sign in
+          {t("common:signIn")}
         </Link>
       </p>
     </main>

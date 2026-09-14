@@ -1,3 +1,4 @@
+import i18next from "~/i18n";
 import { API_BASE_URL, PUBLIC_PATHS } from "~/lib/constants";
 
 /**
@@ -112,7 +113,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       return request<T>(path, { ...options, _retried: true });
     }
     forceLogout();
-    throw new ApiError(401, "Your session has expired. Please sign in again.");
+    throw new ApiError(401, i18next.t("common:sessionExpired"));
   }
 
   if (res.status === 204) {
@@ -133,7 +134,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (!res.ok) {
     const message =
       (payload as { error?: string } | undefined)?.error ??
-      `Request failed (${res.status}).`;
+      i18next.t("common:requestFailed", { status: res.status });
     throw new ApiError(res.status, message);
   }
 

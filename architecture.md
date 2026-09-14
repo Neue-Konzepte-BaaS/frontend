@@ -242,6 +242,54 @@ in either route.
 > SPA mode: use `clientLoader` for auth/data, never a server `loader`. A
 > `HydrateFallback` is only permitted on the **root** route.
 
+## i18n (English + German)
+
+- **`react-i18next`** + **`i18next-browser-languagedetector`**. No URL locale
+  prefix — routes stay exactly as registered in `app/routes.ts`. The active
+  language lives in `localStorage` (key `baas_language`), with the browser's
+  `navigator` language as the first-visit default and `en` as `fallbackLng`.
+  Switch it with `<LanguageSwitcher />` (`~/components/language-switcher.tsx`),
+  mounted in each route's own header (headers are hand-rolled per route, not a
+  shared component — see plot search section above for why other
+  per-page-header content isn't factored out either).
+- Strings live in `app/i18n/locales/<en|de>/<namespace>.ts`, one TS module per
+  feature area (`common`, `home`, `auth`, `search`, `farmer`, `admin` — mirrors
+  the route groupings above). Each `de/*.ts` file imports its `en/*.ts`
+  counterpart's keys as a type (`{ [K in keyof typeof en]: string }`) so a
+  missing or renamed key fails `npm run typecheck`, not just a runtime lookup.
+  Add a new string to **both** files under the namespace matching where it's
+  used; don't invent a new namespace for a one-off string.
+- In a component, `const { t } = useTranslation(["namespace", "common"])` and
+  call `t("namespace:key")` (or the bare key once namespaced via the hook's
+  default namespace argument). A route's `meta()` runs outside component
+  context, so it imports the `~/i18n` singleton directly and calls
+  `i18n.t(...)` there instead of the hook.
+- Plurals use i18next's native `_one`/`_other` key suffixes and `{{count}}`
+  interpolation (e.g. `farmer:plot`) instead of manual ternaries — don't
+  reintroduce `count === 1 ? "x" : "y"` string branching.
+- Locale-sensitive formatting (rental date ranges in `customer.tsx`, plot
+  distances in `plot-card.tsx`/`plot-search.tsx`) derives its `Intl`/
+  `toLocaleString` locale from `i18n.language` (`"de-DE"` vs `"en-GB"`) rather
+  than hardcoding one — translating the surrounding text without also
+  switching number/date formatting would look inconsistent.
+- **`<html lang>` is set imperatively in a `useEffect` in `root.tsx`'s
+  `Layout`, not directly in JSX.** `ssr: false` still prerenders the root
+  route at build time with no real `navigator`/`localStorage`, so the static
+  shell always bakes in `fallbackLng` ("en"). A returning German-language
+  visitor's hydration would then see server `lang="en"` vs. client `lang="de"`
+  and React logs an unpatched hydration mismatch. Setting it after mount
+  avoids that diff entirely; don't move it back into the `<html>` element.
+- **Known gap, not fixed here:** `ApiError.message` (`~/lib/api-client.ts`) is
+  shown directly in the UI in several places (login/register/plot-search/
+  farmer field flows). Only the two strings actually authored in
+  `api-client.ts` are localized (`common:sessionExpired`,
+  `common:requestFailed`) — the backend's own `{ error }` JSON message passes
+  through untranslated, since the frontend can't localize text it didn't
+  write. Fixing this needs either backend-side i18n (e.g. respecting
+  `Accept-Language`) or the frontend switching from trusting `err.message` to
+  mapping `err.status`/an error code to a local translated string — flagged
+  as a backend/API follow-up, not attempted here.
+
 ## Styling & UX
 
 - Tailwind utility classes; shared design tokens via `@theme` in `app/app.css`.
