@@ -82,21 +82,29 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
     anonymous visitor to `/login`, and a wrong-role visitor to their own
     dashboard.
   - `resolveOptionalRole(role)` — for a page that works for BOTH anonymous
-    visitors and one specific role (currently only `/customer`, the public
-    plot search that's also the customer's dashboard). An anonymous visitor
-    resolves to `null` (not an error, not a redirect) so the page renders its
-    logged-out mode; a wrong-role visitor still redirects, same as
+    visitors and one specific role (currently only `/customer`). An anonymous
+    visitor resolves to `null` (not an error, not a redirect) so the page
+    renders its logged-out mode; a wrong-role visitor still redirects, same as
     `requireRole`.
+  - A fully public page (`/`, `/search`) uses **neither** guard — it calls
+    `me()` directly and renders for whatever comes back, including `null`.
+    `resolveOptionalRole` would be wrong there: it redirects a wrong-role
+    visitor away, and a farmer following the landing page's CTA into
+    `/search` should be able to browse plots without being ejected to
+    `/farmer`.
   - `safeRedirectTarget(raw)` — validates a `?redirect=` query param for
     post-login navigation (only a same-origin relative path is honored, so a
     crafted link can't turn `/login` into an open redirect). `login.tsx` and
     `register.tsx` both use this so a flow like "Log in to rent" on
     `/customer` returns the visitor to where they started.
-- Public routes: `/login`, `/register`, `/customer` (see `PUBLIC_PATHS` in
-  `~/lib/constants.ts` — `/customer` is there too since it must survive a
-  stale/expired cookie by falling back to logged-out mode, not by being
-  bounced to `/login` the way `api-client.ts`'s `forceLogout()` treats every
-  other role-guarded page). Role-guarded: `/admin`, `/farmer/*`.
+- Public routes: `/` (landing), `/login`, `/register`, `/search`, `/customer`
+  (see `PUBLIC_PATHS` in `~/lib/constants.ts` — `/customer` is there too since
+  it must survive a stale/expired cookie by falling back to logged-out mode,
+  not by being bounced to `/login` the way `api-client.ts`'s `forceLogout()`
+  treats every other role-guarded page). `/` is **not** in `PUBLIC_PATHS`:
+  those are matched with `startsWith`, so `"/"` would match every path in the
+  app — `forceLogout()` checks it as an exact match instead. Role-guarded:
+  `/admin`, `/farmer/*`.
 
 > **`app/routes/admin.tsx` is still a TEMPORARY** placeholder dashboard
 > (Issue #8) — deliberately left alone; context.md gives no MVP feature list
@@ -108,8 +116,25 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
 > read the already-resolved account via `useRouteLoaderData("farmer-layout")`
 > instead of calling `requireRole`/`me()` again). `/customer`
 > (`app/routes/customer.tsx`) is a flat route — one screen, not a
-> multi-page section, so no layout route — doubling as public plot search
-> (anyone) and the customer's own rentals dashboard (logged in).
+> multi-page section, so no layout route — showing the plot search plus the
+> customer's own rentals.
+
+### Plot search lives in one component, mounted twice
+
+`app/components/plot-search.tsx` (`<PlotSearch />`) owns the whole search:
+the postal-code/city box over `GET /api/plots/nearest` (via
+`findNearestPlots` in `~/lib/rentals.ts`), the results map, and the rent
+flow with its 404/409 error handling. It is mounted by both:
+
+- `/search` (`app/routes/search.tsx`) — the public page, for anyone.
+- `/customer` (`app/routes/customer.tsx`) — same search, plus "My rentals".
+
+The component holds its own search state. Callers pass only `account` (a
+customer gets Rent buttons; `null` gets a "Log in to rent" link),
+`loginRedirectTo` (the `?redirect=` target, validated on arrival by
+`safeRedirectTarget`), and optionally `rentedPlotIds`/`onRented` so a page
+holding a rentals list can mark and update it. Add search features here, not
+in either route.
 
 ## Maps (fields & plots)
 
@@ -124,6 +149,14 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
   active `drawMode` ("field" | "plot" | null) — callers decide what a
   rectangle means. `"plot"` mode exists for the type/handler shape but is
   currently unused: plots are no longer hand-drawn (see below).
+- `FieldMap`'s `fitTo` effect keys on the bbox's four *numbers*, not the
+  object, because callers build it inline (`unionBbox(...)`) and a fresh
+  object every render would re-fire `fitBounds` constantly. It also gates on
+  the component's own `sourceReadyRef`, **not** `map.loaded()`:
+  `map.loaded()` also returns false while tiles stream in after a viewport
+  move, so gating on it silently dropped every fit after the first (the
+  deferred `map.once("load")` path waits on an event that already fired).
+  Both were real bugs — the search map stopped recentring between searches.
 - **Only the field boundary is hand-drawn. Plots are computed, not drawn.**
   A farmer draws and names a field (`app/routes/farmer/new-field.tsx`), which
   navigates to that field's own detail/"digital twin" page

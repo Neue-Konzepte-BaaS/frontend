@@ -235,12 +235,39 @@ export function FieldMap({
     applyShapesData(map, shapes);
   }, [shapes]);
 
-  // Fit the viewport to a given bbox on demand (e.g. after the field is drawn).
+  // Fit the viewport to a given bbox on demand (e.g. after the field is drawn,
+  // or when a new search returns a different set of plots).
+  //
+  // Depends on the bbox's *values*, not the object's identity: callers
+  // routinely build this inline (`unionBbox(results.map(toBbox))`), which
+  // returns a fresh object on every render. Keying the effect on the object
+  // would re-fire fitBounds on every unrelated re-render — measured at 12
+  // redundant calls for a single search — and keying it on a memo the caller
+  // has to remember to write would be a trap. Serializing the four numbers
+  // keeps it correct regardless of how the caller produces the bbox.
+  const fitKey = fitTo
+    ? `${fitTo.minLon},${fitTo.minLat},${fitTo.maxLon},${fitTo.maxLat}`
+    : null;
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !fitTo) return;
-    map.fitBounds(bboxToLngLatBounds(fitTo), { padding: 32, duration: 0 });
-  }, [fitTo]);
+    if (!map || !fitKey) return;
+
+    const [minLon, minLat, maxLon, maxLat] = fitKey.split(",").map(Number);
+    const bounds = bboxToLngLatBounds({ minLon, minLat, maxLon, maxLat });
+
+    // Readiness is tracked via sourceReadyRef (set in the "load" handler), NOT
+    // map.loaded(): that also reports false whenever tiles are still streaming
+    // in, which is the common case right after a search moves the viewport. A
+    // `map.loaded()` check here silently dropped every fit after the first —
+    // it took the "defer until load" path for an event that had already fired
+    // and would never fire again, leaving the camera stuck on the first
+    // search's bounds while the results list updated underneath it.
+    if (sourceReadyRef.current) {
+      map.fitBounds(bounds, { padding: 48, duration: 0 });
+    } else {
+      map.once("load", () => map.fitBounds(bounds, { padding: 48, duration: 0 }));
+    }
+  }, [fitKey]);
 
   return (
     <div
