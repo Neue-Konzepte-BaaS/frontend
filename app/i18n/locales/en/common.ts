@@ -1,0 +1,17 @@
+export const common = {
+  brand: "Bauer as a Service",
+  signIn: "Sign in",
+  createAccount: "Create account",
+  goToDashboard: "Go to dashboard",
+  logOut: "Log out",
+  genericError: "Something went wrong. Please try again.",
+  sessionExpired: "Your session has expired. Please sign in again.",
+  requestFailed: "Request failed ({{status}}).",
+  language: "Language",
+  errorOops: "Oops!",
+  errorUnexpected: "An unexpected error occurred.",
+  errorNotFoundTitle: "404",
+  errorTitle: "Error",
+  errorNotFoundBody: "The requested page could not be found.",
+  backToHome: "Back to home",
+} as const;

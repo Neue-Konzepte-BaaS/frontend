@@ -1,0 +1,26 @@
+export const search = {
+  searchMetaTitle: "Find a plot near you · BaaS",
+  searchTitle: "Find a plot near you",
+  searchSubtitle: "Search a German postal code or city to see available self-harvest plots nearby.",
+
+  customerMetaTitle: "My plots · BaaS",
+  customerTitle: "Find fields near you",
+  myRentals: "My rentals",
+  noRentalsYet: "You haven't rented a plot yet — search above to find one.",
+  booked: "Booked",
+
+  postalCodeOrCity: "Postal code or city",
+  postalCodeOrCityPlaceholder: "e.g. 76133 or Karlsruhe",
+  searching: "Searching…",
+  searchButton: "Search",
+  enterPostalCodeOrCity: "Enter a postal code or a city.",
+  postalCodeOrCityNotFound: "We couldn't find that postal code or city — try another.",
+  searchAboveHint: "Search above to see plots available near you.",
+  noPlotsFoundNearby: "No available plots found near there right now.",
+  distanceAway: "{{distance}} away",
+  rented: "Rented ✓",
+  renting: "Renting…",
+  rentButton: "Rent",
+  rentConflict: "Someone just rented this plot — try another.",
+  loginToRent: "Log in to rent",
+} as const;

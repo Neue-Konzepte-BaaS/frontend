@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import { findNearestPlots, rentPlot, type NearbyPlot, type Rental } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
 import type { Account } from "~/lib/auth";
@@ -45,6 +46,8 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<NearbyPlot[]>([]);
   const [rentState, setRentState] = useState<RentState | null>(null);
+  const { t, i18n } = useTranslation(["search", "common"]);
+  const numberLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
   const rented = rentedPlotIds ?? new Set<string>();
 
@@ -54,7 +57,7 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
 
     const trimmed = query.trim();
     if (!trimmed) {
-      setSearchError("Enter a postal code or a city.");
+      setSearchError(t("search:enterPostalCodeOrCity"));
       return;
     }
 
@@ -69,9 +72,9 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
       setHasSearched(true);
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
-        setSearchError("We couldn't find that postal code or city — try another.");
+        setSearchError(t("search:postalCodeOrCityNotFound"));
       } else {
-        setSearchError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+        setSearchError(err instanceof ApiError ? err.message : t("common:genericError"));
       }
     } finally {
       setSearching(false);
@@ -89,10 +92,10 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
       // non-overlapping rentals with a DB exclusion constraint.
       const message =
         err instanceof ApiError && err.status === 409
-          ? "Someone just rented this plot — try another."
+          ? t("search:rentConflict")
           : err instanceof ApiError
             ? err.message
-            : "Something went wrong. Please try again.";
+            : t("common:genericError");
       setRentState({ plotId: plot.id, status: "error", message });
     }
   }
@@ -109,19 +112,19 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
     <>
       <form onSubmit={handleSearch} className="mt-4 flex max-w-md gap-3" noValidate>
         <div className="flex-1">
-          <FormField label="Postal code or city" htmlFor="search">
+          <FormField label={t("search:postalCodeOrCity")} htmlFor="search">
             <input
               id="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="e.g. 76133 or Karlsruhe"
+              placeholder={t("search:postalCodeOrCityPlaceholder")}
               className={inputClass}
             />
           </FormField>
         </div>
         <div className="flex items-end">
           <button type="submit" disabled={searching} className={`${submitClass} w-auto px-6`}>
-            {searching ? "Searching…" : "Search"}
+            {searching ? t("search:searching") : t("search:searchButton")}
           </button>
         </div>
       </form>
@@ -133,13 +136,9 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
       )}
 
       {!hasSearched ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">
-          Search above to see plots available near you.
-        </p>
+        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("search:searchAboveHint")}</p>
       ) : results.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">
-          No available plots found near there right now.
-        </p>
+        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("search:noPlotsFoundNearby")}</p>
       ) : (
         <>
           <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
@@ -162,7 +161,7 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                   name={plot.name}
                   meta={
                     <>
-                      {formatDistance(plot.distanceMeters)} away
+                      {t("search:distanceAway", { distance: formatDistance(plot.distanceMeters, numberLocale) })}
                       {state?.status === "error" && (
                         <span className="mt-1 block text-red-700 dark:text-red-400">{state.message}</span>
                       )}
@@ -170,7 +169,9 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                   }
                   action={
                     alreadyRented ? (
-                      <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Rented ✓</span>
+                      <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                        {t("search:rented")}
+                      </span>
                     ) : account ? (
                       <button
                         type="button"
@@ -178,14 +179,14 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                         onClick={() => handleRent(plot)}
                         className={`${submitClass} w-auto px-4 py-2 text-sm`}
                       >
-                        {state?.status === "renting" ? "Renting…" : "Rent"}
+                        {state?.status === "renting" ? t("search:renting") : t("search:rentButton")}
                       </button>
                     ) : (
                       <Link
                         to={`/login?redirect=${encodeURIComponent(loginRedirectTo)}`}
                         className={`${secondaryButtonClass} inline-block w-auto px-4 py-2 text-sm`}
                       >
-                        Log in to rent
+                        {t("search:loginToRent")}
                       </Link>
                     )
                   }

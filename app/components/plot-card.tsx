@@ -27,9 +27,9 @@ export function PlotCard({
 }
 
 /** Formats a distance in meters the way a farmer's-market visitor would read it. */
-export function formatDistance(meters: number): string {
+export function formatDistance(meters: number, locale: string = "en-GB"): string {
   if (meters < 1000) {
     return `${Math.round(meters)} m`;
   }
-  return `${(meters / 1000).toFixed(1)} km`;
+  return `${(meters / 1000).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km`;
 }
