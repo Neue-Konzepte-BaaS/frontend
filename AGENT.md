@@ -5,7 +5,9 @@ Guidance for AI agents (and humans) working in this repository.
 ## Project
 
 React frontend for **Bauer as a Service (BaaS)** — a B2B SaaS for managing
-self-harvest farm plots. The app is in **English**.
+self-harvest farm plots. The app supports **English and German** via
+`react-i18next` — see `architecture.md`'s "i18n" section for the conventions
+before adding or changing any user-facing string.
 
 - Repo: <https://github.com/Neue-Konzepte-BaaS/frontend>
 - Backend: <https://github.com/Neue-Konzepte-BaaS/backend> (Go + PostgreSQL, separate repo)

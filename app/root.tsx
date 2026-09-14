@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   isRouteErrorResponse,
   Link,
@@ -7,9 +8,11 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useTranslation } from "react-i18next";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import "~/i18n";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -25,6 +28,19 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const { i18n } = useTranslation();
+
+  // `ssr: false` still prerenders this route at build time (see field-map.tsx's
+  // SSR note) with no real navigator/localStorage available, so the static
+  // shell always bakes in the `fallbackLng` ("en"). Setting `lang` directly in
+  // JSX would then mismatch a returning German-language visitor's hydration
+  // (server "en" vs. client "de") — React logs this as an unpatched hydration
+  // error. Set it imperatively after mount instead, which only touches the
+  // DOM post-hydration and never becomes part of the SSR/CSR diff.
+  useEffect(() => {
+    document.documentElement.lang = i18n.language.startsWith("de") ? "de" : "en";
+  }, [i18n.language]);
+
   return (
     <html lang="en">
       <head>
@@ -58,15 +74,16 @@ export function HydrateFallback() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
+  const { t } = useTranslation();
+  let message = t("common:errorOops");
+  let details = t("common:errorUnexpected");
   let stack: string | undefined;
 
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
+    message = error.status === 404 ? t("common:errorNotFoundTitle") : t("common:errorTitle");
     details =
       error.status === 404
-        ? "The requested page could not be found."
+        ? t("common:errorNotFoundBody")
         : error.statusText || details;
   } else if (import.meta.env.DEV && error && error instanceof Error) {
     details = error.message;
@@ -81,7 +98,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
         to="/"
         className="mt-6 font-medium text-emerald-700 underline dark:text-emerald-400"
       >
-        Back to home
+        {t("common:backToHome")}
       </Link>
       {stack && (
         <pre className="mt-6 w-full overflow-x-auto rounded-lg border border-gray-200 p-4 text-left text-xs dark:border-gray-800">

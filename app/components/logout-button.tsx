@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import { logout } from "~/lib/auth";
 
 /**
@@ -7,6 +8,7 @@ import { logout } from "~/lib/auth";
  */
 export function LogoutButton() {
   const navigate = useNavigate();
+  const { t } = useTranslation("common");
 
   return (
     <button
@@ -17,7 +19,7 @@ export function LogoutButton() {
       }}
       className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
     >
-      Log out
+      {t("logOut")}
     </button>
   );
 }

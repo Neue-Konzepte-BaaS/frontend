@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/fields";
 import { requireRole } from "~/lib/guards";
 import { listFields } from "~/lib/fields";
@@ -6,9 +7,10 @@ import { geocodePostalCode } from "~/lib/geocode";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
 import { submitClass } from "~/components/form";
+import i18n from "~/i18n";
 
 export function meta() {
-  return [{ title: "Your fields · BaaS" }];
+  return [{ title: i18n.t("farmer:fieldsListMetaTitle") }];
 }
 
 export async function clientLoader() {
@@ -22,6 +24,7 @@ export async function clientLoader() {
 
 export default function FieldsList({ loaderData }: Route.ComponentProps) {
   const { fields, center } = loaderData;
+  const { t } = useTranslation("farmer");
 
   const shapes: MapShape[] = fields.flatMap((field) => [
     { id: field.id, polygon: field.coordinates, variant: "field" as const },
@@ -33,16 +36,14 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-5xl p-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Your fields</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("yourFieldsTitle")}</h1>
         <Link to="/farmer/fields/new" className={`${submitClass} inline-block w-auto px-4 py-2 text-sm`}>
-          Add a field
+          {t("addField")}
         </Link>
       </div>
 
       {fields.length === 0 ? (
-        <p className="mt-6 text-gray-600 dark:text-gray-300">
-          No fields yet — draw your first one.
-        </p>
+        <p className="mt-6 text-gray-600 dark:text-gray-300">{t("noFieldsYet")}</p>
       ) : (
         <>
           <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
@@ -58,7 +59,7 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
                 >
                   <p className="font-semibold text-gray-900 dark:text-white">{field.name}</p>
                   <p className="text-sm text-gray-500">
-                    {field.plots.length} {field.plots.length === 1 ? "plot" : "plots"}
+                    {t("plot", { count: field.plots.length })}
                     {field.plots.length > 0 && ": " + field.plots.map((p) => p.name).join(", ")}
                   </p>
                 </Link>
