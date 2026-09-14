@@ -6,6 +6,7 @@ import { requireRole } from "~/lib/guards";
 import {
   getStatistics,
   createCrop,
+  deleteCrop,
   broadcastNotification,
   listCrops,
   type Statistics,
@@ -30,7 +31,6 @@ export async function clientLoader() {
 export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
   const { account } = loaderData;
   const [stats] = useState<Statistics>(loaderData.stats);
-  const [crops, setCrops] = useState<Crop[]>(loaderData.crops);
   const { t, i18n: i18nInstance } = useTranslation("admin");
 
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
@@ -101,7 +101,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
         <BroadcastSection />
 
         {/* Crop catalog */}
-        <CropSection crops={crops} onCropAdded={(c) => setCrops((prev) => [...prev, c])} />
+        <CropSection initialCrops={loaderData.crops} />
       </main>
     </div>
   );
@@ -195,13 +195,15 @@ function BroadcastSection() {
   );
 }
 
-function CropSection({ crops, onCropAdded }: { crops: Crop[]; onCropAdded: (c: Crop) => void }) {
+function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   const { t } = useTranslation("admin");
   const [name, setName] = useState("");
   const [months, setMonths] = useState("");
   const [adding, setAdding] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [cropList, setCropList] = useState<Crop[]>(initialCrops);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -217,7 +219,7 @@ function CropSection({ crops, onCropAdded }: { crops: Crop[]; onCropAdded: (c: C
     setAdding(true);
     try {
       const crop = await createCrop(name.trim(), m);
-      onCropAdded(crop);
+      setCropList((prev) => [...prev, crop]);
       setSuccess(t("cropAddedSuccess", { name: crop.name }));
       setName("");
       setMonths("");
@@ -228,16 +230,45 @@ function CropSection({ crops, onCropAdded }: { crops: Crop[]; onCropAdded: (c: C
     }
   }
 
+  async function handleDelete(crop: Crop) {
+    setError(null);
+    setSuccess(null);
+    setDeletingId(crop.id);
+    try {
+      await deleteCrop(crop.id);
+      setCropList((prev) => prev.filter((c) => c.id !== crop.id));
+      setSuccess(t("cropDeletedSuccess", { name: crop.name }));
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setError(t("cropDeleteConflict", { name: crop.name }));
+      } else {
+        setError(err instanceof ApiError ? err.message : String(err));
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <section>
       <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("cropsTitle")}</h2>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("cropsBody")}</p>
 
-      {crops.length > 0 && (
+      {cropList.length > 0 && (
         <ul className="mt-4 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-          {crops.map((crop) => (
-            <li key={crop.id} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-200">
-              {t("cropDuration", { name: crop.name, months: crop.durationMonths })}
+          {cropList.map((crop) => (
+            <li key={crop.id} className="flex items-center justify-between px-4 py-3">
+              <span className="text-sm text-gray-700 dark:text-gray-200">
+                {t("cropDuration", { name: crop.name, months: crop.durationMonths })}
+              </span>
+              <button
+                type="button"
+                disabled={deletingId === crop.id}
+                onClick={() => handleDelete(crop)}
+                className="ml-4 shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950"
+              >
+                {deletingId === crop.id ? t("cropDeleting") : t("cropDelete")}
+              </button>
             </li>
           ))}
         </ul>

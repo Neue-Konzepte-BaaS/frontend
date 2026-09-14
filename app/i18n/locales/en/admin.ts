@@ -41,4 +41,8 @@ export const admin = {
   cropAdd: "Add crop",
   cropAddedSuccess: "\"{{name}}\" added to the catalog.",
   cropDuration: "{{name}} · {{months}} months",
+  cropDelete: "Delete",
+  cropDeleting: "Deleting…",
+  cropDeletedSuccess: "\"{{name}}\" removed from the catalog.",
+  cropDeleteConflict: "\"{{name}}\" cannot be deleted because it is still used by a rental.",
 } as const;

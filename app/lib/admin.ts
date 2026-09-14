@@ -63,3 +63,7 @@ export function broadcastNotification(subject: string, body: string): Promise<Br
 export function createCrop(name: string, durationMonths: number): Promise<Crop> {
   return apiClient.post<Crop>("/crops", { name, durationMonths });
 }
+
+export function deleteCrop(id: string): Promise<void> {
+  return apiClient.delete(`/crops/${id}`);
+}

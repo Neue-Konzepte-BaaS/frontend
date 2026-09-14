@@ -45,4 +45,8 @@ export const admin: Shape = {
   cropAdd: "Pflanze hinzufügen",
   cropAddedSuccess: "\"{{name}}\" zum Katalog hinzugefügt.",
   cropDuration: "{{name}} · {{months}} Monate",
+  cropDelete: "Löschen",
+  cropDeleting: "Wird gelöscht…",
+  cropDeletedSuccess: "\"{{name}}\" aus dem Katalog entfernt.",
+  cropDeleteConflict: "\"{{name}}\" kann nicht gelöscht werden, da es noch von einem Mietvertrag verwendet wird.",
 };
