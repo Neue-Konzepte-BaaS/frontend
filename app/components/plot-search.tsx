@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { findNearestPlots, rentPlot, type NearbyPlot, type Rental } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
-import type { Account } from "~/lib/auth";
+import { roleLabel, type Account } from "~/lib/auth";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
 import { PlotCard, formatDistance } from "~/components/plot-card";
@@ -18,13 +18,17 @@ import { Field as FormField, FormError, inputClass, submitClass, secondaryButton
  * The component owns all search state (query, results, in-flight, errors) and
  * the rent flow. Callers only supply who is looking and what to do afterwards:
  * an anonymous viewer gets a "Log in to rent" link, a customer gets a real
- * Rent button. That split is the only behavioural difference between the two
- * pages — everything else here is identical for both.
+ * Rent button, and a signed-in non-customer (e.g. a farmer browsing /search)
+ * gets a plain explanation instead of either — they're not logged out, so
+ * "Log in to rent" would be misleading, but they still can't rent. That
+ * split is the only behavioural difference between the two pages —
+ * everything else here is identical for both.
  */
 
 type PlotSearchProps = {
-  /** The viewer. A customer gets Rent buttons; `null` (anonymous, or any
-   *  other role browsing public search) gets "Log in to rent" links. */
+  /** Whoever is viewing, any role — not pre-filtered by the caller. A
+   *  customer gets Rent buttons; `null` (anonymous) gets "Log in to rent";
+   *  any other signed-in role gets a "you can't rent as a farmer" notice. */
   account: Account | null;
   /** Plots the viewer already rents — rendered as "Rented ✓" instead of an action. */
   rentedPlotIds?: Set<string>;
@@ -46,10 +50,11 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<NearbyPlot[]>([]);
   const [rentState, setRentState] = useState<RentState | null>(null);
-  const { t, i18n } = useTranslation(["search", "common"]);
+  const { t, i18n } = useTranslation(["search", "common", "auth"]);
   const numberLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
   const rented = rentedPlotIds ?? new Set<string>();
+  const isCustomer = account?.role === "customer";
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -172,7 +177,7 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                       <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
                         {t("search:rented")}
                       </span>
-                    ) : account ? (
+                    ) : isCustomer ? (
                       <button
                         type="button"
                         disabled={state?.status === "renting"}
@@ -181,9 +186,15 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                       >
                         {state?.status === "renting" ? t("search:renting") : t("search:rentButton")}
                       </button>
+                    ) : account ? (
+                      // Signed in, but as a role that can't rent — "Log in to
+                      // rent" would be misleading (they're not logged out).
+                      <span className="text-sm text-gray-500">
+                        {t("search:cannotRentWrongRole", { role: roleLabel(t, account.role) })}
+                      </span>
                     ) : (
                       <Link
-                        to={`/login?redirect=${encodeURIComponent(loginRedirectTo)}`}
+                        to={`/login?redirect=${encodeURIComponent(loginRedirectTo)}&intent=rent`}
                         className={`${secondaryButtonClass} inline-block w-auto px-4 py-2 text-sm`}
                       >
                         {t("search:loginToRent")}

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/admin";
 import { requireRole } from "~/lib/guards";
 import { TemporaryBanner } from "~/components/temporary-banner";
+import { AccountTypeNotice } from "~/components/account-type-notice";
 import { LogoutButton } from "~/components/logout-button";
 
 export async function clientLoader() {
@@ -18,6 +19,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-3xl p-8">
       <TemporaryBanner />
+      <AccountTypeNotice />
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
         {t("dashboardTitle")}
       </h1>

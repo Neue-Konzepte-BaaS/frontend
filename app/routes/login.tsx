@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Link, redirect, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/login";
-import { login, me, dashboardPath } from "~/lib/auth";
+import { login, me } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
-import { safeRedirectTarget } from "~/lib/guards";
+import { postAuthDestination, safeRedirectTarget } from "~/lib/guards";
 import { Field, FormError, inputClass, submitClass } from "~/components/form";
 import i18n from "~/i18n";
 
@@ -13,13 +13,17 @@ export function meta() {
 }
 
 // If already signed in, skip the form. Honor ?redirect= (e.g. the "Log in to
-// rent" link from /customer) so a logged-in visitor bounces back to where
-// they came from, same as a fresh login below.
+// rent" link on /search or /customer) so a logged-in visitor bounces back to
+// where they came from — unless that target or the link's declared ?intent=
+// requires a different role than this account has, in which case
+// postAuthDestination sends them to their own dashboard instead. Same as a
+// fresh login below.
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const account = await me();
   if (account) {
-    const redirectTo = safeRedirectTarget(new URL(request.url).searchParams.get("redirect"));
-    throw redirect(redirectTo ?? dashboardPath(account.role));
+    const params = new URL(request.url).searchParams;
+    const redirectTo = safeRedirectTarget(params.get("redirect"));
+    throw redirect(postAuthDestination(account, redirectTo, params.get("intent")));
   }
   return null;
 }
@@ -43,7 +47,7 @@ export default function Login() {
     try {
       const account = await login(email, password);
       const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
-      navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
+      navigate(postAuthDestination(account, redirectTo, searchParams.get("intent")), { replace: true });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("common:genericError"));
       setSubmitting(false);

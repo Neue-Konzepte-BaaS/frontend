@@ -30,9 +30,6 @@ export async function clientLoader() {
 
 export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const { account } = loaderData;
-  // Only a customer can actually rent; anyone else browsing gets the
-  // logged-out affordance ("Log in to rent") on each result.
-  const customer = account?.role === "customer" ? account : null;
   const { t } = useTranslation(["search", "common"]);
 
   return (
@@ -74,7 +71,7 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:searchTitle")}</h1>
         <p className="mt-1 text-gray-600 dark:text-gray-300">{t("search:searchSubtitle")}</p>
 
-        <PlotSearch account={customer} loginRedirectTo="/search" />
+        <PlotSearch account={account} loginRedirectTo="/search" />
       </main>
     </div>
   );
