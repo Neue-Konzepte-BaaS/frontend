@@ -1,9 +1,48 @@
 export const admin = {
   dashboardTitle: "Admin dashboard",
   signedInAs: "Signed in as {{id}} (admin).",
-  statisticsTitle: "Statistics",
-  statisticsBody: "Platform statistics will appear here.",
-  temporaryScreenLead: "Temporary screen.",
-  temporaryScreenBody:
-    "This dashboard is a placeholder to verify registration, login and role-based routing (Issue #8). Replace it with the real dashboard.",
+
+  // Statistics
+  statisticsTitle: "Platform statistics",
+  generatedAt: "Generated at {{time}}",
+  statFields: "Fields",
+  statPlots: "Plots",
+  statRentals: "Rentals",
+  statAccounts: "Accounts",
+  statTotal: "Total",
+  statRented: "Rented",
+  statAvailable: "Available",
+  statOccupancy: "Occupancy",
+  statActive: "Active",
+  statLast30Days: "Last 30 days",
+  statArea: "Area (m²)",
+  statFarmers: "Farmers",
+  statCustomers: "Customers",
+  statRegisteredLast30: "Registered (last 30 d)",
+
+  // Notification broadcast
+  notificationsTitle: "Broadcast notification",
+  notificationsBody: "Send an email to every farmer and customer on the platform.",
+  notifSubjectLabel: "Subject",
+  notifBodyLabel: "Message",
+  notifSubjectPlaceholder: "Scheduled maintenance on Sunday",
+  notifBodyPlaceholder: "On Sunday from 8 to 12 the platform will be unavailable.",
+  notifSending: "Sending…",
+  notifSend: "Send to all users",
+  notifSuccess: "Queued for {{recipients}} recipient(s).",
+
+  // Crop catalog management
+  cropsTitle: "Crop catalog",
+  cropsBody: "These crops are available for farmers to assign to their plots.",
+  cropNameLabel: "Crop name",
+  cropDurationLabel: "Rental duration (months)",
+  cropNamePlaceholder: "Tomatoes",
+  cropAdding: "Adding…",
+  cropAdd: "Add crop",
+  cropAddedSuccess: "\"{{name}}\" added to the catalog.",
+  cropDuration: "{{name}} · {{months}} months",
+  cropDelete: "Delete",
+  cropDeleting: "Deleting…",
+  cropDeletedSuccess: "\"{{name}}\" removed from the catalog.",
+  cropDeleteConflict: "\"{{name}}\" cannot be deleted because it is still used by a rental.",
 } as const;
