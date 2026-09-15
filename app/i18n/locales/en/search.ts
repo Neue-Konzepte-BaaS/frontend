@@ -23,4 +23,5 @@ export const search = {
   rentButton: "Rent",
   rentConflict: "Someone just rented this plot — try another.",
   loginToRent: "Log in to rent",
+  cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
 } as const;

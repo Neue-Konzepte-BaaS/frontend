@@ -27,4 +27,5 @@ export const search: Shape = {
   rentButton: "Mieten",
   rentConflict: "Diese Parzelle wurde gerade vermietet — versuche eine andere.",
   loginToRent: "Zum Mieten anmelden",
+  cannotRentWrongRole: "Du bist als {{role}} angemeldet — nur Kunden-Konten können mieten.",
 };

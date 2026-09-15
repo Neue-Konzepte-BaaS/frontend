@@ -6,6 +6,7 @@ import { resolveOptionalRole } from "~/lib/guards";
 import { listMyRentals, type RentalWithPlot } from "~/lib/rentals";
 import { PlotSearch } from "~/components/plot-search";
 import { PlotCard } from "~/components/plot-card";
+import { AccountTypeNotice } from "~/components/account-type-notice";
 import { submitClass } from "~/components/form";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
@@ -68,6 +69,7 @@ export default function CustomerPage({ loaderData }: Route.ComponentProps) {
       </header>
 
       <main className="mx-auto max-w-5xl p-4">
+        <AccountTypeNotice />
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:customerTitle")}</h1>
         <p className="mt-1 text-gray-600 dark:text-gray-300">{t("search:searchSubtitle")}</p>
 
