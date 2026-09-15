@@ -30,6 +30,8 @@ export type Plot = {
   /** Id of the parent field. */
   field: string;
   coordinates: PolygonGeometry;
+  /** The plot's area in square meters, computed geodesically from its boundary. */
+  areaSquareMeters: number;
 };
 
 /**

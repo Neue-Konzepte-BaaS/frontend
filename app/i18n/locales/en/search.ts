@@ -17,7 +17,7 @@ export const search = {
   postalCodeOrCityNotFound: "We couldn't find that postal code or city — try another.",
   searchAboveHint: "Search above to see plots available near you.",
   noPlotsFoundNearby: "No available plots found near there right now.",
-  distanceAway: "{{distance}} away",
+  distanceAndArea: "{{distance}} away · {{area}}",
   browseHint: "Click a number on the map or a result below to see what it offers.",
   availableCrops: "What you can grow here",
   cropWithDuration: "{{name}} ({{months}}-month rental)",
