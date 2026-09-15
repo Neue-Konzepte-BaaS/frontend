@@ -27,6 +27,8 @@ export type NearbyPlot = {
   /** Id of the field this plot belongs to. */
   field: string;
   coordinates: PolygonGeometry;
+  /** The plot's area in square meters, computed geodesically from its boundary. */
+  areaSquareMeters: number;
   /** Distance from the search point to the plot's centroid, in meters. */
   distanceMeters: number;
   /** The crops this plot's field currently offers — the valid choices for `rentPlot`. */
