@@ -3,7 +3,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { findNearestPlots, rentPlot, type Crop, type NearbyPlot, type Rental } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
-import type { Account } from "~/lib/auth";
+import { roleLabel, type Account } from "~/lib/auth";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
 import { formatDistance } from "~/components/plot-card";
@@ -25,13 +25,17 @@ import { Field as FormField, FormError, inputClass, submitClass, secondaryButton
  * The component owns all search state (query, results, in-flight, errors) and
  * the rent flow. Callers only supply who is looking and what to do afterwards:
  * an anonymous viewer gets a "Log in to rent" link, a customer gets a real
- * Rent button. That split is the only behavioural difference between the two
- * pages — everything else here is identical for both.
+ * Rent button, and a signed-in non-customer (e.g. a farmer browsing /search)
+ * gets a plain explanation instead of either — they're not logged out, so
+ * "Log in to rent" would be misleading, but they still can't rent. That
+ * split is the only behavioural difference between the two pages —
+ * everything else here is identical for both.
  */
 
 type PlotSearchProps = {
-  /** The viewer. A customer gets Rent buttons; `null` (anonymous, or any
-   *  other role browsing public search) gets "Log in to rent" links. */
+  /** Whoever is viewing, any role — not pre-filtered by the caller. A
+   *  customer gets Rent buttons; `null` (anonymous) gets "Log in to rent";
+   *  any other signed-in role gets a "you can't rent as a farmer" notice. */
   account: Account | null;
   /** Plots the viewer already rents — rendered as "Rented ✓" instead of an action. */
   rentedPlotIds?: Set<string>;
@@ -58,10 +62,11 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
   // Which crop is picked in each plot's dropdown, keyed by plot id.
   const [selectedCropByPlot, setSelectedCropByPlot] = useState<Record<string, string>>({});
-  const { t, i18n } = useTranslation(["search", "common"]);
+  const { t, i18n } = useTranslation(["search", "common", "auth"]);
   const numberLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
   const rented = rentedPlotIds ?? new Set<string>();
+  const isCustomer = account?.role === "customer";
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
@@ -239,7 +244,7 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                       )}
 
                       {plot.crops.length > 0 &&
-                        (account ? (
+                        (isCustomer ? (
                           <div className="mt-3 flex items-center gap-2">
                             <select
                               aria-label={t("search:chooseCrop")}
@@ -269,9 +274,15 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                               {state?.status === "renting" ? t("search:renting") : t("search:rentButton")}
                             </button>
                           </div>
+                        ) : account ? (
+                          // Signed in, but as a role that can't rent — "Log in to
+                          // rent" would be misleading (they're not logged out).
+                          <p className="mt-3 text-sm text-gray-500">
+                            {t("search:cannotRentWrongRole", { role: roleLabel(t, account.role) })}
+                          </p>
                         ) : (
                           <Link
-                            to={`/login?redirect=${encodeURIComponent(loginRedirectTo)}`}
+                            to={`/login?redirect=${encodeURIComponent(loginRedirectTo)}&intent=rent`}
                             className={`${secondaryButtonClass} mt-3 inline-block w-auto px-4 py-2 text-sm`}
                           >
                             {t("search:loginToRent")}

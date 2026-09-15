@@ -33,4 +33,5 @@ export const search: Shape = {
   chooseCrop: "Pflanze wählen",
   noCropsOffered: "Noch nicht verfügbar — keine Pflanzen angeboten.",
   loginToRent: "Zum Mieten anmelden",
+  cannotRentWrongRole: "Du bist als {{role}} angemeldet — nur Kunden-Konten können mieten.",
 };

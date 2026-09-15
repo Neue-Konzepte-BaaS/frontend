@@ -18,6 +18,8 @@ export const auth: Shape = {
   accountType: "Kontotyp",
   roleCustomer: "Kunde",
   roleFarmer: "Landwirt",
+  roleAdmin: "Admin",
+  wrongAccountTypeNotice: "Diese Seite ist für {{role}}-Konten — du wurdest stattdessen zu deinem eigenen Dashboard weitergeleitet.",
   firstNameLabel: "Vorname",
   lastNameLabel: "Nachname",
   farmNameLabel: "Hofname",
