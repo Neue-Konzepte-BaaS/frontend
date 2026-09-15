@@ -6,7 +6,7 @@ import { ApiError } from "~/lib/api-client";
 import type { Account } from "~/lib/auth";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
-import { formatDistance } from "~/components/plot-card";
+import { formatArea, formatDistance } from "~/components/plot-card";
 import { Field as FormField, FormError, inputClass, submitClass, secondaryButtonClass } from "~/components/form";
 
 /**
@@ -203,7 +203,10 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                     <span className="min-w-0 flex-1">
                       <span className="block font-semibold text-gray-900 dark:text-white">{plot.name}</span>
                       <span className="block text-sm text-gray-500">
-                        {t("search:distanceAway", { distance: formatDistance(plot.distanceMeters, numberLocale) })}
+                        {t("search:distanceAndArea", {
+                          distance: formatDistance(plot.distanceMeters, numberLocale),
+                          area: formatArea(plot.areaSquareMeters, numberLocale),
+                        })}
                       </span>
                     </span>
                     {alreadyRented ? (
