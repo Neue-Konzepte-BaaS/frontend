@@ -26,6 +26,8 @@ export type NearbyPlot = {
   name: string;
   /** Id of the field this plot belongs to. */
   field: string;
+  /** Id of the farm this plot belongs to; also the id used by getFarm. */
+  farm: string;
   coordinates: PolygonGeometry;
   /** The plot's area in square meters, computed geodesically from its boundary. */
   areaSquareMeters: number;

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { findNearestPlots, rentPlot, type Crop, type NearbyPlot, type Rental } from "~/lib/rentals";
+import { getFarm, type Farm } from "~/lib/farms";
 import { ApiError } from "~/lib/api-client";
 import { roleLabel, type Account } from "~/lib/auth";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
@@ -56,6 +57,11 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
   const [searchError, setSearchError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<NearbyPlot[]>([]);
+  // Farm details for each result's `farm` id, fetched after a search completes.
+  // Keyed by farm id so plots sharing a farm only trigger one fetch; a missing
+  // entry (fetch failed or still in flight) just means that plot's farm line
+  // is omitted for now — never blocks rendering the plot itself.
+  const [farmsById, setFarmsById] = useState<Record<string, Farm>>({});
   const [rentState, setRentState] = useState<RentState | null>(null);
   // The one result currently expanded to show its crops and rent control —
   // set by clicking either its list row or its numbered shape on the map.
@@ -70,6 +76,18 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
+  }
+
+  /** Fetches farm details for every distinct farm id among the given plots. */
+  function loadFarms(plots: NearbyPlot[]) {
+    const ids = [...new Set(plots.map((p) => p.farm))];
+    for (const id of ids) {
+      getFarm(id)
+        .then((farm) => setFarmsById((prev) => ({ ...prev, [id]: farm })))
+        .catch(() => {
+          // Omit this farm's info line rather than blocking the search results.
+        });
+    }
   }
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
@@ -92,6 +110,7 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
       setResults(plots);
       setHasSearched(true);
       setSelectedPlotId(null);
+      loadFarms(plots);
     } catch (err) {
       if (err instanceof ApiError && err.status === 404) {
         setSearchError(t("search:postalCodeOrCityNotFound"));
@@ -213,6 +232,11 @@ export function PlotSearch({ account, rentedPlotIds, onRented, loginRedirectTo }
                           area: formatArea(plot.areaSquareMeters, numberLocale),
                         })}
                       </span>
+                      {farmsById[plot.farm] && (
+                        <span className="block text-sm text-gray-500">
+                          {farmsById[plot.farm].name} · {farmsById[plot.farm].address}
+                        </span>
+                      )}
                     </span>
                     {alreadyRented ? (
                       <span className="shrink-0 text-sm font-medium text-emerald-700 dark:text-emerald-400">
