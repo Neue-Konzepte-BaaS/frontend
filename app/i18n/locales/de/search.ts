@@ -7,8 +7,8 @@ export const search: Shape = {
   searchTitle: "Parzelle in deiner Nähe finden",
   searchSubtitle: "Suche nach einer deutschen Postleitzahl oder Stadt, um verfügbare Selbsternte-Parzellen in der Nähe zu sehen.",
 
-  customerMetaTitle: "Meine Parzellen · BaaS",
-  customerTitle: "Felder in deiner Nähe finden",
+  customerMetaTitle: "Home · BaaS",
+  customerTitle: "Home",
   myRentals: "Meine Mieten",
   noRentalsYet: "Du hast noch keine Parzelle gemietet — suche oben, um eine zu finden.",
   booked: "Gebucht",
@@ -33,4 +33,11 @@ export const search: Shape = {
   chooseCrop: "Pflanze wählen",
   noCropsOffered: "Noch nicht verfügbar — keine Pflanzen angeboten.",
   loginToRent: "Zum Mieten anmelden",
+
+  boardMetaTitle: "Pinnwand · BaaS",
+  boardTitle: "Pinnwand",
+  inboxMetaTitle: "Posteingang · BaaS",
+  inboxTitle: "Posteingang",
+  meMetaTitle: "Ich · BaaS",
+  meTitle: "Ich",
 };
