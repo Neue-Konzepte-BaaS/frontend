@@ -15,6 +15,24 @@ import { apiClient, ApiError } from "~/lib/api-client";
 
 export type Role = "admin" | "farmer" | "customer";
 
+/**
+ * Human-readable label for a role, e.g. for "You're signed in as a {{role}}"
+ * messages. Takes `t` rather than calling useTranslation itself so this stays
+ * a plain function usable from any component regardless of which namespaces
+ * it already loaded — pass the `auth` namespace's `t`, or any multi-namespace
+ * `t` that includes it (the `auth:` prefix below resolves either way).
+ */
+export function roleLabel(t: (key: string) => string, role: Role): string {
+  switch (role) {
+    case "customer":
+      return t("auth:roleCustomer");
+    case "farmer":
+      return t("auth:roleFarmer");
+    case "admin":
+      return t("auth:roleAdmin");
+  }
+}
+
 export type Account = {
   id: string;
   role: Role;

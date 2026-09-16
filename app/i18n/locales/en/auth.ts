@@ -14,6 +14,8 @@ export const auth = {
   accountType: "Account type",
   roleCustomer: "Customer",
   roleFarmer: "Farmer",
+  roleAdmin: "Admin",
+  wrongAccountTypeNotice: "That page is for {{role}} accounts — you've been sent to your own dashboard instead.",
   firstNameLabel: "First name",
   lastNameLabel: "Last name",
   farmNameLabel: "Farm name",
