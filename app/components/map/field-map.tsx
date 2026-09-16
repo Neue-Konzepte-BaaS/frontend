@@ -27,7 +27,7 @@ import type { LatLon } from "~/lib/geocode";
 /**
  * The single reusable map for the field/plot feature. Owns the MapLibre +
  * Terra Draw instance lifecycle; knows nothing about fields vs plots beyond
- * the `shapes` it is handed — the create flow (new-field.tsx) decides what
+ * the `shapes` it is handed — the create flow (planner.tsx) decides what
  * "field" vs "plot" means.
  *
  * SSR note: `ssr: false` still prerenders the root route at build time. This
