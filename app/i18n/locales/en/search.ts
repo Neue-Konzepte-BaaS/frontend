@@ -17,7 +17,7 @@ export const search = {
   postalCodeOrCityNotFound: "We couldn't find that postal code or city — try another.",
   searchAboveHint: "Search above to see plots available near you.",
   noPlotsFoundNearby: "No available plots found near there right now.",
-  distanceAway: "{{distance}} away",
+  distanceAndArea: "{{distance}} away · {{area}}",
   browseHint: "Click a number on the map or a result below to see what it offers.",
   availableCrops: "What you can grow here",
   cropWithDuration: "{{name}} ({{months}}-month rental)",
@@ -29,6 +29,7 @@ export const search = {
   chooseCrop: "Choose a crop",
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to rent",
+  cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
 
   // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   boardMetaTitle: "Board · BaaS",

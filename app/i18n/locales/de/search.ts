@@ -21,7 +21,7 @@ export const search: Shape = {
   postalCodeOrCityNotFound: "Wir konnten diese Postleitzahl oder Stadt nicht finden — versuche eine andere.",
   searchAboveHint: "Suche oben, um verfügbare Parzellen in deiner Nähe zu sehen.",
   noPlotsFoundNearby: "Momentan wurden keine verfügbaren Parzellen in der Nähe gefunden.",
-  distanceAway: "{{distance}} entfernt",
+  distanceAndArea: "{{distance}} entfernt · {{area}}",
   browseHint: "Klicke auf eine Nummer auf der Karte oder ein Ergebnis unten, um zu sehen, was dort angeboten wird.",
   availableCrops: "Was du hier anbauen kannst",
   cropWithDuration: "{{name}} ({{months}} Monate Mietdauer)",
@@ -33,6 +33,7 @@ export const search: Shape = {
   chooseCrop: "Pflanze wählen",
   noCropsOffered: "Noch nicht verfügbar — keine Pflanzen angeboten.",
   loginToRent: "Zum Mieten anmelden",
+  cannotRentWrongRole: "Du bist als {{role}} angemeldet — nur Kunden-Konten können mieten.",
 
   boardMetaTitle: "Pinnwand · BaaS",
   boardTitle: "Pinnwand",

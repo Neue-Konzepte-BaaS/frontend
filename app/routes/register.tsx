@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Link, redirect, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/register";
-import { register, me, dashboardPath, type RegisterableRole } from "~/lib/auth";
+import { register, me, type RegisterableRole } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
-import { safeRedirectTarget } from "~/lib/guards";
+import { postAuthDestination, safeRedirectTarget } from "~/lib/guards";
 import { Field, FormError, inputClass, submitClass } from "~/components/form";
 import i18n from "~/i18n";
 
@@ -13,12 +13,15 @@ export function meta() {
 }
 
 // Signed-in users don't register again — send them to their dashboard, or
-// wherever ?redirect= points (e.g. "Log in to rent" from /customer).
+// wherever ?redirect= points (e.g. "Log in to rent" on /search or /customer)
+// — unless that target or the link's declared ?intent= requires a different
+// role than this account has; see postAuthDestination.
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const account = await me();
   if (account) {
-    const redirectTo = safeRedirectTarget(new URL(request.url).searchParams.get("redirect"));
-    throw redirect(redirectTo ?? dashboardPath(account.role));
+    const params = new URL(request.url).searchParams;
+    const redirectTo = safeRedirectTarget(params.get("redirect"));
+    throw redirect(postAuthDestination(account, redirectTo, params.get("intent")));
   }
   return null;
 }
@@ -58,7 +61,7 @@ export default function Register() {
           role === "farmer" ? String(form.get("farm_name") ?? "").trim() : undefined,
       });
       const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
-      navigate(redirectTo ?? dashboardPath(account.role), { replace: true });
+      navigate(postAuthDestination(account, redirectTo, searchParams.get("intent")), { replace: true });
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("common:genericError"));
       setSubmitting(false);
