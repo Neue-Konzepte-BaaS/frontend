@@ -4,6 +4,8 @@ import type { Route } from "./+types/layout";
 import { requireRole } from "~/lib/guards";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
+import { AppShell } from "~/components/nav/app-shell";
+import { useFarmerNavItems, useFarmerMobileNavItems, useFarmerSettingsItem } from "~/lib/nav-items";
 
 /**
  * Shared chrome + auth guard for every /farmer/* route. Runs requireRole once
@@ -19,11 +21,14 @@ export async function clientLoader() {
 export default function FarmerLayout({ loaderData }: Route.ComponentProps) {
   const { account } = loaderData;
   const { t } = useTranslation("common");
+  const items = useFarmerNavItems();
+  const mobileItems = useFarmerMobileNavItems();
+  const settingsItem = useFarmerSettingsItem();
 
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4">
           <div>
             <p className="text-sm text-gray-500 dark:text-gray-400">{t("brand")}</p>
             <p className="font-mono text-xs text-gray-400 dark:text-gray-500">{account.id}</p>
@@ -34,7 +39,9 @@ export default function FarmerLayout({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       </header>
-      <Outlet />
+      <AppShell items={items} mobileItems={mobileItems} pinned={settingsItem}>
+        <Outlet />
+      </AppShell>
     </div>
   );
 }

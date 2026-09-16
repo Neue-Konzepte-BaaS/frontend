@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import type { Route } from "./+types/new-field";
+import type { Route } from "./+types/planner";
 import { requireRole } from "~/lib/guards";
 import { createField } from "~/lib/fields";
 import { geocodePostalCode, FIELD_DRAW_ZOOM } from "~/lib/geocode";

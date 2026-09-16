@@ -18,4 +18,19 @@ export const common: Shape = {
   errorTitle: "Fehler",
   errorNotFoundBody: "Die angeforderte Seite konnte nicht gefunden werden.",
   backToHome: "Zurück zur Startseite",
+
+  navHome: "Home",
+  navSearch: "Suche",
+  navBoard: "Pinnwand",
+  navInbox: "Posteingang",
+  navMe: "Ich",
+  navFields: "Felder",
+  navPlanner: "Parzellenplaner",
+  navTenants: "Pächter",
+  navRequests: "Anfragen",
+  navCareGuide: "Pflegehinweise",
+  navFarmSettings: "Hofeinstellungen",
+
+  comingSoonLead: "Demnächst verfügbar.",
+  comingSoonBody: "Dieser Bereich ist noch nicht gebaut — die Navigation dorthin schon.",
 };
