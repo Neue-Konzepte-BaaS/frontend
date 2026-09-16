@@ -5,8 +5,8 @@ import type { Route } from "./+types/customer";
 import { resolveOptionalRole } from "~/lib/guards";
 import { listMyRentals, type RentalWithPlot } from "~/lib/rentals";
 import { PlotSearch } from "~/components/plot-search";
-import { PlotCard } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
+import { PlotCard, formatArea } from "~/components/plot-card";
 import { submitClass } from "~/components/form";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
@@ -79,12 +79,19 @@ export default function CustomerPage({ loaderData }: Route.ComponentProps) {
           onRented={(plot, rental, crop) =>
             setRentals((prev) => [
               // NearbyPlot carries every Plot field (id, name, field,
-              // coordinates) plus distanceMeters, and the crop the customer
-              // picked is already in hand, so the rented plot can be folded
-              // into a RentalWithPlot without another round trip.
+              // coordinates, areaSquareMeters) plus distanceMeters, and the
+              // crop the customer picked is already in hand, so the rented
+              // plot can be folded into a RentalWithPlot without another
+              // round trip.
               {
                 ...rental,
-                plot: { id: plot.id, name: plot.name, field: plot.field, coordinates: plot.coordinates },
+                plot: {
+                  id: plot.id,
+                  name: plot.name,
+                  field: plot.field,
+                  coordinates: plot.coordinates,
+                  areaSquareMeters: plot.areaSquareMeters,
+                },
                 crop,
               },
               ...prev,
@@ -104,7 +111,7 @@ export default function CustomerPage({ loaderData }: Route.ComponentProps) {
                   <PlotCard
                     key={rental.id}
                     name={rental.plot.name}
-                    meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
+                    meta={`${rental.crop.name} · ${formatArea(rental.plot.areaSquareMeters, dateLocale)} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                     action={<span className="text-sm text-gray-500">{t("search:booked")}</span>}
                   />
                 ))}
