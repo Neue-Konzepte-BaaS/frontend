@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
 import { listMyRentals } from "~/lib/rentals";
 import { PlotCard } from "~/components/plot-card";
+import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -25,6 +26,7 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
+      <AccountTypeNotice />
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:customerTitle")}</h1>
 
       <section className="mt-6">

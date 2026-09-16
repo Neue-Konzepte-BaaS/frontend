@@ -3,6 +3,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/admin";
 import { requireRole } from "~/lib/guards";
+import { AccountTypeNotice } from "~/components/account-type-notice";
 import { getStatistics, listCrops, type Statistics } from "~/lib/admin";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
@@ -48,6 +49,7 @@ export default function AdminDashboard({ loaderData }: Route.ComponentProps) {
       </header>
 
       <main className="mx-auto max-w-5xl space-y-10 p-4">
+        <AccountTypeNotice />
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboardTitle")}</h1>
 
         {/* Statistics */}
