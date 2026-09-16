@@ -33,3 +33,8 @@ export function formatDistance(meters: number, locale: string = "en-GB"): string
   }
   return `${(meters / 1000).toLocaleString(locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} km`;
 }
+
+/** Formats a plot's area in square meters, e.g. "2,340 m²". */
+export function formatArea(squareMeters: number, locale: string = "en-GB"): string {
+  return `${squareMeters.toLocaleString(locale, { maximumFractionDigits: 0 })} m²`;
+}

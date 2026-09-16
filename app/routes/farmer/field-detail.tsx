@@ -7,6 +7,7 @@ import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldW
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-map";
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
+import { formatArea } from "~/components/plot-card";
 import { ringToCorners, subdivideIntoGrid, toBbox } from "~/lib/geo";
 import type { LatLon } from "~/lib/geocode";
 import i18n from "~/i18n";
@@ -48,7 +49,8 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [selectedCropIds, setSelectedCropIds] = useState<Set<string>>(new Set());
   const [savingCrops, setSavingCrops] = useState(false);
   const [cropsError, setCropsError] = useState<string | null>(null);
-  const { t } = useTranslation(["farmer", "common"]);
+  const { t, i18n: i18nInstance } = useTranslation(["farmer", "common"]);
+  const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
 
   const hasPlots = field.plots.length > 0;
 
@@ -275,7 +277,9 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
                     {i + 1}
                   </span>
                   <span>
-                    <span className="block text-sm font-medium text-gray-900 dark:text-white">{p.name}</span>
+                    <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                      {p.name} · {formatArea(p.areaSquareMeters, numberLocale)}
+                    </span>
                     <span className="block text-sm text-gray-500">
                       {p.crops.length > 0 ? p.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
                     </span>
