@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
+import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -11,6 +12,7 @@ export default function FarmerDashboard() {
 
   return (
     <main className="mx-auto max-w-3xl p-8">
+      <AccountTypeNotice />
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboardTitle")}</h1>
       <p className="mt-2 text-gray-600 dark:text-gray-300">{t("dashboardBody")}</p>
 

@@ -29,4 +29,5 @@ export const search = {
   chooseCrop: "Choose a crop",
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to rent",
+  cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
 } as const;
