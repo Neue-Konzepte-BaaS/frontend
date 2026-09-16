@@ -6,8 +6,7 @@ export const farmer = {
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
 
   fieldsListMetaTitle: "Your fields · BaaS",
-  addField: "Add a field",
-  noFieldsYet: "No fields yet — draw your first one.",
+  noFieldsYet: "No fields yet — use the plot planner to draw your first one.",
   plot_one: "{{count}} plot",
   plot_other: "{{count}} plots",
 

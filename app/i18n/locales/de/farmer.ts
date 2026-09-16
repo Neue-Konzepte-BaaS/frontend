@@ -10,8 +10,7 @@ export const farmer: Shape = {
   yourFieldsBody: "Sieh dir deine Felder und Flurstücke an oder zeichne ein neues Feld auf der Karte.",
 
   fieldsListMetaTitle: "Deine Felder · BaaS",
-  addField: "Feld hinzufügen",
-  noFieldsYet: "Noch keine Felder — zeichne dein erstes.",
+  noFieldsYet: "Noch keine Felder — nutze den Parzellenplaner, um dein erstes zu zeichnen.",
   plot_one: "{{count}} Parzelle",
   plot_other: "{{count}} Parzellen",
 

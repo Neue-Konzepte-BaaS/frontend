@@ -25,7 +25,7 @@ export const common: Shape = {
   navInbox: "Posteingang",
   navMe: "Ich",
   navFields: "Felder",
-  navPlanner: "Parzellenplan",
+  navPlanner: "Parzellenplaner",
   navTenants: "Pächter",
   navRequests: "Anfragen",
   navCareGuide: "Pflegehinweise",
