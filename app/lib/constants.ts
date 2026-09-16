@@ -16,16 +16,17 @@ export const API_BASE_URL: string =
 
 /**
  * Public routes that must render without an authenticated session.
- * `/` (landing) and `/search` (public plot search) are open to everyone.
- * `/customer` is here too even though it's a real logged-in dashboard: it
- * shows the same plot search, so a stale/expired cookie there must fall back
- * to logged-out mode rather than bouncing the visitor to /login the way
- * api-client.ts's forceLogout() would for any other role-guarded page.
+ * `/` (landing) and `/search` (public plot search) are open to everyone —
+ * /search renders its own logged-out mode for a stale/expired cookie rather
+ * than bouncing to /login. /customer used to be here too (it doubled as the
+ * plot search before the tenant nav split Home from Search — see issue #27);
+ * now it's Home only, requires a real customer session, and gets the normal
+ * forceLogout()-to-/login treatment like any other role-guarded page.
  *
  * Matched with `startsWith`, so "/" would match every path — the landing page
  * is handled by the exact-match check in forceLogout() instead of living here.
  */
-export const PUBLIC_PATHS = ["/login", "/register", "/search", "/customer"] as const;
+export const PUBLIC_PATHS = ["/login", "/register", "/search"] as const;
 
 /**
  * MapLibre style for the field/plot map: Esri World Imagery satellite tiles.

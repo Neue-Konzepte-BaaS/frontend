@@ -1,6 +1,6 @@
 export const farmer = {
-  dashboardMetaTitle: "Farmer dashboard · BaaS",
-  dashboardTitle: "Farmer dashboard",
+  dashboardMetaTitle: "Home · BaaS",
+  dashboardTitle: "Home",
   dashboardBody: "Manage the fields and land parcels your farm offers for self-harvest rental.",
   yourFieldsTitle: "Your fields",
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
@@ -48,4 +48,16 @@ export const farmer = {
   saveCrops: "Save",
 
   mapAriaLabel: "Field map",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
+  tenantsMetaTitle: "Tenants · BaaS",
+  tenantsTitle: "Tenants",
+  requestsMetaTitle: "Requests · BaaS",
+  requestsTitle: "Requests",
+  boardMetaTitle: "Board · BaaS",
+  boardTitle: "Board",
+  careGuideMetaTitle: "Care guide · BaaS",
+  careGuideTitle: "Care guide",
+  settingsMetaTitle: "Farm settings · BaaS",
+  settingsTitle: "Farm settings",
 } as const;

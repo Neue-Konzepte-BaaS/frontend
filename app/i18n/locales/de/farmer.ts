@@ -3,8 +3,8 @@ import type { farmer as en } from "~/i18n/locales/en/farmer";
 type Shape = { [K in keyof typeof en]: string };
 
 export const farmer: Shape = {
-  dashboardMetaTitle: "Landwirt-Dashboard · BaaS",
-  dashboardTitle: "Landwirt-Dashboard",
+  dashboardMetaTitle: "Home · BaaS",
+  dashboardTitle: "Home",
   dashboardBody: "Verwalte die Felder und Flurstücke, die dein Hof zur Selbsternte anbietet.",
   yourFieldsTitle: "Deine Felder",
   yourFieldsBody: "Sieh dir deine Felder und Flurstücke an oder zeichne ein neues Feld auf der Karte.",
@@ -52,4 +52,15 @@ export const farmer: Shape = {
   saveCrops: "Speichern",
 
   mapAriaLabel: "Feldkarte",
+
+  tenantsMetaTitle: "Pächter · BaaS",
+  tenantsTitle: "Pächter",
+  requestsMetaTitle: "Anfragen · BaaS",
+  requestsTitle: "Anfragen",
+  boardMetaTitle: "Pinnwand · BaaS",
+  boardTitle: "Pinnwand",
+  careGuideMetaTitle: "Pflegehinweise · BaaS",
+  careGuideTitle: "Pflegehinweise",
+  settingsMetaTitle: "Hofeinstellungen · BaaS",
+  settingsTitle: "Hofeinstellungen",
 };
