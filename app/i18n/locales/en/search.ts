@@ -3,8 +3,8 @@ export const search = {
   searchTitle: "Find a plot near you",
   searchSubtitle: "Search a German postal code or city to see available self-harvest plots nearby.",
 
-  customerMetaTitle: "My plots · BaaS",
-  customerTitle: "Find fields near you",
+  customerMetaTitle: "Home · BaaS",
+  customerTitle: "Home",
   myRentals: "My rentals",
   noRentalsYet: "You haven't rented a plot yet — search above to find one.",
   booked: "Booked",
@@ -30,4 +30,12 @@ export const search = {
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to rent",
   cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
+  boardMetaTitle: "Board · BaaS",
+  boardTitle: "Board",
+  inboxMetaTitle: "Inbox · BaaS",
+  inboxTitle: "Inbox",
+  meMetaTitle: "Me · BaaS",
+  meTitle: "Me",
 } as const;

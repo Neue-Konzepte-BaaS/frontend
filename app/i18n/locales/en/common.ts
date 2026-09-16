@@ -14,4 +14,21 @@ export const common = {
   errorTitle: "Error",
   errorNotFoundBody: "The requested page could not be found.",
   backToHome: "Back to home",
+
+  // Nav items — see issue #27. Shared across roles where the label matches
+  // the same concept (e.g. "Board" for both farmer and tenant).
+  navHome: "Home",
+  navSearch: "Search",
+  navBoard: "Board",
+  navInbox: "Inbox",
+  navMe: "Me",
+  navFields: "Fields",
+  navPlanner: "Plot planner",
+  navTenants: "Tenants",
+  navRequests: "Requests",
+  navCareGuide: "Care guide",
+  navFarmSettings: "Farm settings",
+
+  comingSoonLead: "Coming soon.",
+  comingSoonBody: "This screen isn't built yet — the navigation to reach it is.",
 } as const;

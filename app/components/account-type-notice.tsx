@@ -12,8 +12,8 @@ const NOTICE_DURATION_MS = 6000;
  * Several guards set `?wrongAccountType=<role>` when they bounce a visitor
  * to their own dashboard because they're the wrong role for wherever they
  * were headed — postAuthDestination (a login/registration redirect target
- * or the "Log in to rent" flow's intent), and requireRole/resolveOptionalRole
- * (visiting a role-specific page directly). Renders nothing without that
+ * or the "Log in to rent" flow's intent), and requireRole (visiting a
+ * role-specific page directly). Renders nothing without that
  * param; otherwise strips it from the URL right after mount (so refreshing
  * doesn't keep showing it) and dismisses itself after a few seconds (it's a
  * one-time explanation, not a permanent banner).

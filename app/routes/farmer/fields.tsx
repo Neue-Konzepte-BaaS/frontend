@@ -6,7 +6,6 @@ import { listFields } from "~/lib/fields";
 import { geocodePostalCode } from "~/lib/geocode";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
-import { submitClass } from "~/components/form";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -35,12 +34,7 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("yourFieldsTitle")}</h1>
-        <Link to="/farmer/fields/new" className={`${submitClass} inline-block w-auto px-4 py-2 text-sm`}>
-          {t("addField")}
-        </Link>
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("yourFieldsTitle")}</h1>
 
       {fields.length === 0 ? (
         <p className="mt-6 text-gray-600 dark:text-gray-300">{t("noFieldsYet")}</p>
@@ -72,7 +66,7 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
   );
 }
 
-// Note: the create flow (new-field.tsx) always ends with navigate("/farmer/fields"),
+// Note: the create flow (planner.tsx) always ends with navigate("/farmer/fields"),
 // which re-runs this clientLoader fresh — no manual revalidation is needed for
 // that path. If a create action is ever added directly on this route (e.g. a
 // future inline "add plot"), use useRevalidator():
