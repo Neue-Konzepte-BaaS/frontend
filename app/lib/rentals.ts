@@ -26,6 +26,8 @@ export type NearbyPlot = {
   name: string;
   /** Id of the field this plot belongs to. */
   field: string;
+  /** Id of the farm this plot belongs to; also the id used by getFarm. */
+  farm: string;
   coordinates: PolygonGeometry;
   /** Distance from the search point to the plot's centroid, in meters. */
   distanceMeters: number;

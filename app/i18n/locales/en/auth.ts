@@ -17,6 +17,8 @@ export const auth = {
   firstNameLabel: "First name",
   lastNameLabel: "Last name",
   farmNameLabel: "Farm name",
+  addressLabel: "Address",
+  descriptionLabel: "Description (optional)",
   postalCodeLabel: "Postal code",
   invalidPostalCode: "Please enter a valid postal code.",
   creatingAccount: "Creating account…",
