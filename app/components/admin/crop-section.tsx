@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createCrop, deleteCrop, type Crop } from "~/lib/admin";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
+import { Field as FormField, FormError, inputClass, primaryButtonClass } from "~/components/form";
 
 export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   const { t } = useTranslation("admin");
@@ -143,7 +143,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
           />
         </FormField>
 
-        <button type="submit" disabled={adding} className={`${submitClass} w-auto px-6 py-2 text-sm`}>
+        <button type="submit" disabled={adding} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
           {adding ? t("cropAdding") : t("cropAdd")}
         </button>
       </form>

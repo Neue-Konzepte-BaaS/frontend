@@ -11,6 +11,8 @@ export const admin = {
   statFields: "Fields",
   statFieldsDetail: "{{perFarm}} per farm · {{area}} m²",
   statPlots: "Plots",
+  statOccupancy: "Occupancy",
+  statActive: "Active",
   statPlotsDetail: "{{rented}} rented · {{occupancy}} %",
   statRentals: "Rentals",
   statRentalsDetail: "{{active}} active · {{last30}} in 30 d",
@@ -18,13 +20,36 @@ export const admin = {
   statAccountsDetail: "{{farmers}} farmer · {{customers}} renter · +{{registered}} in 30 d",
   systemTitle: "System",
 
-  // Stub pages — nav exists, the backend endpoint behind it doesn't yet
-  farmsMetaTitle: "Farms · BaaS",
-  farmsTitle: "Farms",
-  accountsMetaTitle: "Accounts · BaaS",
-  accountsTitle: "Accounts",
+  // Stub page — nav exists, the backend endpoint behind it doesn't yet
   rentalsMetaTitle: "Rentals · BaaS",
   rentalsTitle: "Rentals",
+
+  // Shared listing chrome (farms, accounts)
+  listFilter: "Filter",
+  listRange: "{{from}}–{{to}} of {{total}}",
+  listPrevious: "Previous",
+  listNext: "Next",
+  listPagerLabel: "Pages",
+  listEmpty: "Nothing here yet.",
+  listNoMatches: "No matches for that filter.",
+
+  // Farms
+  farmsMetaTitle: "Farms · BaaS",
+  farmsTitle: "Farms",
+  farmsBody: "Every farm on the platform, with its owner and what it holds.",
+  farmsSearchLabel: "Search",
+  farmsSearchPlaceholder: "Farm, address or owner",
+  farmsPostalCodeLabel: "Postal code",
+
+  // Accounts
+  accountsMetaTitle: "Accounts · BaaS",
+  accountsTitle: "Accounts",
+  accountsBody: "Every account on the platform, newest first.",
+  accountsSearchLabel: "Search",
+  accountsSearchPlaceholder: "Name or email",
+  accountsRoleFilterLabel: "Filter by account type",
+  accountsAllRoles: "All",
+  accountsNoRole: "No role",
 
   // Notification broadcast
   broadcastMetaTitle: "Broadcast · BaaS",
