@@ -57,11 +57,9 @@ export default function Register() {
         password: String(form.get("password") ?? ""),
         role,
         postalCode,
-        farmName:
-          role === "farmer" ? String(form.get("farm_name") ?? "").trim() : undefined,
+        farmName: role === "farmer" ? String(form.get("farm_name") ?? "").trim() : undefined,
         address: role === "farmer" ? String(form.get("address") ?? "").trim() : undefined,
-        description:
-          role === "farmer" ? String(form.get("description") ?? "").trim() : undefined,
+        description: role === "farmer" ? String(form.get("description") ?? "").trim() : undefined,
       });
       const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
       navigate(postAuthDestination(account, redirectTo, searchParams.get("intent")), { replace: true });
@@ -111,11 +109,9 @@ export default function Register() {
             <Field label={t("auth:farmNameLabel")} htmlFor="farm_name">
               <input id="farm_name" name="farm_name" required className={inputClass} />
             </Field>
-
             <Field label={t("auth:addressLabel")} htmlFor="address">
               <input id="address" name="address" required className={inputClass} />
             </Field>
-
             <Field label={t("auth:descriptionLabel")} htmlFor="description">
               <textarea id="description" name="description" rows={3} className={inputClass} />
             </Field>

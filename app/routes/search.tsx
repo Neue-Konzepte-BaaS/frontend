@@ -30,28 +30,26 @@ export async function clientLoader() {
 
 export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const { account } = loaderData;
-  // Only a customer can actually rent; anyone else browsing gets the
-  // logged-out affordance ("Log in to rent") on each result.
+  // Only a customer's session gets the tenant nav rail/bar — an anonymous
+  // visitor or a farmer/admin browsing public search isn't in the tenant
+  // nav's world (no Board/Inbox/Me to show them).
   const customer = account?.role === "customer" ? account : null;
   const { t } = useTranslation(["search", "common"]);
-  // Only a logged-in customer gets the tenant nav rail/bar around this page
-  // — an anonymous visitor or a farmer/admin browsing public search isn't in
-  // the tenant nav's world (no Board/Inbox/Me to show them).
   const tenantNavItems = useTenantNavItems();
 
   const content = (
-    <main className="mx-auto max-w-5xl p-4">
+    <main className="mx-auto w-full max-w-5xl p-4">
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:searchTitle")}</h1>
       <p className="mt-1 text-gray-600 dark:text-gray-300">{t("search:searchSubtitle")}</p>
 
-      <PlotSearch account={customer} loginRedirectTo="/search" />
+      <PlotSearch />
     </main>
   );
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="mx-auto flex max-w-5xl items-center justify-between p-4">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between p-4">
           <Link to="/" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
             {t("common:brand")}
           </Link>

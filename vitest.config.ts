@@ -1,3 +1,4 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
 /**
@@ -8,7 +9,12 @@ import { defineConfig } from "vitest/config";
  */
 export default defineConfig({
   resolve: {
-    alias: { "~": new URL("./app", import.meta.url).pathname },
+    // fileURLToPath, not the URL's own .pathname: .pathname percent-encodes
+    // characters like the space in this repo's directory name (".../Neue
+    // Konzepte Vibecoding/..." -> "...%20Konzepte..."), which silently broke
+    // every "~/..." import in tests — nothing under app/lib ever exercised
+    // the alias before (they all use relative imports), so this went unnoticed.
+    alias: { "~": fileURLToPath(new URL("./app", import.meta.url)) },
   },
   test: {
     environment: "node",
