@@ -17,7 +17,8 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
   screens sharing chrome/auth gets its own subfolder + a `layout()` route
   (e.g. `app/routes/farmer/`) rather than flat sibling files.
 - `app/components/` — shared, reusable UI. `app/components/form.tsx` holds the
-  shared form primitives (`inputClass`, `submitClass`, `Field`, `FormError`) —
+  shared form primitives (`inputClass`, `submitClass`/`primaryButtonClass`,
+  `secondaryButtonClass`, `Field`, `FormError`) —
   every form in the app should use these instead of redefining them.
 - `app/lib/` — shared logic: constants, the API client, helpers, types.
   E.g. `~/lib/constants.ts`, `~/lib/api-client.ts`.
@@ -145,16 +146,46 @@ Two rules worth knowing before adding a role or a destination:
 feature doesn't exist yet gets a four-line stub route via
 `~/lib/coming-soon-route.tsx` (`comingSoonMeta` + `comingSoonPage`), which
 renders `<ComingSoon />` — an explicit "not built yet", never a blank page or
-a spinner. The admin's Farms/Accounts/Rentals are waiting on admin endpoints
-the backend doesn't have (backend#50, backend#51, and an admin rentals list);
-each swaps in as its endpoint lands.
+a spinner. `/admin/rentals` is the remaining one: there is no admin rentals
+endpoint and no backend issue for it yet. Farms and Accounts were stubs too
+until backend#55 landed their endpoints, which is the shape this is meant to
+take — the stub swaps out, the nav entry never moves.
 
-**What the admin can't show yet**, all flagged as backend follow-ups rather
-than faked: a farms table (name, region, fields, plots, occupancy, status),
-an accounts list, an admin rentals list, the account's email in the header
+### Paginated listings (`/admin/farms`, `/admin/accounts`)
+
+The two admin listings are the first paginated responses the frontend
+consumes, and the only ones: they return an envelope
+`{items, total, limit, offset}` (typed once as `Page<T>` in `~/lib/admin.ts`)
+where `/api/fields`, `/api/rentals` and `/api/announcements` return bare
+arrays. Their JSON is camelCase, checked against the handlers rather than
+assumed.
+
+- **`limit` is our constant, never the user's.** `ADMIN_PAGE_SIZE` (20) is
+  what both listings send. The backend answers a `limit` outside `[1, 100]`
+  with a **400 rather than a clamp**, so a page-size control would be a way to
+  break the page with nothing gained.
+- **Filters and the page live in the URL, not component state.** Each route's
+  `clientLoader` reads `q`/`role`/`postalCode`/`offset` off the request URL, so
+  a filtered page is bookmarkable and Back steps through the admin's own
+  searches. Filter forms are plain `<Form method="get">` — no submit handler,
+  nothing to keep in sync. A form that sits inside an active filter must carry
+  that filter in a hidden input (see `admin/accounts.tsx`), or submitting
+  silently clears it.
+- **Anything the backend would 400 on is normalised in the loader**, not
+  forwarded: `offset` is floored at a whole number ≥ 0 and an unrecognised
+  `?role=` is dropped. A hand-edited or stale link should degrade to page one,
+  not to an error screen.
+- Rows are cards that become rows at `md`, not a `<table>`: a six-column table
+  at 375px either scrolls sideways or shrinks the type below what context.md
+  asks for.
+
+**What the admin still can't show**, all flagged as backend follow-ups rather
+than faked: an admin rentals list, the account's email in the header
 (`Account` carries only `id`/`role`/`postalCode`), a farms-added-this-month
-delta (`registeredLast30Days` counts every account, not farmers), and the
-"needs attention"/season panels from the mockup on issue #25 (announcements
+delta (`registeredLast30Days` counts every account, not farmers), the Region
+and Status columns the issue #25 mockup drew on the farms table (the endpoint
+carries the owner's postal code and a free-text address; farm verification is
+backend#49), and that mockup's "needs attention"/season panels (announcements
 are farmer+customer-only on the backend, and there is no season model).
 
 ### Plot search lives in one component

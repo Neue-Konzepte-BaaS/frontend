@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { broadcastNotification } from "~/lib/admin";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, secondaryButtonClass, submitClass } from "~/components/form";
+import { Field as FormField, FormError, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
 
 export function BroadcastSection() {
   const { t } = useTranslation("admin");
@@ -87,20 +87,20 @@ export function BroadcastSection() {
           <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
             <p className="text-sm text-amber-900 dark:text-amber-100">{t("notifConfirmPrompt")}</p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button type="submit" disabled={sending} className={`${submitClass} w-auto px-6 py-2 text-sm`}>
+              <button type="submit" disabled={sending} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
                 {sending ? t("notifSending") : t("notifConfirmSend")}
               </button>
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className={`${secondaryButtonClass} w-auto px-6 py-2 text-sm`}
+                className={`${secondaryButtonClass} px-6 py-2 text-sm`}
               >
                 {t("notifCancel")}
               </button>
             </div>
           </div>
         ) : (
-          <button type="submit" className={`${submitClass} w-auto px-6 py-2 text-sm`}>
+          <button type="submit" className={`${primaryButtonClass} px-6 py-2 text-sm`}>
             {t("notifSend")}
           </button>
         )}

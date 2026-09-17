@@ -15,6 +15,8 @@ export const admin: Shape = {
   statFields: "Felder",
   statFieldsDetail: "{{perFarm}} pro Hof · {{area}} m²",
   statPlots: "Parzellen",
+  statOccupancy: "Belegung",
+  statActive: "Aktiv",
   statPlotsDetail: "{{rented}} vermietet · {{occupancy}} %",
   statRentals: "Mietverträge",
   statRentalsDetail: "{{active}} aktiv · {{last30}} in 30 T.",
@@ -22,13 +24,36 @@ export const admin: Shape = {
   statAccountsDetail: "{{farmers}} Landwirte · {{customers}} Pächter · +{{registered}} in 30 T.",
   systemTitle: "System",
 
-  // Platzhalterseiten — die Navigation steht, der Backend-Endpunkt dahinter noch nicht
-  farmsMetaTitle: "Höfe · BaaS",
-  farmsTitle: "Höfe",
-  accountsMetaTitle: "Konten · BaaS",
-  accountsTitle: "Konten",
+  // Platzhalterseite — die Navigation steht, der Backend-Endpunkt dahinter noch nicht
   rentalsMetaTitle: "Mietverträge · BaaS",
   rentalsTitle: "Mietverträge",
+
+  // Gemeinsame Listen-Elemente (Höfe, Konten)
+  listFilter: "Filtern",
+  listRange: "{{from}}–{{to}} von {{total}}",
+  listPrevious: "Zurück",
+  listNext: "Weiter",
+  listPagerLabel: "Seiten",
+  listEmpty: "Hier ist noch nichts.",
+  listNoMatches: "Keine Treffer für diesen Filter.",
+
+  // Höfe
+  farmsMetaTitle: "Höfe · BaaS",
+  farmsTitle: "Höfe",
+  farmsBody: "Alle Höfe der Plattform, mit Inhaber und Bestand.",
+  farmsSearchLabel: "Suche",
+  farmsSearchPlaceholder: "Hof, Adresse oder Inhaber",
+  farmsPostalCodeLabel: "PLZ",
+
+  // Konten
+  accountsMetaTitle: "Konten · BaaS",
+  accountsTitle: "Konten",
+  accountsBody: "Alle Konten der Plattform, neueste zuerst.",
+  accountsSearchLabel: "Suche",
+  accountsSearchPlaceholder: "Name oder E-Mail",
+  accountsRoleFilterLabel: "Nach Kontotyp filtern",
+  accountsAllRoles: "Alle",
+  accountsNoRole: "Keine Rolle",
 
   // Broadcast-Benachrichtigung
   broadcastMetaTitle: "Rundnachricht · BaaS",
