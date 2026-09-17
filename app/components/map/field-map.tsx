@@ -48,6 +48,8 @@ export type MapShape = {
   label?: string;
   /** Rendered with a highlighted outline/fill, e.g. the plot(s) currently picked. */
   selected?: boolean;
+  /** Rendered in a distinct "occupied" color, e.g. a plot currently rented out. */
+  rented?: boolean;
 };
 
 export type FieldMapProps = {
@@ -72,6 +74,7 @@ const SHAPES_SOURCE_ID = "field-map-shapes";
 const FIELD_FILL_COLOR = "#059669"; // emerald-600
 const PLOT_FILL_COLOR = "#6ee7b7"; // emerald-300
 const SELECTED_COLOR = "#f59e0b"; // amber-500
+const RENTED_COLOR = "#f43f5e"; // rose-500
 
 /**
  * Terra Draw only knows the mode names actually registered with it below
@@ -96,6 +99,7 @@ function applyShapesData(map: MapLibreMap, shapes: MapShape[]) {
         variant: shape.variant,
         label: shape.label ?? "",
         selected: shape.selected ?? false,
+        rented: shape.rented ?? false,
       },
       geometry: shape.polygon,
     })),
@@ -170,11 +174,13 @@ export function FieldMap({
             "case",
             ["get", "selected"],
             SELECTED_COLOR,
+            ["get", "rented"],
+            RENTED_COLOR,
             ["==", ["get", "variant"], "field"],
             FIELD_FILL_COLOR,
             PLOT_FILL_COLOR,
           ],
-          "fill-opacity": ["case", ["get", "selected"], 0.45, 0.25],
+          "fill-opacity": ["case", ["get", "selected"], 0.45, ["get", "rented"], 0.35, 0.25],
         },
       });
       map.addLayer({
@@ -186,6 +192,8 @@ export function FieldMap({
             "case",
             ["get", "selected"],
             SELECTED_COLOR,
+            ["get", "rented"],
+            RENTED_COLOR,
             ["==", ["get", "variant"], "field"],
             FIELD_FILL_COLOR,
             PLOT_FILL_COLOR,

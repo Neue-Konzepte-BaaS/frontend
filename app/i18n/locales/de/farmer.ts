@@ -13,6 +13,8 @@ export const farmer: Shape = {
   noFieldsYet: "Noch keine Felder — nutze den Parzellenplaner, um dein erstes zu zeichnen.",
   plot_one: "{{count}} Parzelle",
   plot_other: "{{count}} Parzellen",
+  rentedTo: "vermietet an {{name}}",
+  editPlots: "Parzellen bearbeiten",
 
   newFieldMetaTitle: "Feld zeichnen · BaaS",
   newFieldTitle: "Neues Feld zeichnen",

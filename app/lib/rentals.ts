@@ -33,6 +33,8 @@ export type NearbyPlot = {
   distanceMeters: number;
   /** The crops this plot's field currently offers — the valid choices for `rentPlot`. */
   crops: Crop[];
+  /** Id of the plot's farm — see farms.ts's getFarm, and /search/farms/:farmId. */
+  farm: string;
 };
 
 export type Rental = {
@@ -46,6 +48,49 @@ export type Rental = {
 };
 
 export type RentalWithPlot = Rental & { plot: Plot; crop: Crop };
+
+export type FarmRentalCustomer = {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type FarmRental = Rental & { plot: Plot; fieldName: string; customer: FarmRentalCustomer };
+
+/**
+ * One farm near the search point, aggregated from its nearby plots. Just the
+ * id/distance/count — the farm's name and other details come from a separate
+ * getFarm(farmId) call (see farms.ts); the nearest-plots endpoint only
+ * carries the farm id per plot, not its name.
+ */
+export type NearbyFarm = {
+  farmId: string;
+  /** Distance to this farm's nearest plot, in meters. */
+  distanceMeters: number;
+  /** How many of this farm's plots are in the search results. */
+  plotCount: number;
+};
+
+/**
+ * Groups nearby plots by farm, for a farmer-centric results list (see issue:
+ * search should surface farms, not a flat plot list — the plot-level detail
+ * lives on each farm's own page, /search/farms/:farmId). `plots` must already
+ * be sorted nearest-first (as findNearestPlots returns them); the result
+ * keeps that order via each farm's nearest plot.
+ */
+export function groupPlotsByFarm(plots: NearbyPlot[]): NearbyFarm[] {
+  const byFarm = new Map<string, NearbyFarm>();
+  for (const plot of plots) {
+    const farm = byFarm.get(plot.farm);
+    if (farm) {
+      farm.plotCount += 1;
+    } else {
+      byFarm.set(plot.farm, { farmId: plot.farm, distanceMeters: plot.distanceMeters, plotCount: 1 });
+    }
+  }
+  return [...byFarm.values()];
+}
 
 export type NearestPlotsQuery =
   | { lat: number; lon: number; limit?: number }
@@ -90,4 +135,32 @@ export function rentPlot(plotId: string, cropId: string): Promise<Rental> {
 /** The authenticated customer's own rentals, newest first, expired included. */
 export function listMyRentals(): Promise<RentalWithPlot[]> {
   return apiClient.get<RentalWithPlot[]>("/rentals");
+}
+
+/**
+ * Every rental on the authenticated farmer's own plots, active and historic,
+ * newest first, each with the plot and the renting customer. Customer-only
+ * fields elsewhere (email) are visible here because this is the farmer
+ * looking at their own tenants, not a public listing.
+ */
+export function listFarmRentals(): Promise<FarmRental[]> {
+  return apiClient.get<FarmRental[]>("/rentals/farm");
+}
+
+/**
+ * Keeps only rentals covering right now, keyed by plot — listFarmRentals
+ * returns historic ones too, and a plot can only have one *active* rental at
+ * a time (the backend rejects overlapping periods). Used by the farmer's own
+ * fields pages so they can show which of their plots are currently occupied,
+ * and by whom, before the farmer edits crops or regenerates a plot grid.
+ */
+export function activeRentalsByPlot(rentals: FarmRental[]): Map<string, FarmRental> {
+  const now = Date.now();
+  const byPlot = new Map<string, FarmRental>();
+  for (const rental of rentals) {
+    if (new Date(rental.startAt).getTime() <= now && now < new Date(rental.endAt).getTime()) {
+      byPlot.set(rental.plotId, rental);
+    }
+  }
+  return byPlot;
 }

@@ -23,6 +23,8 @@ export const auth: Shape = {
   firstNameLabel: "Vorname",
   lastNameLabel: "Nachname",
   farmNameLabel: "Hofname",
+  addressLabel: "Hofadresse",
+  descriptionLabel: "Hofbeschreibung (optional)",
   postalCodeLabel: "Postleitzahl",
   invalidPostalCode: "Bitte gib eine gültige Postleitzahl ein.",
   creatingAccount: "Konto wird erstellt…",
