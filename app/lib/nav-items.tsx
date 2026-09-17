@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import {
   BookOpen,
+  Building2,
   CircleUser,
   ClipboardList,
   Home,
@@ -8,8 +9,10 @@ import {
   LandPlot,
   LayoutGrid,
   ListChecks,
+  Megaphone,
   Search,
   Settings,
+  Sprout,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -72,6 +75,54 @@ export function useFarmerMobileNavItems(): NavItem[] {
     { to: "/farmer/tenants", label: t("navTenants"), icon: Users },
     { to: "/farmer/board", label: t("navBoard"), icon: ClipboardList },
     { to: "/farmer/settings", label: t("navMe"), icon: CircleUser },
+  ];
+}
+
+/**
+ * Admin nav for the desktop sidebar — the platform-scope destinations (issue
+ * #25). Farms/Accounts/Rentals are ComingSoon stubs until the backend grows
+ * the endpoints behind them (backend#50, backend#51, and an admin rentals
+ * list that has no issue yet) — same "nav first, feature after" split as the
+ * farmer/tenant stubs above.
+ */
+export function useAdminNavItems(): NavItem[] {
+  const { t } = useTranslation("common");
+  return [
+    { to: "/admin", label: t("navPlatform"), icon: LayoutGrid, end: true },
+    { to: "/admin/farms", label: t("navFarms"), icon: Building2 },
+    { to: "/admin/accounts", label: t("navAccounts"), icon: Users },
+    { to: "/admin/rentals", label: t("navRentals"), icon: ClipboardList },
+  ];
+}
+
+/**
+ * Pinned below the admin sidebar's divider: the platform-wide system tools,
+ * which act on the whole platform rather than on one farm's data. Two items
+ * rather than the farmer's single pinned "Farm settings" — see SideNav's
+ * `pinned` prop.
+ */
+export function useAdminSystemItems(): NavItem[] {
+  const { t } = useTranslation("common");
+  return [
+    { to: "/admin/crops", label: t("navCrops"), icon: Sprout },
+    { to: "/admin/broadcast", label: t("navBroadcast"), icon: Megaphone },
+  ];
+}
+
+/**
+ * Admin nav for the mobile bottom bar — five slots, so the sidebar's six
+ * destinations don't all fit (same constraint as useFarmerMobileNavItems).
+ * Broadcast is the one left out: it's the rarest action of the six and the
+ * Platform overview links to it directly.
+ */
+export function useAdminMobileNavItems(): NavItem[] {
+  const { t } = useTranslation("common");
+  return [
+    { to: "/admin", label: t("navPlatform"), icon: LayoutGrid, end: true },
+    { to: "/admin/farms", label: t("navFarms"), icon: Building2 },
+    { to: "/admin/accounts", label: t("navAccounts"), icon: Users },
+    { to: "/admin/rentals", label: t("navRentals"), icon: ClipboardList },
+    { to: "/admin/crops", label: t("navCrops"), icon: Sprout },
   ];
 }
 
