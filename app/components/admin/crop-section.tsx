@@ -60,9 +60,6 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("cropsTitle")}</h2>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("cropsBody")}</p>
-
       {cropList.length > 0 && (
         <ul className="mt-4 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
           {cropList.map((crop) => (

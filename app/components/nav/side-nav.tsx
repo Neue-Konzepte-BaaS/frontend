@@ -5,7 +5,11 @@ import type { NavItem } from "~/lib/nav-items";
  * Desktop-only left sidebar (hidden below the `md` breakpoint — see
  * app-shell.tsx for why width, not orientation, decides which nav shows).
  */
-export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem }) {
+export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem | NavItem[] }) {
+  // One item (the farmer's "Farm settings") or a group (the admin's System
+  // tools) — both render below the same divider.
+  const pinnedItems = pinned ? (Array.isArray(pinned) ? pinned : [pinned]) : [];
+
   return (
     <nav className="hidden shrink-0 flex-col justify-between border-r border-gray-200 p-4 md:flex md:w-56 dark:border-gray-800">
       <ul className="space-y-1">
@@ -13,9 +17,11 @@ export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem 
           <SideNavLink key={item.to} item={item} />
         ))}
       </ul>
-      {pinned && (
-        <ul className="mt-4 border-t border-gray-200 pt-4 dark:border-gray-800">
-          <SideNavLink item={pinned} />
+      {pinnedItems.length > 0 && (
+        <ul className="mt-4 space-y-1 border-t border-gray-200 pt-4 dark:border-gray-800">
+          {pinnedItems.map((item) => (
+            <SideNavLink key={item.to} item={item} />
+          ))}
         </ul>
       )}
     </nav>

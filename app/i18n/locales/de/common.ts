@@ -30,6 +30,12 @@ export const common: Shape = {
   navRequests: "Anfragen",
   navCareGuide: "Pflegehinweise",
   navFarmSettings: "Hofeinstellungen",
+  navPlatform: "Plattform",
+  navFarms: "Höfe",
+  navAccounts: "Konten",
+  navRentals: "Mietverträge",
+  navCrops: "Pflanzenkatalog",
+  navBroadcast: "Rundnachricht",
 
   comingSoonLead: "Demnächst verfügbar.",
   comingSoonBody: "Dieser Bereich ist noch nicht gebaut — die Navigation dorthin schon.",

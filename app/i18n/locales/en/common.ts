@@ -28,6 +28,12 @@ export const common = {
   navRequests: "Requests",
   navCareGuide: "Care guide",
   navFarmSettings: "Farm settings",
+  navPlatform: "Platform",
+  navFarms: "Farms",
+  navAccounts: "Accounts",
+  navRentals: "Rentals",
+  navCrops: "Crop catalog",
+  navBroadcast: "Broadcast",
 
   comingSoonLead: "Coming soon.",
   comingSoonBody: "This screen isn't built yet — the navigation to reach it is.",
