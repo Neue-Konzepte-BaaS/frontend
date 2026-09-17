@@ -26,6 +26,8 @@ export type NearbyPlot = {
   name: string;
   /** Id of the field this plot belongs to. */
   field: string;
+  /** Id of the plot's farm — see farms.ts's getFarm, and /search/farms/:farmId. */
+  farm: string;
   coordinates: PolygonGeometry;
   /** The plot's area in square meters, computed geodesically from its boundary. */
   areaSquareMeters: number;
@@ -33,8 +35,6 @@ export type NearbyPlot = {
   distanceMeters: number;
   /** The crops this plot's field currently offers — the valid choices for `rentPlot`. */
   crops: Crop[];
-  /** Id of the plot's farm — see farms.ts's getFarm, and /search/farms/:farmId. */
-  farm: string;
 };
 
 export type Rental = {

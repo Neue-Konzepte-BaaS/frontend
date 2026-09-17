@@ -69,7 +69,7 @@ export type RegisterInput = {
   farmName?: string;
   /** Required when role is "farmer". */
   address?: string;
-  /** Optional even for farmers. */
+  /** Optional; only used when role is "farmer". */
   description?: string;
 };
 
