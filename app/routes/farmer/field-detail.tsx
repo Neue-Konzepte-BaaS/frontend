@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
 import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots } from "~/lib/fields";
+import { activeRentalsByPlot, listFarmRentals } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-map";
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
@@ -29,16 +30,17 @@ export function meta() {
  */
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   await requireRole("farmer");
-  const [fields, catalog] = await Promise.all([listFields(), listCrops()]);
+  const [fields, catalog, farmRentals] = await Promise.all([listFields(), listCrops(), listFarmRentals()]);
   const field = fields.find((f) => f.id === params.fieldId);
   if (!field) {
     throw redirect("/farmer/fields");
   }
-  return { field, catalog };
+  return { field, catalog, farmRentals };
 }
 
 export default function FieldDetail({ loaderData }: Route.ComponentProps) {
-  const { catalog } = loaderData;
+  const { catalog, farmRentals } = loaderData;
+  const rentalByPlot = activeRentalsByPlot(farmRentals);
   const [field, setField] = useState<FieldWithPlots>(loaderData.field);
   const [rows, setRows] = useState("");
   const [cols, setCols] = useState("");
@@ -173,13 +175,19 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
   const mapShapes: MapShape[] = [
     { id: field.id, polygon: field.coordinates, variant: "field" as const },
-    ...field.plots.map((p, i) => ({
-      id: p.id,
-      polygon: p.coordinates,
-      variant: "plot" as const,
-      label: String(i + 1),
-      selected: selectedPlotIds.has(p.id),
-    })),
+    ...field.plots.map((p, i) => {
+      const rental = rentalByPlot.get(p.id);
+      return {
+        id: p.id,
+        polygon: p.coordinates,
+        variant: "plot" as const,
+        // Keeps the plot's number (still needed to match the checklist below)
+        // while making a rented plot impossible to miss before editing it.
+        label: rental ? `${i + 1}\n${rental.customer.firstName} ${rental.customer.lastName.charAt(0)}.` : String(i + 1),
+        selected: selectedPlotIds.has(p.id),
+        rented: Boolean(rental),
+      };
+    }),
   ];
 
   function handleMapShapeClick(id: string) {
@@ -261,7 +269,9 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
           <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:plotsLabel")}</p>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t("farmer:selectPlotsInstructions")}</p>
           <ul className="mt-3 divide-y divide-gray-200 dark:divide-gray-800">
-            {field.plots.map((p, i) => (
+            {field.plots.map((p, i) => {
+              const rental = rentalByPlot.get(p.id);
+              return (
               <li key={p.id}>
                 <label className="flex cursor-pointer items-start gap-3 py-3">
                   <input
@@ -283,10 +293,16 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
                     <span className="block text-sm text-gray-500">
                       {p.crops.length > 0 ? p.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
                     </span>
+                    {rental && (
+                      <span className="block text-sm font-medium text-rose-600 dark:text-rose-400">
+                        {t("farmer:rentedTo", { name: `${rental.customer.firstName} ${rental.customer.lastName}` })}
+                      </span>
+                    )}
                   </span>
                 </label>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       )}
