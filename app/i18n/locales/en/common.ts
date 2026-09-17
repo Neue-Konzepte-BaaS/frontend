@@ -32,7 +32,7 @@ export const common = {
   navFarms: "Farms",
   navAccounts: "Accounts",
   navRentals: "Rentals",
-  navCrops: "Crop catalog",
+  navCrops: "Crops",
   navBroadcast: "Broadcast",
 
   comingSoonLead: "Coming soon.",

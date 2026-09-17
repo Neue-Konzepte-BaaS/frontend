@@ -21,15 +21,18 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               // colour: context.md's accessibility bar rules out colour as the
               // only signal. A transparent border on the inactive tabs keeps
               // the bar from shifting height as you move between them.
-              `flex flex-1 flex-col items-center gap-1 border-t-2 py-2 text-xs ${
+              `flex min-w-0 flex-1 flex-col items-center gap-1 border-t-2 px-1 py-2 text-xs ${
                 isActive
                   ? "border-emerald-600 font-semibold text-emerald-700 dark:border-emerald-400 dark:text-emerald-400"
                   : "border-transparent font-medium text-gray-500 dark:text-gray-400"
               }`
             }
           >
-            <Icon className="h-5 w-5" aria-hidden />
-            {item.label}
+            <Icon className="h-5 w-5 shrink-0" aria-hidden />
+            {/* Five slots on a 375px screen leave ~70px per label; a long one
+                (German "Pflanzenkatalog") would otherwise run into its
+                neighbour. */}
+            <span className="w-full truncate text-center">{item.label}</span>
           </NavLink>
         );
       })}

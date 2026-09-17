@@ -35,7 +35,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             </Link>
             {/* Every /admin page acts on the whole platform, not one farm —
                 the badge keeps that visible next to the brand. */}
-            <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200">
+            <span className="hidden rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-800 sm:inline dark:bg-emerald-950 dark:text-emerald-200">
               {t("admin:roleBadge")}
             </span>
           </div>

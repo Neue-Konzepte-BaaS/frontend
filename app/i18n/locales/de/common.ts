@@ -33,8 +33,8 @@ export const common: Shape = {
   navPlatform: "Plattform",
   navFarms: "Höfe",
   navAccounts: "Konten",
-  navRentals: "Mietverträge",
-  navCrops: "Pflanzenkatalog",
+  navRentals: "Mieten",
+  navCrops: "Pflanzen",
   navBroadcast: "Rundnachricht",
 
   comingSoonLead: "Demnächst verfügbar.",
