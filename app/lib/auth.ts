@@ -4,9 +4,9 @@ import { apiClient, ApiError } from "~/lib/api-client";
  * Auth helpers, thin wrappers over the api client. These mirror the backend's
  * auth endpoints (see backend openapi.yml):
  *
- *   POST /api/auth/register  -> sets cookies, returns { id, role, postal_code }
- *   POST /api/auth/login     -> sets cookies, returns { id, role, postal_code }
- *   GET  /api/auth/me        -> returns { id, role, postal_code } for the cookie
+ *   POST /api/auth/register  -> sets cookies, returns { id, role, first_name, last_name, postal_code }
+ *   POST /api/auth/login     -> sets cookies, returns { id, role, first_name, last_name, postal_code }
+ *   GET  /api/auth/me        -> returns { id, role, first_name, last_name, postal_code } for the cookie
  *
  * The tokens live in HttpOnly cookies the browser can't read; we keep only a
  * minimal `auth_user` in localStorage for fast client-side role checks/redirects.
@@ -36,6 +36,8 @@ export function roleLabel(t: (key: string) => string, role: Role): string {
 export type Account = {
   id: string;
   role: Role;
+  firstName: string;
+  lastName: string;
   /**
    * 0 for admins (no subtype postal_code column) and for any Account cached
    * in localStorage from before this field existed — treat 0 as "unknown",
@@ -48,11 +50,13 @@ export type Account = {
 type SessionAccountResponse = {
   id: string;
   role: Role;
+  first_name: string;
+  last_name: string;
   postal_code: number;
 };
 
 function fromResponse(res: SessionAccountResponse): Account {
-  return { id: res.id, role: res.role, postalCode: res.postal_code };
+  return { id: res.id, role: res.role, firstName: res.first_name, lastName: res.last_name, postalCode: res.postal_code };
 }
 
 /** Roles a user may pick when registering. Admins are seeded in the DB. */
@@ -89,9 +93,9 @@ export function getStoredUser(): Account | null {
     const raw = localStorage.getItem(AUTH_USER_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Account;
-    // A stale entry cached before `postalCode` existed on this type would
-    // otherwise carry `undefined` at runtime despite the type saying `number`.
-    return { ...parsed, postalCode: parsed.postalCode ?? 0 };
+    // A stale entry cached before these fields existed on this type would
+    // otherwise carry `undefined` at runtime despite the type saying `number`/`string`.
+    return { ...parsed, postalCode: parsed.postalCode ?? 0, firstName: parsed.firstName ?? "", lastName: parsed.lastName ?? "" };
   } catch {
     return null;
   }

@@ -6,7 +6,9 @@ export const search = {
   customerMetaTitle: "Home · BaaS",
   customerTitle: "Home",
   myRentals: "My rentals",
-  noRentalsYet: "You haven't rented a plot yet — search above to find one.",
+  // Plot search moved to its own /search tab (issue #27) — this page no
+  // longer has a search box "above" it, hence no mention of one here.
+  noRentalsYet: "You haven't rented a plot yet.",
   booked: "Booked",
 
   postalCodeOrCity: "Postal code or city",
@@ -44,10 +46,9 @@ export const search = {
   farmHasNoPlotsNearby: "No available plots from this farm near your search right now.",
 
   // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
+  // "Me" moved out of coming-soon once issue #34 built it — see i18n/locales/*/customer.ts.
   boardMetaTitle: "Board · BaaS",
   boardTitle: "Board",
   inboxMetaTitle: "Inbox · BaaS",
   inboxTitle: "Inbox",
-  meMetaTitle: "Me · BaaS",
-  meTitle: "Me",
 } as const;

@@ -10,7 +10,7 @@ export const search: Shape = {
   customerMetaTitle: "Home · BaaS",
   customerTitle: "Home",
   myRentals: "Meine Mieten",
-  noRentalsYet: "Du hast noch keine Parzelle gemietet — suche oben, um eine zu finden.",
+  noRentalsYet: "Du hast noch keine Parzelle gemietet.",
   booked: "Gebucht",
 
   postalCodeOrCity: "Postleitzahl oder Stadt",
@@ -51,6 +51,4 @@ export const search: Shape = {
   boardTitle: "Pinnwand",
   inboxMetaTitle: "Posteingang · BaaS",
   inboxTitle: "Posteingang",
-  meMetaTitle: "Ich · BaaS",
-  meTitle: "Ich",
 };
