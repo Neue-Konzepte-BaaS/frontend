@@ -8,6 +8,9 @@ export default [
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).
   route("search", "routes/search.tsx"),
+  // A farm's public details, reached by clicking a farm in search results.
+  // Same public reach as /search — no guard, no customer-layout.
+  route("search/farms/:farmId", "routes/search/farm.tsx"),
   // Admin is still a TEMPORARY placeholder (Issue #8).
   route("admin", "routes/admin.tsx"),
   // Tenant section: nav is Home/Search/Board/Inbox/Me (issue #27). A layout

@@ -12,15 +12,15 @@ import type { PolygonGeometry } from "~/lib/geo";
  *   PUT  /api/plots/{plotID}/crops      -> Crop[]
  *
  * Unlike auth.ts, no camelCase<->snake_case mapping is needed: the backend
- * already uses flat lowercase JSON keys (id, name, farmer, field,
+ * already uses flat lowercase JSON keys (id, name, farm, field,
  * coordinates, plots) that match these types directly.
  */
 
 export type Field = {
   id: string;
   name: string;
-  /** Account id of the owning farmer. */
-  farmer: string;
+  /** Id of the owning farm — see farms.ts. */
+  farm: string;
   coordinates: PolygonGeometry;
 };
 

@@ -67,6 +67,10 @@ export type RegisterInput = {
   postalCode: number;
   /** Required when role is "farmer". */
   farmName?: string;
+  /** Required when role is "farmer". */
+  address?: string;
+  /** Optional even for farmers. */
+  description?: string;
 };
 
 const AUTH_USER_KEY = "auth_user";
@@ -109,6 +113,8 @@ export async function register(input: RegisterInput): Promise<Account> {
     role: input.role,
     postal_code: input.postalCode,
     farm_name: input.farmName ?? "",
+    address: input.address ?? "",
+    description: input.description ?? "",
   });
   const account = fromResponse(res);
   rememberUser(account);

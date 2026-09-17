@@ -9,6 +9,8 @@ export const farmer = {
   noFieldsYet: "No fields yet — use the plot planner to draw your first one.",
   plot_one: "{{count}} plot",
   plot_other: "{{count}} plots",
+  rentedTo: "rented to {{name}}",
+  editPlots: "Edit plots",
 
   newFieldMetaTitle: "Draw a field · BaaS",
   newFieldTitle: "Draw a new field",
