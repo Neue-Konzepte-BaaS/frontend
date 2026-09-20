@@ -38,3 +38,9 @@ export function formatDistance(meters: number, locale: string = "en-GB"): string
 export function formatArea(squareMeters: number, locale: string = "en-GB"): string {
   return `${squareMeters.toLocaleString(locale, { maximumFractionDigits: 0 })} m²`;
 }
+
+/** Formats a rental's date range, e.g. "01 Jan 2026 – 30 Jun 2026". */
+export function formatRentalPeriod(startAt: string, endAt: string, locale: string = "en-GB"): string {
+  const dateFormatter = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" });
+  return `${dateFormatter.format(new Date(startAt))} – ${dateFormatter.format(new Date(endAt))}`;
+}
