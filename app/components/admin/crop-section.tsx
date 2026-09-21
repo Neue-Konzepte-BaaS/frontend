@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createCrop, deleteCrop, type Crop } from "~/lib/admin";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
+import { Field as FormField, FormError, inputClass, primaryButtonClass } from "~/components/form";
 
 export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   const { t } = useTranslation("admin");
@@ -10,6 +10,8 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   const [months, setMonths] = useState("");
   const [adding, setAdding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  /** Which crop's Delete button is armed and waiting for a second click. */
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [cropList, setCropList] = useState<Crop[]>(initialCrops);
@@ -21,7 +23,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
 
     const m = Number(months);
     if (!Number.isInteger(m) || m < 1) {
-      setError("Duration must be a positive integer.");
+      setError(t("cropDurationInvalid"));
       return;
     }
 
@@ -42,6 +44,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   async function handleDelete(crop: Crop) {
     setError(null);
     setSuccess(null);
+    setPendingDeleteId(null);
     setDeletingId(crop.id);
     try {
       await deleteCrop(crop.id);
@@ -60,9 +63,6 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("cropsTitle")}</h2>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("cropsBody")}</p>
-
       {cropList.length > 0 && (
         <ul className="mt-4 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
           {cropList.map((crop) => (
@@ -70,14 +70,37 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
               <span className="text-sm text-gray-700 dark:text-gray-200">
                 {t("cropDuration", { name: crop.name, months: crop.durationMonths })}
               </span>
-              <button
-                type="button"
-                disabled={deletingId === crop.id}
-                onClick={() => handleDelete(crop)}
-                className="ml-4 shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 dark:text-red-400 dark:hover:bg-red-950"
-              >
-                {deletingId === crop.id ? t("cropDeleting") : t("cropDelete")}
-              </button>
+              {/* Deleting a crop is platform-wide and immediate, so the first
+                  click only arms the button — the second one deletes. Inline
+                  rather than window.confirm, which is unstyled and can't be
+                  translated. */}
+              {pendingDeleteId === crop.id ? (
+                <span className="ml-4 flex shrink-0 items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={deletingId === crop.id}
+                    onClick={() => handleDelete(crop)}
+                    className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                  >
+                    {deletingId === crop.id ? t("cropDeleting") : t("cropDeleteConfirm")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPendingDeleteId(null)}
+                    className="rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                  >
+                    {t("cropDeleteCancel")}
+                  </button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setPendingDeleteId(crop.id)}
+                  className="ml-4 shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+                >
+                  {t("cropDelete")}
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -86,7 +109,10 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
       <form onSubmit={handleSubmit} className="mt-4 max-w-sm space-y-4">
         {error && <FormError message={error} />}
         {success && (
-          <p className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
+          <p
+            role="status"
+            className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
+          >
             {success}
           </p>
         )}
@@ -117,7 +143,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
           />
         </FormField>
 
-        <button type="submit" disabled={adding} className={`${submitClass} w-auto px-6 py-2 text-sm`}>
+        <button type="submit" disabled={adding} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
           {adding ? t("cropAdding") : t("cropAdd")}
         </button>
       </form>
