@@ -9,6 +9,8 @@ export const farmer = {
   noFieldsYet: "No fields yet — use the plot planner to draw your first one.",
   plot_one: "{{count}} plot",
   plot_other: "{{count}} plots",
+  rentedTo: "rented to {{name}}",
+  editPlots: "Edit plots",
 
   newFieldMetaTitle: "Draw a field · BaaS",
   newFieldTitle: "Draw a new field",
@@ -48,9 +50,26 @@ export const farmer = {
 
   mapAriaLabel: "Field map",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   tenantsMetaTitle: "Tenants · BaaS",
   tenantsTitle: "Tenants",
+  tenantsActiveSummary: "{{count}} active",
+  field_one: "{{count}} field",
+  field_other: "{{count}} fields",
+  tenantsSearchPlaceholder: "Search name or plot…",
+  tenantsColTenant: "Tenant",
+  tenantsColPlot: "Plot",
+  tenantsColField: "Field",
+  tenantsColPeriod: "Period",
+  tenantsColStatus: "Status",
+  tenantsColAction: "Action",
+  statusRented: "Rented",
+  statusPast: "Past",
+  tenantEndedOn: "ended {{date}}",
+  openAction: "Open",
+  noTenantsYet: "No tenants yet — plots you rent out will show up here.",
+  noTenantsMatchSearch: "No tenants match your search.",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   requestsMetaTitle: "Requests · BaaS",
   requestsTitle: "Requests",
   boardMetaTitle: "Board · BaaS",

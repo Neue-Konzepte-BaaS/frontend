@@ -20,6 +20,9 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
   shared form primitives (`inputClass`, `submitClass`/`primaryButtonClass`,
   `secondaryButtonClass`, `Field`, `FormError`) —
   every form in the app should use these instead of redefining them.
+  `app/components/switch.tsx` (`<Switch>`) is the shared on/off toggle (labeled
+  row + pill/knob, `role="switch"`) — added for the tenant Me page's settings
+  (issue #34); use it instead of a new bespoke toggle.
 - `app/lib/` — shared logic: constants, the API client, helpers, types.
   E.g. `~/lib/constants.ts`, `~/lib/api-client.ts`.
 - Group by feature under these folders when a feature grows — don't invent
@@ -322,8 +325,11 @@ in either route.
   shared component — see plot search section above for why other
   per-page-header content isn't factored out either).
 - Strings live in `app/i18n/locales/<en|de>/<namespace>.ts`, one TS module per
-  feature area (`common`, `home`, `auth`, `search`, `farmer`, `admin` — mirrors
-  the route groupings above). Each `de/*.ts` file imports its `en/*.ts`
+  feature area (`common`, `home`, `auth`, `search`, `farmer`, `admin`,
+  `customer` — mirrors the route groupings above; `customer` holds the tenant
+  Me/profile page's strings, issue #34 — tenant Home still uses `search` for
+  historical reasons, see that section's own note). Each `de/*.ts` file
+  imports its `en/*.ts`
   counterpart's keys as a type (`{ [K in keyof typeof en]: string }`) so a
   missing or renamed key fails `npm run typecheck`, not just a runtime lookup.
   Add a new string to **both** files under the namespace matching where it's

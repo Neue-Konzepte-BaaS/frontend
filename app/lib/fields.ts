@@ -19,7 +19,7 @@ import type { PolygonGeometry } from "~/lib/geo";
 export type Field = {
   id: string;
   name: string;
-  /** Id of the farm this field belongs to. */
+  /** Id of the owning farm — see farms.ts. */
   farm: string;
   coordinates: PolygonGeometry;
 };
