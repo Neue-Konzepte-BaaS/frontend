@@ -11,8 +11,19 @@ export default [
   // A farm's public details, reached by clicking a farm in search results.
   // Same public reach as /search — no guard, no customer-layout.
   route("search/farms/:farmId", "routes/search/farm.tsx"),
-  // Admin is still a TEMPORARY placeholder (Issue #8).
-  route("admin", "routes/admin.tsx"),
+  // Admin section: nav is Platform/Farms/Accounts/Rentals, plus the System
+  // tools (Crop catalog, Broadcast) pinned separately (issue #25). A layout
+  // owns the requireRole("admin") guard and shared chrome; children render in
+  // its <Outlet />. /admin/rentals is still a ComingSoon stub — the backend
+  // has no admin rentals endpoint yet.
+  layout("routes/admin/layout.tsx", { id: "admin-layout" }, [
+    route("admin", "routes/admin/index.tsx"),
+    route("admin/farms", "routes/admin/farms.tsx"),
+    route("admin/accounts", "routes/admin/accounts.tsx"),
+    route("admin/rentals", "routes/admin/rentals.tsx"),
+    route("admin/crops", "routes/admin/crops.tsx"),
+    route("admin/broadcast", "routes/admin/broadcast.tsx"),
+  ]),
   // Tenant section: nav is Home/Search/Board/Inbox/Me (issue #27). A layout
   // owns the requireRole("customer") guard + shared chrome for everything
   // except Search — see that route's own comment above.
