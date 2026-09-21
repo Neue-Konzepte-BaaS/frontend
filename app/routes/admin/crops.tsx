@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/crops";
 import { listCrops } from "~/lib/admin";
 import { CropSection } from "~/components/admin/crop-section";
+import { CareGuideSection } from "~/components/admin/care-guide-section";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -22,6 +23,11 @@ export default function AdminCrops({ loaderData }: Route.ComponentProps) {
       <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("cropsTitle")}</h1>
       <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("cropsBody")}</p>
       <CropSection initialCrops={loaderData.crops} />
+      {/* The weekly care guide hangs off a crop, so it is authored here rather
+          than under its own nav entry — see backend#44 and the section's own
+          comment. It reads the catalog as loaded; a crop added above appears
+          in the picker after the next visit. */}
+      <CareGuideSection crops={loaderData.crops} />
     </main>
   );
 }

@@ -122,7 +122,8 @@ calling `requireRole`/`me()` again.
   Farms, Accounts, Rentals, plus Crop catalog and Broadcast.
 - `app/routes/farmer/` — `farmer-layout`; Home, Fields, a field's detail page,
   Plot planner, Tenants, Requests, Board, Care guide, Farm settings.
-- `app/routes/customer/` — `customer-layout`; Home, Board, Inbox, Me.
+- `app/routes/customer/` — `customer-layout`; Home, a rented plot's own page,
+  Board, Inbox, Me.
   `/search` stays **outside** this layout (it must render for anonymous
   visitors) and mounts the shell itself when a customer is signed in.
 
@@ -190,6 +191,52 @@ and Status columns the issue #25 mockup drew on the farms table (the endpoint
 carries the owner's postal code and a free-text address; farm verification is
 backend#49), and that mockup's "needs attention"/season panels (announcements
 are farmer+customer-only on the backend, and there is no season model).
+
+### The tenant plot page (`/customer/plots/:plotId`)
+
+Issue #33, and the frontend half of backend#44. Home lists the tenant's
+rentals; "Open plot" opens one, with three tabs — care, crops, rental.
+
+**Two list calls, no per-plot endpoint.** `GET /api/rentals` already returns
+every rental with its plot and crop, and `GET /api/care-guide` every *running*
+rental's guide, so the loader finds the plot in what the tenant already has
+rather than fetching it by id — the same reasoning as
+`farmer/field-detail.tsx`. A plot id the tenant has never rented redirects to
+`/customer`.
+
+**The two lists are not the same set, and the difference is the whole design.**
+`listMyRentals()` includes rentals that have ended; the care guide only carries
+running ones. So `guide` is legitimately `undefined`, and the page says "this
+rental isn't running" instead of rendering an empty week. Everything that needs
+a live rental — the current week, the field name, the progress bar — hangs off
+`guide`; everything that survives the rental's end — the period, the crop, the
+plot size — comes from the rental.
+
+**Never recompute the week client-side.** `currentWeek`/`totalWeeks` are
+computed by the backend against the *database* clock, and a rental week is
+counted from the tenant's own start date, not the calendar (`~/lib/care.ts`
+documents both). `isoWeek()` in that module is the one place a real calendar
+week is wanted — the "expected harvest" line, which a tenant reads off a wall
+calendar.
+
+**What is derived, and labelled as derived.** `cropStage()` maps the rental
+period to Not started / Growing / Ready to harvest / Season over. Nothing in
+the API observes the plant: there is no growth state, and the farmer's ripeness
+signal is backend#33, still open. The Crops tab therefore carries a note saying
+the status follows the rental period — don't drop it and let the badge read as
+an observation of the plot. The **handover document** the issue asks for is
+missing for the same kind of reason: nothing stores or serves one, so the tab
+says so rather than rendering a dead download button. Both are backend
+follow-ups.
+
+**The active tab lives in `?tab=`**, like the admin listings' filters, so a
+care tab is bookmarkable and Back steps through the tabs rather than off the
+page. `care` is the default and writes no parameter.
+
+Authoring for the guide is on the admin side:
+`app/components/admin/care-guide-section.tsx`, mounted on `/admin/crops`
+because a guide hangs off a crop and the catalog is admin-owned. A farmer can
+read a crop's guide through the same endpoint but cannot write it.
 
 ### Plot search lives in one component
 
