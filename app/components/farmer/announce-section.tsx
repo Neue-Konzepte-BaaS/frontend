@@ -59,6 +59,10 @@ export function AnnounceSection({ fields, onPosted }: AnnounceSectionProps) {
   const hasFields = fields.length > 0;
   const hasPlots = plots.length > 0;
   const scopeIncomplete = (scope === "field" && !fieldId) || (scope === "plot" && !plotId);
+  // HTML's `required` only blocks the literal empty string, not whitespace —
+  // without this, a subject/body of only spaces would pass validation and
+  // get trimmed to "" right before the request, submitting an empty post.
+  const textIncomplete = subject.trim() === "" || body.trim() === "";
 
   return (
     <section>
@@ -166,7 +170,11 @@ export function AnnounceSection({ fields, onPosted }: AnnounceSectionProps) {
           </div>
         </fieldset>
 
-        <button type="submit" disabled={sending || scopeIncomplete} className={`${submitClass} w-auto px-6 py-2 text-sm`}>
+        <button
+          type="submit"
+          disabled={sending || scopeIncomplete || textIncomplete}
+          className={`${submitClass} w-auto px-6 py-2 text-sm`}
+        >
           {sending ? t("announceSending") : t("announceSend")}
         </button>
       </form>
