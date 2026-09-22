@@ -49,6 +49,13 @@ export const search: Shape = {
 
   boardMetaTitle: "Pinnwand · BaaS",
   boardTitle: "Pinnwand",
+  boardEmptySubtitle: "Hier siehst du Mitteilungen der Höfe, bei denen du mietest.",
+  boardMultipleFarmsSubtitle: "Mitteilungen von {{count}} Höfen, bei denen du mietest",
+  noAnnouncementsYet: "Noch keine Mitteilungen.",
+  pinnedBadge: "Angeheftet",
+  pinAnnouncement: "Diese Nachricht anheften",
+  unpinAnnouncement: "Anheftung dieser Nachricht aufheben",
+
   inboxMetaTitle: "Posteingang · BaaS",
   inboxTitle: "Posteingang",
 };
