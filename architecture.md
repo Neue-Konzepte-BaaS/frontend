@@ -17,7 +17,8 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
   screens sharing chrome/auth gets its own subfolder + a `layout()` route
   (e.g. `app/routes/farmer/`) rather than flat sibling files.
 - `app/components/` — shared, reusable UI. `app/components/form.tsx` holds the
-  shared form primitives (`inputClass`, `submitClass`, `Field`, `FormError`) —
+  shared form primitives (`inputClass`, `submitClass`/`primaryButtonClass`,
+  `secondaryButtonClass`, `Field`, `FormError`) —
   every form in the app should use these instead of redefining them.
   `app/components/switch.tsx` (`<Switch>`) is the shared on/off toggle (labeled
   row + pill/knob, `role="switch"`) — added for the tenant Me page's settings
@@ -107,30 +108,98 @@ Lightweight conventions so the codebase stays coherent. Rules, not a straitjacke
   treats every other role-guarded page). `/` is **not** in `PUBLIC_PATHS`:
   those are matched with `startsWith`, so `"/"` would match every path in the
   app — `forceLogout()` checks it as an exact match instead. Role-guarded:
-  `/admin`, `/farmer/*`.
+  `/admin/*`, `/farmer/*`, `/customer/*`.
 
-> **`app/routes/admin.tsx` is still a TEMPORARY** placeholder dashboard
-> (Issue #8) — deliberately left alone; context.md gives no MVP feature list
-> for the admin role, so there's nothing real to build against yet. `/farmer`
-> and `/customer` are both real: `/farmer` is a layout route
-> (`app/routes/farmer/layout.tsx`) with `requireRole("farmer")` in its
-> `clientLoader`, plus child routes for field/plot management
-> (`app/routes/farmer/{index,fields,new-field,field-detail}.tsx`; children
-> read the already-resolved account via `useRouteLoaderData("farmer-layout")`
-> instead of calling `requireRole`/`me()` again). `/customer`
-> (`app/routes/customer.tsx`) is a flat route — one screen, not a
-> multi-page section, so no layout route — showing the plot search plus the
-> customer's own rentals.
+### Role sections and the nav shell
 
-### Plot search lives in one component, mounted twice
+All three roles follow the same shape (issues #27 and #25): a `layout()` route
+per role owning `requireRole(<role>)` in its `clientLoader` and the page
+chrome, with child routes rendering in its `<Outlet />`. Children read the
+already-resolved account via `useRouteLoaderData("<role>-layout")` rather than
+calling `requireRole`/`me()` again.
+
+- `app/routes/admin/` — `admin-layout`; Platform overview (`index.tsx`),
+  Farms, Accounts, Rentals, plus Crop catalog and Broadcast.
+- `app/routes/farmer/` — `farmer-layout`; Home, Fields, a field's detail page,
+  Plot planner, Tenants, Requests, Board, Care guide, Farm settings.
+- `app/routes/customer/` — `customer-layout`; Home, Board, Inbox, Me.
+  `/search` stays **outside** this layout (it must render for anonymous
+  visitors) and mounts the shell itself when a customer is signed in.
+
+The nav itself is shared: `<AppShell items mobileItems pinned>`
+(`app/components/nav/app-shell.tsx`) renders `SideNav` at `md` and up and
+`BottomNav` below it, with the page's own header — brand, account, logout,
+which differ per role — staying outside the shell. Nav entries come from the
+per-role hooks in `~/lib/nav-items.tsx`, hooks rather than plain data so
+labels re-resolve on a language switch; their labels live in the `common`
+namespace with the other `nav*` keys.
+
+Two rules worth knowing before adding a role or a destination:
+
+- **The bottom bar holds about five items.** Past that it stops being usable
+  on a phone, so a role with a longer sidebar passes a curated `mobileItems`
+  subset (see `useFarmerMobileNavItems`, `useAdminMobileNavItems`) and makes
+  sure whatever it drops is reachable from a page that *is* in the bar — the
+  admin's Platform overview links to Broadcast for exactly that reason.
+- **`pinned` takes one item or a group.** It renders below the sidebar's
+  divider: the farmer pins "Farm settings" alone, the admin pins the System
+  tools (Crop catalog, Broadcast) as a pair.
+
+**Nav can lead somewhere unbuilt, but it must say so.** A destination whose
+feature doesn't exist yet gets a four-line stub route via
+`~/lib/coming-soon-route.tsx` (`comingSoonMeta` + `comingSoonPage`), which
+renders `<ComingSoon />` — an explicit "not built yet", never a blank page or
+a spinner. `/admin/rentals` is the remaining one: there is no admin rentals
+endpoint and no backend issue for it yet. Farms and Accounts were stubs too
+until backend#55 landed their endpoints, which is the shape this is meant to
+take — the stub swaps out, the nav entry never moves.
+
+### Paginated listings (`/admin/farms`, `/admin/accounts`)
+
+The two admin listings are the first paginated responses the frontend
+consumes, and the only ones: they return an envelope
+`{items, total, limit, offset}` (typed once as `Page<T>` in `~/lib/admin.ts`)
+where `/api/fields`, `/api/rentals` and `/api/announcements` return bare
+arrays. Their JSON is camelCase, checked against the handlers rather than
+assumed.
+
+- **`limit` is our constant, never the user's.** `ADMIN_PAGE_SIZE` (20) is
+  what both listings send. The backend answers a `limit` outside `[1, 100]`
+  with a **400 rather than a clamp**, so a page-size control would be a way to
+  break the page with nothing gained.
+- **Filters and the page live in the URL, not component state.** Each route's
+  `clientLoader` reads `q`/`role`/`postalCode`/`offset` off the request URL, so
+  a filtered page is bookmarkable and Back steps through the admin's own
+  searches. Filter forms are plain `<Form method="get">` — no submit handler,
+  nothing to keep in sync. A form that sits inside an active filter must carry
+  that filter in a hidden input (see `admin/accounts.tsx`), or submitting
+  silently clears it.
+- **Anything the backend would 400 on is normalised in the loader**, not
+  forwarded: `offset` is floored at a whole number ≥ 0 and an unrecognised
+  `?role=` is dropped. A hand-edited or stale link should degrade to page one,
+  not to an error screen.
+- Rows are cards that become rows at `md`, not a `<table>`: a six-column table
+  at 375px either scrolls sideways or shrinks the type below what context.md
+  asks for.
+
+**What the admin still can't show**, all flagged as backend follow-ups rather
+than faked: an admin rentals list, the account's email in the header
+(`Account` carries only `id`/`role`/`postalCode`), a farms-added-this-month
+delta (`registeredLast30Days` counts every account, not farmers), the Region
+and Status columns the issue #25 mockup drew on the farms table (the endpoint
+carries the owner's postal code and a free-text address; farm verification is
+backend#49), and that mockup's "needs attention"/season panels (announcements
+are farmer+customer-only on the backend, and there is no season model).
+
+### Plot search lives in one component
 
 `app/components/plot-search.tsx` (`<PlotSearch />`) owns the whole search:
 the postal-code/city box over `GET /api/plots/nearest` (via
 `findNearestPlots` in `~/lib/rentals.ts`), the results map, and the rent
-flow with its 404/409 error handling. It is mounted by both:
-
-- `/search` (`app/routes/search.tsx`) — the public page, for anyone.
-- `/customer` (`app/routes/customer.tsx`) — same search, plus "My rentals".
+flow with its 404/409 error handling. It is mounted by `/search` (`app/routes/search.tsx`) — the public page, for
+anyone, and the tenant nav's own "Search" tab since #27 moved search off the
+customer dashboard. `/customer` (`app/routes/customer/home.tsx`) now shows
+only the tenant's own rentals.
 
 The component holds its own search state. Callers pass only `account` (a
 customer gets Rent buttons; `null` gets a "Log in to rent" link),

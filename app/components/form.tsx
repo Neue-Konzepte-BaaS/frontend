@@ -7,8 +7,17 @@
 export const inputClass =
   "w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white";
 
-export const submitClass =
-  "w-full rounded-lg bg-emerald-600 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60";
+/**
+ * Primary button, sized to its label — for a button that sits in a row with
+ * other controls (a filter bar, a confirm pair). `submitClass` below is this
+ * plus `w-full`, which is what a form's lone submit button wants; note that
+ * appending `w-auto` to it does NOT undo that, since both are width utilities
+ * and Tailwind's own order decides which wins.
+ */
+export const primaryButtonClass =
+  "rounded-lg bg-emerald-600 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60";
+
+export const submitClass = `w-full ${primaryButtonClass}`;
 
 /** Secondary/outline button, for a non-primary action next to a submitClass button (e.g. "cancel", "redraw"). */
 export const secondaryButtonClass =
@@ -51,7 +60,10 @@ export function FormError({ message }: { message: string }) {
 /** Shared inline success banner — the FormError of the happy path. */
 export function FormSuccess({ message }: { message: string }) {
   return (
-    <p className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
+    <p
+      role="status"
+      className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
+    >
       {message}
     </p>
   );
