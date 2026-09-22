@@ -45,10 +45,17 @@ export const search = {
   farmNeedsSearchContext: "Search for a postal code or city to see this farm's available plots.",
   farmHasNoPlotsNearby: "No available plots from this farm near your search right now.",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
-  // "Me" moved out of coming-soon once issue #34 built it — see i18n/locales/*/customer.ts.
   boardMetaTitle: "Board · BaaS",
   boardTitle: "Board",
+  boardEmptySubtitle: "You'll see messages from the farms you rent from here.",
+  // Only ever shown for 2+ farms — a single farm renders its name directly instead (see board.tsx).
+  boardMultipleFarmsSubtitle: "Announcements from {{count}} farms you rent from",
+  noAnnouncementsYet: "No announcements yet.",
+  pinnedBadge: "Pinned",
+  pinAnnouncement: "Pin this message",
+  unpinAnnouncement: "Unpin this message",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   inboxMetaTitle: "Inbox · BaaS",
   inboxTitle: "Inbox",
 } as const;
