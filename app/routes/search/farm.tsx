@@ -60,7 +60,10 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     hasLocationContext: Boolean(postalCode || city),
     // Carries the search that led here back into "back to search" below.
     backToSearchQuery: url.searchParams.toString(),
-    rentedPlotIds: myRentals.map((r) => r.plotId),
+    // A declined rental never occupied the plot, so it doesn't block
+    // rebooking; requested and approved both do (the backend enforces this
+    // with the same overlap constraint either way).
+    rentedPlotIds: myRentals.filter((r) => r.status !== "declined").map((r) => r.plotId),
   };
 }
 
@@ -187,7 +190,7 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                   </span>
                   {isRented ? (
                     <span className="shrink-0 text-sm font-medium text-emerald-700 dark:text-emerald-400">
-                      {t("search:rented")}
+                      {t("search:requestSent")}
                     </span>
                   ) : (
                     <span className="shrink-0 text-gray-400" aria-hidden>
@@ -218,7 +221,11 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between p-4">
+        {/* A signed-in customer gets AppShell's full-bleed sidebar layout below,
+            so the header must also go edge to edge to line up with it — unlike
+            the anonymous case, whose content stays centered at max-w-6xl with
+            no sidebar (see search.tsx for the same pattern). */}
+        <div className={`flex items-center justify-between p-4 ${customer ? "" : "mx-auto max-w-6xl"}`}>
           <Link to="/" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
             {t("common:brand")}
           </Link>

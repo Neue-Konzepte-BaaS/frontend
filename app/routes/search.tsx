@@ -49,7 +49,12 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between p-4">
+        {/* A signed-in customer gets AppShell's full-bleed sidebar layout below,
+            so the header must also go edge to edge to line up with it — unlike
+            the anonymous case, whose content stays centered at max-w-5xl with
+            no sidebar (see customer/layout.tsx's header for the same full-bleed
+            pattern once AppShell is in play). */}
+        <div className={`flex items-center justify-between p-4 ${customer ? "" : "mx-auto max-w-5xl"}`}>
           <Link to="/" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
             {t("common:brand")}
           </Link>
