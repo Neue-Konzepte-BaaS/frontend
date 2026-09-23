@@ -21,8 +21,8 @@ export function LanguageSwitcher() {
           className={
             "rounded-md px-2 py-1 text-xs font-medium " +
             (current === code
-              ? "bg-emerald-600 text-white"
-              : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800")
+              ? "bg-moss text-ivory"
+              : "text-olive hover:bg-cream")
           }
         >
           {label}

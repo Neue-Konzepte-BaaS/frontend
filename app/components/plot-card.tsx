@@ -18,8 +18,8 @@ export function PlotCard({
   return (
     <li className="flex items-center justify-between gap-4 py-4">
       <div className="min-w-0">
-        <p className="font-semibold text-gray-900 dark:text-white">{name}</p>
-        {meta && <p className="mt-1 text-sm text-gray-500">{meta}</p>}
+        <p className="font-semibold text-forest">{name}</p>
+        {meta && <p className="mt-1 text-sm text-warm-olive">{meta}</p>}
       </div>
       <div className="shrink-0">{action}</div>
     </li>

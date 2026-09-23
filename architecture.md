@@ -371,6 +371,53 @@ in either route.
 - Hold the accessibility bar from `context.md`: sufficient contrast, large tap
   targets, few steps, mobile-first.
 
+### Colour palette
+
+All brand colours are defined once as CSS variables in `app/app.css` under
+`@theme` and are available as Tailwind utilities (`bg-forest`, `text-moss`,
+etc.). Never use hardcoded Tailwind grey/emerald/green classes — always use a
+palette token:
+
+| Token | Hex | Use |
+|---|---|---|
+| `forest` | #31311B | darkest text, backgrounds |
+| `deep-olive` | #34371D | primary buttons, logo |
+| `moss` | #524A26 | active states, focus rings |
+| `olive` | #797449 | secondary actions |
+| `sage` | #848662 | accents |
+| `warm-olive` | #9B8D5B | muted text |
+| `wood` | #5F572E | body text |
+| `beige` | #B4AF8A | borders, dividers |
+| `cream` | #E5D7B4 | nav background, hover fills |
+| `ivory` | #F3E7C8 | cards, inputs |
+| `paper` | #F7F1DF | page background |
+| `error` | #A96F4A | error states |
+
+No dark mode is implemented — remove `dark:` variants when encountered.
+
+### Typography
+
+Global utility classes are defined in `app/app.css` under `@layer components`:
+`.h1`–`.h4` (serif/Lora headings) and `.body-lg`, `.body-md`, `.body-sm`,
+`.text-muted` (body text). Use these instead of redefining font-size/weight
+inline. The serif font is **Lora** (loaded via Google Fonts in `root.tsx`);
+the sans font is **Inter**.
+
+### Headers / navigation
+
+- **Public routes** (`/`, `/login`, `/register`, `/search`, `/for-farmers`)
+  each have their own **inline header** (no shared PublicNav component). Each
+  inline header shows the logo, nav links (Home / For farmers / For customers),
+  `<LanguageSwitcher />`, and Login/Get-Started buttons. The header is
+  hand-rolled per route so each page controls its own active nav state and
+  account-aware CTA (e.g. "Go to dashboard" when already logged in).
+- **Authenticated routes** (Customer, Farmer, Admin layouts) have their own
+  inline header (logo + user name + `<LanguageSwitcher />` + logout). The
+  switcher stays visible in authenticated layouts because settings-page
+  navigation shouldn't be the only way to change language.
+- The nav shell (`AppShell` / `SideNav` / `BottomNav`) stays outside these
+  headers, as before.
+
 ## Working conventions
 
 - Small, focused commits with imperative messages ("add login form").

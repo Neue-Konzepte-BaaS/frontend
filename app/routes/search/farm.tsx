@@ -10,7 +10,6 @@ import { formatArea } from "~/components/plot-card";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
-import { submitClass } from "~/components/form";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
@@ -21,20 +20,6 @@ export function meta() {
   return [{ title: i18n.t("search:farmMetaTitle") }];
 }
 
-/**
- * A farm's public details — reached by clicking a farm in plot search
- * results (see plot-search.tsx). Public, like /search itself: an anonymous
- * visitor or a farmer/admin can browse it, only a customer gets a rent
- * control per plot.
- *
- * There's no "list this farm's plots" endpoint, only GET /api/farms/{id}
- * (name/address/description) and the same nearest-plots search /search
- * itself uses. So this route carries the postalCode/city that produced the
- * click-through (see plot-search.tsx's toFarmLink) and re-runs that search,
- * filtered down to this farm's plots. Landing here without that context
- * (e.g. a bookmarked/shared link) shows the farm's details with no plot
- * list — see hasLocationContext below.
- */
 export async function clientLoader({ params, request }: Route.ClientLoaderArgs) {
   const farmId = params.farmId;
   const url = new URL(request.url);
@@ -49,7 +34,6 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
       : city
         ? findNearestPlots({ city, limit: 30 })
         : Promise.resolve<NearbyPlot[]>([]),
-    // Only a customer can have rentals; asking as any other role 403s.
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
   ]);
 
@@ -58,7 +42,6 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     farm,
     farmPlots: plots.filter((p) => p.farm === farmId),
     hasLocationContext: Boolean(postalCode || city),
-    // Carries the search that led here back into "back to search" below.
     backToSearchQuery: url.searchParams.toString(),
     rentedPlotIds: myRentals.map((r) => r.plotId),
   };
@@ -67,16 +50,11 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
   const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, rentedPlotIds } = loaderData;
   const customer = account?.role === "customer" ? account : null;
-  const { t, i18n: i18nInstance } = useTranslation(["search", "common"]);
+  const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const tenantNavItems = useTenantNavItems();
 
-  // The one plot currently expanded to show its crops and rent control —
-  // mirrors plot-search.tsx's own selection state, one at a time.
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
-  // Seeded from the customer's own rentals, then grown as they rent more
-  // plots on this page, so a just-rented plot immediately shows "Rented"
-  // instead of the crop picker without a full reload.
   const [rented, setRented] = useState<Set<string>>(() => new Set(rentedPlotIds));
 
   function toggleSelectPlot(plotId: string) {
@@ -84,12 +62,8 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
   }
 
   const backToSearchLink = backToSearchQuery ? `/search?${backToSearchQuery}` : "/search";
-  // This page's own URL, query included — so signing in (or a rent's login
-  // redirect) returns here with the same search context, not a bare farm page.
   const farmPageUrl = backToSearchQuery ? `/search/farms/${farm.id}?${backToSearchQuery}` : `/search/farms/${farm.id}`;
 
-  // Each plot's real outline, numbered to match the list below, so booking
-  // can start by clicking the plot on the map instead of picking from the list.
   const shapes: MapShape[] = farmPlots.map((plot, i) => ({
     id: plot.id,
     polygon: plot.coordinates,
@@ -100,46 +74,46 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
   const fitTo = unionBbox(farmPlots.map((p) => toBbox(p.coordinates)));
 
   const content = (
-    <main className="mx-auto w-full max-w-6xl p-4">
-      <Link to={backToSearchLink} className="text-sm text-gray-500 hover:underline dark:text-gray-400">
+    <main className="mx-auto w-full max-w-6xl p-6">
+      <Link to={backToSearchLink} className="text-sm text-warm-olive hover:text-wood hover:underline">
         &larr; {t("search:backToSearch")}
       </Link>
 
-      {/* No per-farm photo exists yet — a themed banner stands in for one. */}
-      <div className="relative mt-4 overflow-hidden rounded-2xl bg-linear-to-br from-emerald-600 to-emerald-800 dark:from-emerald-800 dark:to-emerald-950">
+      {/* Farm banner */}
+      <div className="relative mt-4 overflow-hidden rounded-2xl bg-gradient-to-br from-moss to-forest">
         <Wheat className="absolute -top-8 -right-8 h-44 w-44 text-white/10" aria-hidden />
         <div className="relative p-6 md:p-10">
-          <h1 className="text-3xl font-bold text-white">{farm.name}</h1>
-          <p className="mt-2 flex items-center gap-1.5 text-emerald-50">
+          <h1 className="font-serif text-3xl font-bold text-ivory">{farm.name}</h1>
+          <p className="mt-2 flex items-center gap-1.5 text-cream/80">
             <MapPin className="h-4 w-4 shrink-0" aria-hidden />
             {farm.address}
           </p>
         </div>
       </div>
 
-      <section className="mt-6 rounded-xl border border-gray-200 p-6 dark:border-gray-800">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("search:aboutFarm")}</h2>
+      <section className="mt-6 rounded-xl border border-beige p-6">
+        <h2 className="font-serif text-lg font-semibold text-forest">{t("search:aboutFarm")}</h2>
         {farm.description ? (
-          <p className="mt-2 max-w-2xl whitespace-pre-line text-gray-600 dark:text-gray-300">{farm.description}</p>
+          <p className="mt-2 max-w-2xl whitespace-pre-line text-wood">{farm.description}</p>
         ) : (
-          <p className="mt-2 text-gray-500 italic dark:text-gray-400">{t("search:noFarmDescriptionYet")}</p>
+          <p className="mt-2 italic text-warm-olive">{t("search:noFarmDescriptionYet")}</p>
         )}
-        <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
+        <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-sm text-warm-olive">
           {farm.foundedAt && (
             <div>
-              <dt className="inline font-medium text-gray-700 dark:text-gray-200">{t("search:foundedLabel")}</dt>{" "}
+              <dt className="inline font-medium text-wood">{t("search:foundedLabel")}</dt>{" "}
               <dd className="inline">{new Date(farm.foundedAt).getFullYear()}</dd>
             </div>
           )}
           <div>
-            <dt className="inline font-medium text-gray-700 dark:text-gray-200">{t("search:totalAreaLabel")}</dt>{" "}
+            <dt className="inline font-medium text-wood">{t("search:totalAreaLabel")}</dt>{" "}
             <dd className="inline">{formatArea(farm.totalSquareMeters, numberLocale)}</dd>
           </div>
         </dl>
       </section>
 
       {hasLocationContext && farmPlots.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="mt-6 overflow-hidden rounded-lg border border-beige">
           <FieldMap
             center={{ lat: farmPlots[0].coordinates.coordinates[0][0][1], lon: farmPlots[0].coordinates.coordinates[0][0][0] }}
             shapes={shapes}
@@ -150,19 +124,19 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      <h2 className="mt-8 text-lg font-semibold text-gray-900 dark:text-white">{t("search:availablePlots")}</h2>
+      <h2 className="mt-8 font-serif text-lg font-semibold text-forest">{t("search:availablePlots")}</h2>
 
       {!hasLocationContext ? (
-        <p className="mt-2 text-gray-600 dark:text-gray-300">
+        <p className="mt-2 text-wood">
           {t("search:farmNeedsSearchContext")}{" "}
-          <Link to={backToSearchLink} className="text-emerald-700 hover:underline dark:text-emerald-400">
+          <Link to={backToSearchLink} className="text-moss hover:underline">
             {t("search:backToSearch")}
           </Link>
         </p>
       ) : farmPlots.length === 0 ? (
-        <p className="mt-2 text-gray-600 dark:text-gray-300">{t("search:farmHasNoPlotsNearby")}</p>
+        <p className="mt-2 text-wood">{t("search:farmHasNoPlotsNearby")}</p>
       ) : (
-        <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-800">
+        <ul className="mt-2 divide-y divide-beige">
           {farmPlots.map((plot, i) => {
             const isSelected = plot.id === selectedPlotId;
             const isRented = rented.has(plot.id);
@@ -176,21 +150,21 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                   className="flex w-full items-center gap-3 py-3 text-left disabled:cursor-default"
                 >
                   <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-beige text-xs font-semibold text-wood"
                     aria-hidden
                   >
                     {i + 1}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-medium text-gray-900 dark:text-white">{plot.name}</span>
-                    <span className="block text-sm text-gray-500">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
+                    <span className="block font-medium text-forest">{plot.name}</span>
+                    <span className="block text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
                   </span>
                   {isRented ? (
-                    <span className="shrink-0 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                    <span className="shrink-0 text-sm font-medium text-moss">
                       {t("search:rented")}
                     </span>
                   ) : (
-                    <span className="shrink-0 text-gray-400" aria-hidden>
+                    <span className="shrink-0 text-warm-olive" aria-hidden>
                       {isSelected ? "▾" : "▸"}
                     </span>
                   )}
@@ -215,45 +189,70 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
     </main>
   );
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between p-4">
-          <Link to="/" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
-            {t("common:brand")}
-          </Link>
-          {account ? (
-            <div className="flex items-center gap-3">
+  if (customer) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <header className="border-b border-beige bg-cream">
+          <div className="flex items-center justify-between px-6 py-4">
+            <Link to="/" className="flex items-center gap-2">
+              <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none">
+                <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
+                <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
+              </svg>
+              <div className="leading-tight">
+                <span className="block text-sm font-bold uppercase tracking-widest text-forest">BAUER</span>
+                <span className="block text-[10px] text-forest/60">as a service</span>
+              </div>
+            </Link>
+            <div className="flex items-center gap-4">
               <LanguageSwitcher />
-              <Link
-                to={dashboardPath(account.role)}
-                className="whitespace-nowrap text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
-              >
-                {t("common:goToDashboard")}
-              </Link>
+              <span className="hidden text-sm font-medium text-wood sm:block">
+                {customer.firstName} {customer.lastName}
+              </span>
               <LogoutButton />
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <LanguageSwitcher />
-              <Link
-                to={`/login?redirect=${encodeURIComponent(farmPageUrl)}`}
-                className="whitespace-nowrap text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
-              >
-                {t("common:signIn")}
-              </Link>
-              <Link
-                to={`/register?redirect=${encodeURIComponent(farmPageUrl)}`}
-                className={`${submitClass} inline-block w-auto px-4 py-2 text-sm`}
-              >
-                {t("common:createAccount")}
-              </Link>
+          </div>
+        </header>
+        <AppShell items={tenantNavItems}>{content}</AppShell>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-paper">
+      <header className="bg-cream">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
+          <Link to="/" className="flex items-center gap-3">
+            <svg viewBox="0 0 32 32" className="h-10 w-10" fill="none">
+              <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
+              <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
+            </svg>
+            <div className="leading-tight">
+              <span className="block text-base font-bold uppercase tracking-widest text-forest">BAUER</span>
+              <span className="block text-xs text-forest/60">as a service</span>
             </div>
-          )}
+          </Link>
+          <nav className="hidden items-center gap-8 md:flex">
+            <Link to="/" className="text-sm text-wood hover:text-forest">{t("home:navHome")}</Link>
+            <Link to="/for-farmers" className="text-sm text-wood hover:text-forest">{t("home:navForFarmers")}</Link>
+            <Link to="/search" className="text-sm text-wood hover:text-forest">{t("home:navForCustomers")}</Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            {account ? (
+              <Link to={dashboardPath(account.role)} className="rounded-full bg-deep-olive px-6 py-2.5 text-sm font-semibold text-ivory hover:bg-moss">
+                {t("common:goToDashboard")}
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium text-wood hover:text-forest">{t("common:signIn")}</Link>
+                <Link to="/register" className="rounded-full bg-deep-olive px-6 py-2.5 text-sm font-semibold text-ivory hover:bg-moss">{t("home:getStarted")}</Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
-
-      {customer ? <AppShell items={tenantNavItems}>{content}</AppShell> : content}
+      {content}
     </div>
   );
 }

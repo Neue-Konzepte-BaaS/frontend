@@ -51,8 +51,8 @@ function toTenantRow(rental: FarmRental): TenantRow {
 }
 
 const statusPillClass: Record<TenantStatus, string> = {
-  rented: "bg-rose-50 text-rose-700 dark:bg-rose-950 dark:text-rose-300",
-  past: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300",
+  rented: "bg-rose-50 text-rose-700",
+  past: "bg-cream text-wood",
 };
 
 export default function TenantsList({ loaderData }: Route.ComponentProps) {
@@ -94,10 +94,10 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
     <main className="mx-auto max-w-5xl p-4">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+          <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
             {t("tenantsActiveSummary", { count: activeCount })} · {t("field", { count: fields.length })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{t("tenantsTitle")}</h1>
+          <h1 className="mt-1 text-2xl font-bold text-forest">{t("tenantsTitle")}</h1>
         </div>
         <input
           type="search"
@@ -105,14 +105,14 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
           onChange={(event) => setQuery(event.target.value)}
           placeholder={t("tenantsSearchPlaceholder")}
           aria-label={t("tenantsSearchPlaceholder")}
-          className="w-full rounded-full border border-gray-300 px-4 py-2 text-sm text-gray-900 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500 focus:outline-none lg:w-64 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
+          className="w-full rounded-full border border-beige px-4 py-2 text-sm text-forest focus:border-moss focus:ring-2 focus:ring-moss focus:outline-none lg:w-64"
         />
       </div>
 
       {rows.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("noTenantsYet")}</p>
+        <p className="mt-8 text-wood">{t("noTenantsYet")}</p>
       ) : filteredRows.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("noTenantsMatchSearch")}</p>
+        <p className="mt-8 text-wood">{t("noTenantsMatchSearch")}</p>
       ) : (
         <>
           {/* Desktop: a real table. Held off until lg — with the sidebar already
@@ -121,7 +121,7 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
           <div className="mt-6 hidden overflow-x-auto lg:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-200 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
+                <tr className="border-b border-beige text-xs tracking-wide text-warm-olive uppercase">
                   <th scope="col" className="py-2 pr-4 font-medium">
                     {t("tenantsColTenant")}
                   </th>
@@ -142,13 +142,13 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+              <tbody className="divide-y divide-beige">
                 {filteredRows.map((row) => (
                   <tr key={row.id}>
-                    <td className="py-3 pr-4 font-semibold text-gray-900 dark:text-white">{row.name}</td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{row.plotName}</td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{row.fieldName}</td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{periodLabel(row)}</td>
+                    <td className="py-3 pr-4 font-semibold text-forest">{row.name}</td>
+                    <td className="py-3 pr-4 text-wood">{row.plotName}</td>
+                    <td className="py-3 pr-4 text-wood">{row.fieldName}</td>
+                    <td className="py-3 pr-4 text-wood">{periodLabel(row)}</td>
                     <td className="py-3 pr-4">
                       <span
                         className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusPillClass[row.status]}`}
@@ -159,7 +159,7 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
                     <td className="py-3 text-right">
                       <Link
                         to={`/farmer/fields/${row.fieldId}`}
-                        className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+                        className="font-medium text-moss hover:underline"
                       >
                         {t("openAction")}
                       </Link>
@@ -171,16 +171,16 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
           </div>
 
           {/* Below lg: one card per tenant instead of a horizontally cramped table. */}
-          <ul className="mt-6 divide-y divide-gray-200 lg:hidden dark:divide-gray-800">
+          <ul className="mt-6 divide-y divide-beige lg:hidden">
             {filteredRows.map((row) => (
               <li key={row.id} className="py-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-gray-900 dark:text-white">{row.name}</p>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p className="font-semibold text-forest">{row.name}</p>
+                    <p className="mt-1 text-sm text-warm-olive">
                       {row.plotName} · {row.fieldName}
                     </p>
-                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{periodLabel(row)}</p>
+                    <p className="mt-1 text-sm text-warm-olive">{periodLabel(row)}</p>
                   </div>
                   <span
                     className={`inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${statusPillClass[row.status]}`}
@@ -190,7 +190,7 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
                 </div>
                 <Link
                   to={`/farmer/fields/${row.fieldId}`}
-                  className="mt-2 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400"
+                  className="mt-2 inline-block text-sm font-medium text-moss hover:underline"
                 >
                   {t("openAction")} &rarr;
                 </Link>

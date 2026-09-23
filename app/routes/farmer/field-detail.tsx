@@ -206,8 +206,8 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{field.name}</h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">
+      <h1 className="text-2xl font-bold text-forest">{field.name}</h1>
+      <p className="mt-1 text-wood">
         {hasPlots ? t("farmer:plot", { count: field.plots.length }) : t("farmer:fieldHasNoPlotsYet")}
       </p>
 
@@ -217,7 +217,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="mt-4 overflow-hidden rounded-lg border border-beige">
         <FieldMap
           center={initialCenter}
           shapes={mapShapes}
@@ -229,7 +229,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
       {!hasPlots ? (
         <form onSubmit={handleGenerate} className="mt-4 max-w-sm space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-300">{t("farmer:gridInstructions")}</p>
+          <p className="text-sm text-wood">{t("farmer:gridInstructions")}</p>
           <div className="flex gap-4">
             <FormField label={t("farmer:rowsLabel")} htmlFor="rows">
               <input
@@ -266,9 +266,9 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         </form>
       ) : (
         <div className="mt-4">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:plotsLabel")}</p>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{t("farmer:selectPlotsInstructions")}</p>
-          <ul className="mt-3 divide-y divide-gray-200 dark:divide-gray-800">
+          <p className="text-sm font-medium text-wood">{t("farmer:plotsLabel")}</p>
+          <p className="mt-1 text-sm text-wood">{t("farmer:selectPlotsInstructions")}</p>
+          <ul className="mt-3 divide-y divide-beige">
             {field.plots.map((p, i) => {
               const rental = rentalByPlot.get(p.id);
               return (
@@ -278,23 +278,23 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
                     type="checkbox"
                     checked={selectedPlotIds.has(p.id)}
                     onChange={() => togglePlotSelection(p.id)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-beige text-moss focus:ring-moss"
                   />
                   <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cream text-xs font-semibold text-wood"
                     aria-hidden
                   >
                     {i + 1}
                   </span>
                   <span>
-                    <span className="block text-sm font-medium text-gray-900 dark:text-white">
+                    <span className="block text-sm font-medium text-forest">
                       {p.name} · {formatArea(p.areaSquareMeters, numberLocale)}
                     </span>
-                    <span className="block text-sm text-gray-500">
+                    <span className="block text-sm text-warm-olive">
                       {p.crops.length > 0 ? p.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
                     </span>
                     {rental && (
-                      <span className="block text-sm font-medium text-rose-600 dark:text-rose-400">
+                      <span className="block text-sm font-medium text-rose-600">
                         {t("farmer:rentedTo", { name: `${rental.customer.firstName} ${rental.customer.lastName}` })}
                       </span>
                     )}
@@ -309,8 +309,8 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
       {hasPlots && (
         <div className="mt-8 max-w-sm">
-          <p className="text-sm font-medium text-gray-700 dark:text-gray-200">{t("farmer:offeredCropsLabel")}</p>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+          <p className="text-sm font-medium text-wood">{t("farmer:offeredCropsLabel")}</p>
+          <p className="mt-1 text-sm text-wood">
             {selectedPlots.length > 0
               ? t("farmer:plotsSelected", { count: selectedPlots.length })
               : t("farmer:noPlotsSelected")}
@@ -323,19 +323,19 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
           )}
 
           {catalog.length === 0 ? (
-            <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("farmer:noCropsInCatalog")}</p>
+            <p className="mt-3 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
           ) : (
             <>
               <ul className="mt-3 space-y-2">
                 {catalog.map((crop: Crop) => (
                   <li key={crop.id}>
-                    <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                    <label className="flex items-center gap-2 text-sm text-wood">
                       <input
                         type="checkbox"
                         checked={selectedCropIds.has(crop.id)}
                         onChange={() => toggleCrop(crop.id)}
                         disabled={selectedPlots.length === 0}
-                        className="h-4 w-4 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                        className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
                       />
                       {t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })}
                     </label>

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { logout } from "~/lib/auth";
 
 const DEFAULT_CLASS =
-  "rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800";
+  "rounded-lg border border-beige px-4 py-2 text-sm font-medium text-wood transition-colors hover:border-moss hover:bg-moss/10 hover:text-moss";
 
 /**
  * Sign out: expire the auth cookies on the server (they're HttpOnly, so the

@@ -31,7 +31,7 @@ export function AppShell({
   return (
     <div className="md:flex md:flex-1">
       <SideNav items={items} pinned={pinned} />
-      <main className="flex-1 pb-16 md:pb-0">{children}</main>
+      <main className="flex-1 pb-16 pt-8 md:pb-0">{children}</main>
       <BottomNav items={mobileItems ?? items} />
     </div>
   );

@@ -30,14 +30,14 @@ const LANGUAGES = [
 ] as const;
 
 const languagePillClass = (active: boolean) =>
-  "rounded-full border px-6 py-3 text-center font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 " +
+  "rounded-full border px-6 py-3 text-center font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-moss " +
   (active
-    ? "border-emerald-600 bg-emerald-600 text-white"
-    : "border-gray-300 text-gray-900 hover:bg-gray-50 dark:border-gray-700 dark:text-white dark:hover:bg-gray-800");
+    ? "border-moss bg-moss text-white"
+    : "border-beige text-forest hover:bg-cream");
 
 const logoutButtonClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-3 text-base font-semibold text-gray-700 " +
-  "hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800";
+  "w-full rounded-lg border border-beige px-4 py-3 text-base font-semibold text-wood " +
+  "hover:bg-cream";
 
 export default function CustomerMe({ loaderData }: Route.ComponentProps) {
   const { rentals } = loaderData;
@@ -59,27 +59,27 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+      <h1 className="text-2xl font-bold text-forest">
         {account.firstName} {account.lastName}
       </h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">
+      <p className="mt-1 text-wood">
         {roleLabel(t, account.role)}
         {account.postalCode > 0 ? ` · ${account.postalCode}` : ""}
       </p>
 
       <section className="mt-6">
-        <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+        <h2 className="text-sm font-semibold tracking-wide text-warm-olive uppercase">
           {t("customer:myPlotsHeading")}
         </h2>
         {rentals.length === 0 ? (
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-wood">
             {t("customer:noRentedPlots")}{" "}
-            <Link to="/search" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+            <Link to="/search" className="font-medium text-moss hover:underline">
               {t("customer:findAPlot")}
             </Link>
           </p>
         ) : (
-          <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-800">
+          <ul className="mt-2 divide-y divide-beige">
             {rentals.map((rental) => (
               <PlotCard
                 key={rental.id}
@@ -93,7 +93,7 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
       </section>
 
       <section className="mt-8">
-        <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+        <h2 className="text-sm font-semibold tracking-wide text-warm-olive uppercase">
           {t("common:language")}
         </h2>
         <div className="mt-2 grid grid-cols-2 gap-3" role="group" aria-label={t("common:language")}>
@@ -111,7 +111,7 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
-      <section className="mt-6 rounded-lg border border-gray-200 px-4 dark:border-gray-800">
+      <section className="mt-6 rounded-lg border border-beige px-4">
         <Switch
           id="simple-mode"
           checked={simpleMode}
@@ -122,10 +122,10 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
       </section>
 
       <section className="mt-6">
-        <h2 className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+        <h2 className="text-sm font-semibold tracking-wide text-warm-olive uppercase">
           {t("customer:notificationsHeading")}
         </h2>
-        <div className="mt-2 divide-y divide-gray-200 rounded-lg border border-gray-200 px-4 dark:divide-gray-800 dark:border-gray-800">
+        <div className="mt-2 divide-y divide-beige rounded-lg border border-beige px-4">
           <Switch
             id="push-notifications"
             checked={pushEnabled}

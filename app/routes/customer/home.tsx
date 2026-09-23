@@ -28,25 +28,25 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:customerTitle")}</h1>
+      <h1 className="text-2xl font-bold text-forest">{t("search:customerTitle")}</h1>
 
       <section className="mt-6">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("search:myRentals")}</h2>
+        <h2 className="text-lg font-semibold text-forest">{t("search:myRentals")}</h2>
         {rentals.length === 0 ? (
-          <p className="mt-2 text-gray-600 dark:text-gray-300">
+          <p className="mt-2 text-wood">
             {t("search:noRentalsYet")}{" "}
-            <Link to="/search" className="font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+            <Link to="/search" className="font-medium text-moss hover:underline">
               {t("customer:findAPlot")}
             </Link>
           </p>
         ) : (
-          <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-800">
+          <ul className="mt-2 divide-y divide-beige">
             {rentals.map((rental) => (
               <PlotCard
                 key={rental.id}
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
-                action={<span className="text-sm text-gray-500">{t("search:booked")}</span>}
+                action={<span className="text-sm text-warm-olive">{t("search:booked")}</span>}
               />
             ))}
           </ul>
