@@ -107,6 +107,22 @@ export const farmer: Shape = {
 
   requestsMetaTitle: "Anfragen · BaaS",
   requestsTitle: "Anfragen",
+  requestsOpenSummary: "{{count}} offen",
+  requestsColApplicant: "Antragsteller",
+  requestsColPlot: "Parzelle",
+  requestsColField: "Feld",
+  requestsColStartDate: "Gewünschter Start",
+  requestsColMessage: "Nachricht",
+  requestsColAction: "Aktion",
+  requestsStartsOn: "Beginnt {{date}}",
+  approveAction: "Annehmen",
+  declineAction: "Ablehnen",
+  requestDeciding: "Wird gespeichert…",
+  noRequestsYet: "Keine offenen Anfragen — neue Mietanfragen von Kunden erscheinen hier.",
+
+  boardMetaTitle: "Pinnwand · BaaS",
+  boardTitle: "Pinnwand",
+
   careGuideMetaTitle: "Pflegehinweise · BaaS",
   careGuideTitle: "Pflegehinweise",
   settingsMetaTitle: "Hofeinstellungen · BaaS",

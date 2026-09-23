@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { rentPlot, type Crop, type Rental } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
 import { roleLabel, type Account } from "~/lib/auth";
-import { submitClass, secondaryButtonClass } from "~/components/form";
+import { inputClass, submitClass, secondaryButtonClass } from "~/components/form";
+
+/** Isoformat (YYYY-MM-DD) date offset from today by the given number of days, for <input type="date"> min/max. */
+function isoDateOffset(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
 
 type PlotCropsAndRentProps = {
   plotId: string;
@@ -30,33 +37,45 @@ type RentState = { status: "renting" } | { status: "error"; message: string };
  */
 export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRented }: PlotCropsAndRentProps) {
   const [selectedCropId, setSelectedCropId] = useState(crops[0]?.id ?? "");
+  const [startAt, setStartAt] = useState("");
+  const [message, setMessage] = useState("");
   const [rentState, setRentState] = useState<RentState | null>(null);
   const { t } = useTranslation(["search", "common", "auth"]);
   const isCustomer = account?.role === "customer";
 
+  // The backend requires startAt 1-60 days out — computed once per mount
+  // rather than on every render, since "today" doesn't change mid-session.
+  const minStartAt = useMemo(() => isoDateOffset(1), []);
+  const maxStartAt = useMemo(() => isoDateOffset(60), []);
+
   async function handleRent() {
     const crop = crops.find((c) => c.id === selectedCropId) ?? crops[0];
-    if (!crop) return;
+    if (!crop || !startAt || !message.trim()) return;
 
     setRentState({ status: "renting" });
     try {
-      const rental = await rentPlot(plotId, crop.id);
+      const startAtIso = new Date(`${startAt}T00:00:00`).toISOString();
+      const rental = await rentPlot(plotId, crop.id, startAtIso, message.trim());
       onRented?.(rental, crop);
       setRentState(null);
     } catch (err) {
       // A 409 covers two distinct, expected outcomes here: a real race on the
       // plot (the backend enforces non-overlapping rentals with a DB
       // exclusion constraint) and picking a crop this plot doesn't offer.
-      // Both are told apart by the backend's exact error message.
-      let message: string;
-      if (err instanceof ApiError && err.status === 409 && err.message === "plot is already rented") {
-        message = t("search:rentConflict");
+      // Both are told apart by the backend's exact error message. A 400
+      // means the start date or message failed the backend's own validation
+      // (the client-side checks above should normally prevent this).
+      let errorMessage: string;
+      if (err instanceof ApiError && err.status === 409 && err.message.includes("already")) {
+        errorMessage = t("search:rentConflict");
       } else if (err instanceof ApiError && err.status === 409 && err.message === "crop is not offered by this plot") {
-        message = t("search:cropNotOffered");
+        errorMessage = t("search:cropNotOffered");
+      } else if (err instanceof ApiError && err.status === 400) {
+        errorMessage = t("search:invalidRentalRequest");
       } else {
-        message = err instanceof ApiError ? err.message : t("common:genericError");
+        errorMessage = err instanceof ApiError ? err.message : t("common:genericError");
       }
-      setRentState({ status: "error", message });
+      setRentState({ status: "error", message: errorMessage });
     }
   }
 
@@ -77,7 +96,7 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
 
       {crops.length > 0 &&
         (isCustomer ? (
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-3 space-y-2">
             <select
               aria-label={t("search:chooseCrop")}
               value={selectedCropId || crops[0].id}
@@ -91,9 +110,28 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
                 </option>
               ))}
             </select>
+            <input
+              type="date"
+              aria-label={t("search:rentStartDateLabel")}
+              value={startAt}
+              min={minStartAt}
+              max={maxStartAt}
+              onChange={(e) => setStartAt(e.target.value)}
+              disabled={rentState?.status === "renting"}
+              className={`${inputClass} block text-sm`}
+            />
+            <textarea
+              aria-label={t("search:rentMessageLabel")}
+              placeholder={t("search:rentMessagePlaceholder")}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              disabled={rentState?.status === "renting"}
+              rows={3}
+              className={`${inputClass} block text-sm`}
+            />
             <button
               type="button"
-              disabled={rentState?.status === "renting"}
+              disabled={rentState?.status === "renting" || !startAt || !message.trim()}
               onClick={handleRent}
               className={`${submitClass} w-auto px-4 py-2 text-sm`}
             >

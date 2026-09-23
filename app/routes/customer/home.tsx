@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
-import { listMyRentals } from "~/lib/rentals";
+import { listMyRentals, type RentalStatus } from "~/lib/rentals";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
@@ -9,6 +9,13 @@ import i18n from "~/i18n";
 export function meta() {
   return [{ title: i18n.t("search:customerMetaTitle") }];
 }
+
+/** Translation key per rental status, for the action label on the customer's own rental list. */
+const rentalStatusKey: Record<RentalStatus, string> = {
+  requested: "search:statusRequested",
+  approved: "search:booked",
+  declined: "search:statusDeclined",
+};
 
 /**
  * The tenant's "Home" — their own rentals. Plot search moved to its own tab
@@ -46,7 +53,7 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
                 key={rental.id}
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
-                action={<span className="text-sm text-gray-500">{t("search:booked")}</span>}
+                action={<span className="text-sm text-gray-500">{t(rentalStatusKey[rental.status])}</span>}
               />
             ))}
           </ul>
