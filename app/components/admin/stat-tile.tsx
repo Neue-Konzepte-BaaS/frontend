@@ -6,10 +6,10 @@
  */
 export function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 p-4 dark:border-gray-800">
-      <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">{label}</p>
-      <p className="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{value}</p>
-      {detail && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{detail}</p>}
+    <div className="rounded-lg border border-beige p-4">
+      <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">{label}</p>
+      <p className="mt-2 text-3xl font-bold text-forest">{value}</p>
+      {detail && <p className="mt-1 text-sm text-warm-olive">{detail}</p>}
     </div>
   );
 }

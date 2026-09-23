@@ -71,8 +71,8 @@ export type FieldMapProps = {
 setWorkerUrl(workerUrl);
 
 const SHAPES_SOURCE_ID = "field-map-shapes";
-const FIELD_FILL_COLOR = "#059669"; // emerald-600
-const PLOT_FILL_COLOR = "#6ee7b7"; // emerald-300
+const FIELD_FILL_COLOR = "#524A26"; // moss
+const PLOT_FILL_COLOR = "#B4AF8A"; // beige
 const SELECTED_COLOR = "#f59e0b"; // amber-500
 const RENTED_COLOR = "#f43f5e"; // rose-500
 

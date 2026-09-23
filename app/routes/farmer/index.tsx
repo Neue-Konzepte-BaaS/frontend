@@ -13,15 +13,15 @@ export default function FarmerDashboard() {
   return (
     <main className="mx-auto max-w-3xl p-8">
       <AccountTypeNotice />
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("dashboardTitle")}</h1>
-      <p className="mt-2 text-gray-600 dark:text-gray-300">{t("dashboardBody")}</p>
+      <h1 className="text-2xl font-bold text-forest">{t("dashboardTitle")}</h1>
+      <p className="mt-2 text-wood">{t("dashboardBody")}</p>
 
       <Link
         to="/farmer/fields"
-        className="mt-6 block rounded-lg border border-gray-200 p-6 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+        className="mt-6 block rounded-lg border border-beige p-6 hover:bg-cream"
       >
-        <h2 className="font-semibold text-gray-900 dark:text-white">{t("yourFieldsTitle")}</h2>
-        <p className="mt-1 text-sm text-gray-500">{t("yourFieldsBody")}</p>
+        <h2 className="font-semibold text-forest">{t("yourFieldsTitle")}</h2>
+        <p className="mt-1 text-sm text-warm-olive">{t("yourFieldsBody")}</p>
       </Link>
     </main>
   );

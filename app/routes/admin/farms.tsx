@@ -42,19 +42,19 @@ export default function AdminFarms({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("farmsTitle")}</h1>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("farmsBody")}</p>
+      <h1 className="text-2xl font-bold text-forest">{t("farmsTitle")}</h1>
+      <p className="mt-1 text-sm text-warm-olive">{t("farmsBody")}</p>
 
       {/* A GET form: submitting navigates with the filters in the URL, which
           re-runs the loader. No onSubmit handler, no local state to keep in
           sync, and the result is a shareable link. */}
       <Form method="get" className="mt-4 flex flex-wrap items-end gap-2">
         <label className="flex-1 basis-48 text-sm">
-          <span className="mb-1 block font-medium text-gray-700 dark:text-gray-200">{t("farmsSearchLabel")}</span>
+          <span className="mb-1 block font-medium text-wood">{t("farmsSearchLabel")}</span>
           <input type="search" name="q" defaultValue={query} placeholder={t("farmsSearchPlaceholder")} className={inputClass} />
         </label>
         <label className="basis-32 text-sm">
-          <span className="mb-1 block font-medium text-gray-700 dark:text-gray-200">{t("farmsPostalCodeLabel")}</span>
+          <span className="mb-1 block font-medium text-wood">{t("farmsPostalCodeLabel")}</span>
           <input
             type="text"
             inputMode="numeric"
@@ -95,14 +95,14 @@ function FarmRow({ farm, locale }: { farm: FarmListing; locale: string }) {
   const num = (value: number, maximumFractionDigits = 0) => value.toLocaleString(locale, { maximumFractionDigits });
 
   return (
-    <li className="rounded-lg border border-gray-200 p-4 md:flex md:items-center md:justify-between md:gap-6 dark:border-gray-800">
+    <li className="rounded-lg border border-beige p-4 md:flex md:items-center md:justify-between md:gap-6">
       <div className="min-w-0">
-        <p className="font-semibold text-gray-900 dark:text-white">{farm.name}</p>
-        <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+        <p className="font-semibold text-forest">{farm.name}</p>
+        <p className="truncate text-sm text-warm-olive">
           {farm.postalCode > 0 ? `${farm.postalCode} · ` : ""}
           {farm.address}
         </p>
-        <p className="truncate text-sm text-gray-500 dark:text-gray-400">
+        <p className="truncate text-sm text-warm-olive">
           {farm.owner.firstName} {farm.owner.lastName} · {farm.owner.email}
         </p>
       </div>
@@ -119,8 +119,8 @@ function FarmRow({ farm, locale }: { farm: FarmListing; locale: string }) {
 function Figure({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs text-gray-500 dark:text-gray-400">{label}</dt>
-      <dd className="font-medium text-gray-900 dark:text-white">{value}</dd>
+      <dt className="text-xs text-warm-olive">{label}</dt>
+      <dd className="font-medium text-forest">{value}</dd>
     </div>
   );
 }

@@ -47,7 +47,7 @@ export function BroadcastSection() {
         {success && (
           <p
             role="status"
-            className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
+            className="rounded-lg border border-moss/40 bg-moss/10 px-4 py-3 text-sm text-forest"
           >
             {success}
           </p>
@@ -84,8 +84,8 @@ export function BroadcastSection() {
         </FormField>
 
         {confirming ? (
-          <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 dark:border-amber-700 dark:bg-amber-950">
-            <p className="text-sm text-amber-900 dark:text-amber-100">{t("notifConfirmPrompt")}</p>
+          <div className="rounded-lg border border-amber-300 bg-amber-50 p-4">
+            <p className="text-sm text-amber-900">{t("notifConfirmPrompt")}</p>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <button type="submit" disabled={sending} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
                 {sending ? t("notifSending") : t("notifConfirmSend")}
