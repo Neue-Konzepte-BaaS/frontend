@@ -31,11 +31,10 @@ type TenantRow = {
 };
 
 /**
- * "Requested" (a rental pending farmer approval, with its own "Review"
- * action) is part of the target design but has no backend data yet — see
- * issue #36 (farmer request queue). Only the two statuses the API can
- * actually produce are modeled here; both use the same "Open" action, so
- * there's no branch to add once #36 lands, just a third status to fold in.
+ * Still-requested rentals aren't tenants yet — they belong in the /farmer/requests
+ * queue (issue #36) until approved, so they're filtered out before this runs
+ * (see filteredRows below). A declined rental never occupied the plot in the
+ * first place and is likewise excluded — only approved rentals become tenants.
  */
 function toTenantRow(rental: FarmRental): TenantRow {
   return {
@@ -76,8 +75,11 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
 
   // Active tenants first — the ones a farmer is most likely checking on —
   // then past ones as a trailing record. Array#sort is stable, so within
-  // each status the API's own newest-first order survives.
+  // each status the API's own newest-first order survives. Only approved
+  // rentals are tenants; requested ones live in /farmer/requests instead,
+  // and declined ones never occupied the plot.
   const rows = farmRentals
+    .filter((rental) => rental.status === "approved")
     .map(toTenantRow)
     .sort((a, b) => (a.status === b.status ? 0 : a.status === "rented" ? -1 : 1));
   const activeCount = rows.filter((row) => row.status === "rented").length;

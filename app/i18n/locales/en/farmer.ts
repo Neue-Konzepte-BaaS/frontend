@@ -69,9 +69,22 @@ export const farmer = {
   noTenantsYet: "No tenants yet — plots you rent out will show up here.",
   noTenantsMatchSearch: "No tenants match your search.",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   requestsMetaTitle: "Requests · BaaS",
   requestsTitle: "Requests",
+  requestsOpenSummary: "{{count}} open",
+  requestsColApplicant: "Applicant",
+  requestsColPlot: "Plot",
+  requestsColField: "Field",
+  requestsColStartDate: "Requested start",
+  requestsColMessage: "Message",
+  requestsColAction: "Action",
+  requestsStartsOn: "Starts {{date}}",
+  approveAction: "Approve",
+  declineAction: "Decline",
+  requestDeciding: "Saving…",
+  noRequestsYet: "No open requests — new rental requests from customers will show up here.",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   boardMetaTitle: "Board · BaaS",
   boardTitle: "Board",
   careGuideMetaTitle: "Care guide · BaaS",
