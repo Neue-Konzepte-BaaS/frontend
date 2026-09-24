@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createCrop, deleteCrop, type Crop } from "~/lib/admin";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, primaryButtonClass } from "~/components/form";
+import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass } from "~/components/form";
 
 export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   const { t } = useTranslation("admin");
@@ -108,14 +108,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
 
       <form onSubmit={handleSubmit} className="mt-4 max-w-sm space-y-4">
         {error && <FormError message={error} />}
-        {success && (
-          <p
-            role="status"
-            className="rounded-lg border border-moss/40 bg-moss/10 px-4 py-3 text-sm text-forest"
-          >
-            {success}
-          </p>
-        )}
+        {success && <FormSuccess message={success} />}
 
         <FormField label={t("cropNameLabel")} htmlFor="crop-name">
           <input

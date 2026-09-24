@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { broadcastNotification } from "~/lib/admin";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
+import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
 
 export function BroadcastSection() {
   const { t } = useTranslation("admin");
@@ -44,14 +44,7 @@ export function BroadcastSection() {
     <section>
       <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4">
         {error && <FormError message={error} />}
-        {success && (
-          <p
-            role="status"
-            className="rounded-lg border border-moss/40 bg-moss/10 px-4 py-3 text-sm text-forest"
-          >
-            {success}
-          </p>
-        )}
+        {success && <FormSuccess message={success} />}
 
         <FormField label={t("notifSubjectLabel")} htmlFor="notif-subject">
           <input
