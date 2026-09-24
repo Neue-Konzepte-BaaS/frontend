@@ -66,8 +66,8 @@ export function AnnounceSection({ fields, onPosted }: AnnounceSectionProps) {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("announceSectionTitle")}</h2>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("announceSectionBody")}</p>
+      <h2 className="text-lg font-semibold text-forest">{t("announceSectionTitle")}</h2>
+      <p className="mt-1 text-sm text-warm-olive">{t("announceSectionBody")}</p>
 
       <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4">
         {error && <FormError message={error} />}
@@ -100,28 +100,28 @@ export function AnnounceSection({ fields, onPosted }: AnnounceSectionProps) {
         </FormField>
 
         <fieldset>
-          <legend className="mb-1 text-sm font-medium text-gray-700 dark:text-gray-200">{t("announceScopeLabel")}</legend>
+          <legend className="mb-1 text-sm font-medium text-wood">{t("announceScopeLabel")}</legend>
           <div className="space-y-2">
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <label className="flex items-center gap-2 text-sm text-wood">
               <input
                 type="radio"
                 name="announce-scope"
                 checked={scope === "all"}
                 onChange={() => setScope("all")}
                 disabled={sending}
-                className="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                className="h-4 w-4 border-beige text-moss focus:ring-moss"
               />
               {t("announceScopeAll")}
             </label>
 
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <label className="flex items-center gap-2 text-sm text-wood">
               <input
                 type="radio"
                 name="announce-scope"
                 checked={scope === "field"}
                 onChange={() => setScope("field")}
                 disabled={!hasFields || sending}
-                className="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                className="h-4 w-4 border-beige text-moss focus:ring-moss"
               />
               {t("announceScopeField")}
             </label>
@@ -141,14 +141,14 @@ export function AnnounceSection({ fields, onPosted }: AnnounceSectionProps) {
               </select>
             )}
 
-            <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+            <label className="flex items-center gap-2 text-sm text-wood">
               <input
                 type="radio"
                 name="announce-scope"
                 checked={scope === "plot"}
                 onChange={() => setScope("plot")}
                 disabled={!hasPlots || sending}
-                className="h-4 w-4 border-gray-300 text-emerald-600 focus:ring-emerald-500 dark:border-gray-700"
+                className="h-4 w-4 border-beige text-moss focus:ring-moss"
               />
               {t("announceScopePlot")}
             </label>

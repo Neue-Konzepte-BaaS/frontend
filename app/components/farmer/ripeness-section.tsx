@@ -58,13 +58,13 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
 
   return (
     <section>
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("ripenessSectionTitle")}</h2>
+      <h2 className="text-lg font-semibold text-forest">{t("ripenessSectionTitle")}</h2>
 
       {!hasFields ? (
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("ripenessNoFieldsYet")}</p>
+        <p className="mt-1 text-sm text-warm-olive">{t("ripenessNoFieldsYet")}</p>
       ) : (
         <>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("ripenessSectionBody")}</p>
+          <p className="mt-1 text-sm text-warm-olive">{t("ripenessSectionBody")}</p>
 
           <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4">
             {error && <FormError message={error} />}
@@ -114,7 +114,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
             </div>
 
             {crops.length === 0 && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">{t("ripenessNoCropsForField")}</p>
+              <p className="text-sm text-warm-olive">{t("ripenessNoCropsForField")}</p>
             )}
           </form>
         </>
