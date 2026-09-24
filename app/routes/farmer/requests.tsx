@@ -54,20 +54,20 @@ export default function RequestsQueue({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
         {t("requestsOpenSummary", { count: requests.length })}
       </p>
-      <h1 className="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{t("requestsTitle")}</h1>
+      <h1 className="mt-1 text-2xl font-bold text-forest">{t("requestsTitle")}</h1>
 
       {requests.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("noRequestsYet")}</p>
+        <p className="mt-8 text-wood">{t("noRequestsYet")}</p>
       ) : (
         <>
           {/* Desktop: a real table, matching tenants.tsx's breakpoint. */}
           <div className="mt-6 hidden overflow-x-auto lg:block">
             <table className="w-full text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-200 text-xs tracking-wide text-gray-500 uppercase dark:border-gray-800 dark:text-gray-400">
+                <tr className="border-b border-beige text-xs tracking-wide text-warm-olive uppercase">
                   <th scope="col" className="py-2 pr-4 font-medium">
                     {t("requestsColApplicant")}
                   </th>
@@ -88,18 +88,18 @@ export default function RequestsQueue({ loaderData }: Route.ComponentProps) {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+              <tbody className="divide-y divide-beige">
                 {requests.map((rental) => (
                   <tr key={rental.id}>
-                    <td className="py-3 pr-4 font-semibold text-gray-900 dark:text-white">
+                    <td className="py-3 pr-4 font-semibold text-forest">
                       {rental.customer.firstName} {rental.customer.lastName}
                     </td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{rental.plot.name}</td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{rental.fieldName}</td>
-                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">
+                    <td className="py-3 pr-4 text-wood">{rental.plot.name}</td>
+                    <td className="py-3 pr-4 text-wood">{rental.fieldName}</td>
+                    <td className="py-3 pr-4 text-wood">
                       {dateFormatter.format(new Date(rental.startAt))}
                     </td>
-                    <td className="py-3 pr-4 max-w-xs text-gray-600 dark:text-gray-300">{rental.message}</td>
+                    <td className="py-3 pr-4 max-w-xs text-wood">{rental.message}</td>
                     <td className="py-3">
                       <RequestActions
                         rental={rental}
@@ -115,19 +115,19 @@ export default function RequestsQueue({ loaderData }: Route.ComponentProps) {
           </div>
 
           {/* Below lg: one card per request instead of a horizontally cramped table. */}
-          <ul className="mt-6 divide-y divide-gray-200 lg:hidden dark:divide-gray-800">
+          <ul className="mt-6 divide-y divide-beige lg:hidden">
             {requests.map((rental) => (
               <li key={rental.id} className="py-4">
-                <p className="font-semibold text-gray-900 dark:text-white">
+                <p className="font-semibold text-forest">
                   {rental.customer.firstName} {rental.customer.lastName}
                 </p>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-warm-olive">
                   {rental.plot.name} · {rental.fieldName}
                 </p>
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-warm-olive">
                   {t("requestsStartsOn", { date: dateFormatter.format(new Date(rental.startAt)) })}
                 </p>
-                <p className="mt-2 text-sm text-gray-700 dark:text-gray-200">{rental.message}</p>
+                <p className="mt-2 text-sm text-wood">{rental.message}</p>
                 <div className="mt-3">
                   <RequestActions
                     rental={rental}
@@ -172,12 +172,12 @@ function RequestActions({
           type="button"
           disabled={acting}
           onClick={() => onDecide(rental, "decline")}
-          className="rounded border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950"
+          className="rounded border border-red-300 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50 disabled:opacity-50"
         >
           {acting ? t("requestDeciding") : t("declineAction")}
         </button>
       </div>
-      {error && <p className="mt-1 text-xs text-red-700 dark:text-red-400">{error}</p>}
+      {error && <p className="mt-1 text-xs text-red-700">{error}</p>}
     </div>
   );
 }

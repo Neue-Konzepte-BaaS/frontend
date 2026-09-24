@@ -41,36 +41,36 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl space-y-10 p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("boardTitle")}</h1>
+      <h1 className="text-2xl font-bold text-forest">{t("boardTitle")}</h1>
 
       <AnnounceSection fields={fields} onPosted={(posted) => setAnnouncements((prev) => [posted, ...prev])} />
 
       <RipenessSection fields={fields} />
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("boardYourPostsTitle")}</h2>
+        <h2 className="text-lg font-semibold text-forest">{t("boardYourPostsTitle")}</h2>
         {announcements.length === 0 ? (
-          <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{t("noPostsYet")}</p>
+          <p className="mt-3 text-sm text-wood">{t("noPostsYet")}</p>
         ) : (
           <ul className="mt-4 flex flex-col gap-3">
             {announcements.map((announcement) => {
               const scope = scopeLabel(announcement, fields);
               return (
-                <li key={announcement.id} className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+                <li key={announcement.id} className="rounded-xl border border-beige p-4">
                   <div className="flex items-start justify-between gap-3">
                     {scope ? (
-                      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                      <span className="inline-flex items-center rounded-full bg-cream px-2.5 py-0.5 text-xs font-medium text-wood">
                         {scope}
                       </span>
                     ) : (
                       <span />
                     )}
-                    <time className="text-sm text-gray-500 dark:text-gray-400">
+                    <time className="text-sm text-warm-olive">
                       {dateFormatter.format(new Date(announcement.createdAt))}
                     </time>
                   </div>
-                  <h3 className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{announcement.subject}</h3>
-                  <p className="mt-1 whitespace-pre-line text-gray-600 dark:text-gray-300">{announcement.body}</p>
+                  <h3 className="mt-2 text-lg font-bold text-forest">{announcement.subject}</h3>
+                  <p className="mt-1 whitespace-pre-line text-wood">{announcement.body}</p>
                 </li>
               );
             })}
