@@ -9,13 +9,14 @@ type PlotRentPanelProps = {
   selected: { plot: NearbyPlot; number: number } | null;
   /** The viewer already requested (or rents) this plot. */
   alreadyRequested: boolean;
+  farmName: string;
   account: Account | null;
   loginRedirectTo: string;
   onRented: (rental: Rental, crop: Crop) => void;
 };
 
 /** The customer's side panel on a farm page: the selected plot and how to rent it. */
-export function PlotRentPanel({ selected, alreadyRequested, account, loginRedirectTo, onRented }: PlotRentPanelProps) {
+export function PlotRentPanel({ selected, alreadyRequested, farmName, account, loginRedirectTo, onRented }: PlotRentPanelProps) {
   const { t, i18n } = useTranslation(["search", "common"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
@@ -51,6 +52,8 @@ export function PlotRentPanel({ selected, alreadyRequested, account, loginRedire
           <PlotCropsAndRent
             key={plot.id}
             plotId={plot.id}
+            plotName={plot.name}
+            farmName={farmName}
             crops={plot.crops}
             account={account}
             loginRedirectTo={loginRedirectTo}

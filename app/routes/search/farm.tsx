@@ -9,6 +9,7 @@ import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals"
 import { formatArea } from "~/components/plot-card";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
+import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { sortPlotsNaturally } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
@@ -146,6 +147,7 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       ) : farmPlots.length === 0 ? (
         <p className="mt-2 text-wood">{t("search:farmHasNoPlotsNearby")}</p>
       ) : (
+        <>
         <ul className="mt-2 divide-y divide-beige">
           {farmPlots.map((plot, i) => {
             const isSelected = plot.id === selectedPlotId;
@@ -221,12 +223,14 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             <PlotRentPanel
               selected={selected}
               alreadyRequested={selected ? rented.has(selected.plot.id) : false}
+              farmName={farm.name}
               account={account}
               loginRedirectTo={farmPageUrl}
               onRented={(rental) => setRented((prev) => new Set(prev).add(rental.plotId))}
             />
           </div>
         </div>
+        </>
       )}
     </main>
   );
