@@ -11,10 +11,10 @@ export function ComingSoon({ title }: { title: string }) {
 
   return (
     <main className="mx-auto max-w-3xl p-8">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
+      <h1 className="text-2xl font-bold text-forest">{title}</h1>
       <div
         role="note"
-        className="mt-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-100"
+        className="mt-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"
       >
         <strong>{t("comingSoonLead")}</strong> {t("comingSoonBody")}
       </div>

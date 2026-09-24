@@ -8,6 +8,7 @@ export default [
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).
   route("search", "routes/search.tsx"),
+  route("for-farmers", "routes/for-farmers.tsx"),
   // A farm's public details, reached by clicking a farm in search results.
   // Same public reach as /search — no guard, no customer-layout.
   route("search/farms/:farmId", "routes/search/farm.tsx"),

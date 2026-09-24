@@ -205,9 +205,11 @@ rather than fetching it by id — the same reasoning as
 `/customer`.
 
 **The two lists are not the same set, and the difference is the whole design.**
-`listMyRentals()` includes rentals that have ended; the care guide only carries
-running ones. So `guide` is legitimately `undefined`, and the page says "this
-rental isn't running" instead of rendering an empty week. Everything that needs
+`listMyRentals()` includes rentals that have ended, that start next month, and
+— since rental requests — ones the farmer has not decided on yet. The care
+guide carries only the running, *approved* ones. So `guide` is legitimately
+`undefined`, and the page says "this rental isn't running" instead of
+rendering an empty week. Everything that needs
 a live rental — the current week, the field name, the progress bar — hangs off
 `guide`; everything that survives the rental's end — the period, the crop, the
 plot size — comes from the rental.
@@ -232,6 +234,13 @@ follow-ups.
 **The active tab lives in `?tab=`**, like the admin listings' filters, so a
 care tab is bookmarkable and Back steps through the tabs rather than off the
 page. `care` is the default and writes no parameter.
+
+**The guide is read, not pushed.** Nothing mails a care instruction and the
+backend emits no `care` item into `GET /api/inbox`, so the tenant inbox's
+`care` filter (`app/lib/notifications.ts` models the kind already) stays empty
+until the backend adds one. A tenant finds this week's tasks by opening their
+plot, which is what issue #33 asks for — don't read the empty filter as a bug
+in this page.
 
 Authoring for the guide is on the admin side:
 `app/components/admin/care-guide-section.tsx`, mounted on `/admin/crops`
@@ -417,6 +426,53 @@ in either route.
 - Tailwind utility classes; shared design tokens via `@theme` in `app/app.css`.
 - Hold the accessibility bar from `context.md`: sufficient contrast, large tap
   targets, few steps, mobile-first.
+
+### Colour palette
+
+All brand colours are defined once as CSS variables in `app/app.css` under
+`@theme` and are available as Tailwind utilities (`bg-forest`, `text-moss`,
+etc.). Never use hardcoded Tailwind grey/emerald/green classes — always use a
+palette token:
+
+| Token | Hex | Use |
+|---|---|---|
+| `forest` | #31311B | darkest text, backgrounds |
+| `deep-olive` | #34371D | primary buttons, logo |
+| `moss` | #524A26 | active states, focus rings |
+| `olive` | #797449 | secondary actions |
+| `sage` | #848662 | accents |
+| `warm-olive` | #9B8D5B | muted text |
+| `wood` | #5F572E | body text |
+| `beige` | #B4AF8A | borders, dividers |
+| `cream` | #E5D7B4 | nav background, hover fills |
+| `ivory` | #F3E7C8 | cards, inputs |
+| `paper` | #F7F1DF | page background |
+| `error` | #A96F4A | error states |
+
+No dark mode is implemented — remove `dark:` variants when encountered.
+
+### Typography
+
+Global utility classes are defined in `app/app.css` under `@layer components`:
+`.h1`–`.h4` (serif/Lora headings) and `.body-lg`, `.body-md`, `.body-sm`,
+`.text-muted` (body text). Use these instead of redefining font-size/weight
+inline. The serif font is **Lora** (loaded via Google Fonts in `root.tsx`);
+the sans font is **Inter**.
+
+### Headers / navigation
+
+- **Public routes** (`/`, `/login`, `/register`, `/search`, `/for-farmers`)
+  each have their own **inline header** (no shared PublicNav component). Each
+  inline header shows the logo, nav links (Home / For farmers / For customers),
+  `<LanguageSwitcher />`, and Login/Get-Started buttons. The header is
+  hand-rolled per route so each page controls its own active nav state and
+  account-aware CTA (e.g. "Go to dashboard" when already logged in).
+- **Authenticated routes** (Customer, Farmer, Admin layouts) have their own
+  inline header (logo + user name + `<LanguageSwitcher />` + logout). The
+  switcher stays visible in authenticated layouts because settings-page
+  navigation shouldn't be the only way to change language.
+- The nav shell (`AppShell` / `SideNav` / `BottomNav`) stays outside these
+  headers, as before.
 
 ## Working conventions
 

@@ -36,10 +36,12 @@ function isTab(value: string | null): value is Tab {
  * rather than fetched by id. The same reasoning as farmer/field-detail.tsx —
  * these lists are small, and a backend endpoint per screen is not worth it.
  *
- * The two are not the same set. A rental that has ended is still in
- * `listMyRentals()` (the tenant can look back at it) but never in the care
- * guide, so `guide` is legitimately undefined and the page says so instead of
- * rendering an empty week.
+ * The two are not the same set, and that is the whole design. A rental that
+ * has ended, that has not started, or that the farmer has not approved yet is
+ * still in `listMyRentals()` — the tenant can look back at it, and since
+ * rental requests the list also carries what they have merely asked for — but
+ * never in the care guide. So `guide` is legitimately undefined and the page
+ * says so instead of rendering an empty week.
  */
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   const [rentals, guides] = await Promise.all([listMyRentals(), listCareGuide()]);
@@ -70,22 +72,25 @@ export default function CustomerPlot({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <Link to="/customer" className="text-sm font-medium text-emerald-600 hover:underline dark:text-emerald-400">
+    <main className="mx-auto max-w-2xl px-4 py-8">
+      <Link to="/customer" className="text-sm font-medium text-moss hover:underline">
         ← {t("customer:backToHome")}
       </Link>
 
-      <h1 className="mt-2 text-2xl font-bold text-gray-900 dark:text-white">{rental.plot.name}</h1>
+      <h1 className="mt-2 font-serif text-3xl font-bold text-forest">{rental.plot.name}</h1>
       {/* The field name only exists on an active guide — GET /api/rentals does
           not carry it — so the subtitle drops it rather than substituting
           something else for a rental that has ended. */}
-      <p className="mt-1 text-gray-600 dark:text-gray-300">
+      <p className="mt-1 text-wood">
         {[guide?.fieldName, rental.crop.name, formatArea(rental.plot.areaSquareMeters, locale)]
           .filter(Boolean)
           .join(" · ")}
       </p>
 
-      <div role="tablist" aria-label={t("customer:plotTabsLabel")} className="mt-6 flex gap-2 border-b border-gray-200 dark:border-gray-800">
+      {/* Chips rather than underlined tabs: that is the filter-row idiom the
+          tenant inbox established in the redesign, and it survives three
+          labels at 375px where an underline row starts to crowd. */}
+      <div role="tablist" aria-label={t("customer:plotTabsLabel")} className="mt-5 flex flex-wrap gap-2">
         {TABS.map((tab) => (
           <button
             key={tab}
@@ -96,10 +101,8 @@ export default function CustomerPlot({ loaderData }: Route.ComponentProps) {
             aria-controls={`plot-panel-${tab}`}
             onClick={() => selectTab(tab)}
             className={
-              "-mb-px border-b-2 px-4 py-3 text-base font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 " +
-              (activeTab === tab
-                ? "border-emerald-600 text-emerald-700 dark:text-emerald-400"
-                : "border-transparent text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white")
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-olive " +
+              (activeTab === tab ? "bg-deep-olive text-ivory" : "bg-beige/50 text-wood hover:bg-beige")
             }
           >
             {t(`customer:plotTab_${tab}`)}
@@ -119,22 +122,20 @@ export default function CustomerPlot({ loaderData }: Route.ComponentProps) {
 /** Shared muted note, for the two places where the backend has nothing to show. */
 function Note({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300">
-      {children}
-    </p>
+    <p className="rounded-2xl border border-beige bg-cream/60 px-5 py-4 text-sm text-wood">{children}</p>
   );
 }
 
 function InstructionList({ instructions, weekLabel }: { instructions: CareInstruction[]; weekLabel: (week: number) => string }) {
   return (
-    <ul className="mt-2 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+    <ul className="mt-3 flex flex-col gap-3">
       {instructions.map((instruction) => (
-        <li key={instruction.id} className="px-4 py-3">
-          <p className="text-xs font-semibold tracking-wide text-emerald-700 uppercase dark:text-emerald-400">
+        <li key={instruction.id} className="rounded-2xl border border-beige bg-cream px-5 py-4 shadow-sm">
+          <span className="rounded-full bg-moss/15 px-3 py-1 text-xs font-semibold text-moss">
             {weekLabel(instruction.week)}
-          </p>
-          <p className="mt-1 font-semibold text-gray-900 dark:text-white">{instruction.title}</p>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{instruction.body}</p>
+          </span>
+          <p className="mt-3 text-base font-medium text-forest">{instruction.title}</p>
+          <p className="mt-1 text-sm text-wood">{instruction.body}</p>
         </li>
       ))}
     </ul>
@@ -157,21 +158,21 @@ function CareTab({ guide, t }: { guide: PlotCareGuide | undefined; t: TFunction 
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+        <p className="text-xs font-semibold tracking-widest text-warm-olive uppercase">
           {t("customer:careWeekOfTotal", { week: guide.currentWeek, total: guide.totalWeeks })}
         </p>
         {/* Progress through the rental, not through the plant: nothing in the
             API observes the crop itself — see cropStage in ~/lib/care.ts. */}
-        <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-800">
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-beige/60">
           <div
-            className="h-full rounded-full bg-emerald-600"
+            className="h-full rounded-full bg-moss"
             style={{ width: `${Math.min(100, Math.round((guide.currentWeek / guide.totalWeeks) * 100))}%` }}
           />
         </div>
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("customer:careThisWeek")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-widest text-warm-olive uppercase">{t("customer:careThisWeek")}</h2>
         {thisWeek.length === 0 ? (
           <Note>{t("customer:careNothingThisWeek")}</Note>
         ) : (
@@ -180,7 +181,7 @@ function CareTab({ guide, t }: { guide: PlotCareGuide | undefined; t: TFunction 
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("customer:careUpcoming")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-widest text-warm-olive uppercase">{t("customer:careUpcoming")}</h2>
         {upcoming.length === 0 ? (
           <Note>{t("customer:careNothingUpcoming")}</Note>
         ) : (
@@ -191,11 +192,13 @@ function CareTab({ guide, t }: { guide: PlotCareGuide | undefined; t: TFunction 
   );
 }
 
+// Same badge vocabulary as the inbox's kinds: ripeness is the warm accent,
+// everything neutral is beige.
 const stageClass: Record<CropStage, string> = {
-  upcoming: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200",
-  growing: "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200",
-  readyToHarvest: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200",
-  seasonOver: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200",
+  upcoming: "bg-beige text-wood",
+  growing: "bg-moss/15 text-moss",
+  readyToHarvest: "bg-warm-olive/20 text-warm-olive",
+  seasonOver: "bg-beige text-wood",
 };
 
 /**
@@ -222,9 +225,9 @@ function CropsTab({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-gray-200 px-4 py-4 dark:border-gray-800">
+      <div className="rounded-2xl border border-beige bg-cream px-5 py-4 shadow-sm">
         <div className="flex items-start justify-between gap-4">
-          <p className="text-lg font-semibold text-gray-900 dark:text-white">{rental.crop.name}</p>
+          <p className="text-lg font-medium text-forest">{rental.crop.name}</p>
           <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${stageClass[stage]}`}>
             {t(`customer:cropStage_${stage}`)}
           </span>
@@ -232,15 +235,15 @@ function CropsTab({
 
         <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-gray-500 dark:text-gray-400">{t("customer:cropHarvestWeek")}</dt>
-            <dd className="mt-1 font-medium text-gray-900 dark:text-white">
+            <dt className="text-warm-olive">{t("customer:cropHarvestWeek")}</dt>
+            <dd className="mt-1 font-medium text-forest">
               {t("customer:calendarWeek", { week: isoWeek(harvest) })} · {dateFormatter.format(harvest)}
             </dd>
           </div>
           {guide && (
             <div>
-              <dt className="text-gray-500 dark:text-gray-400">{t("customer:cropProgress")}</dt>
-              <dd className="mt-1 font-medium text-gray-900 dark:text-white">
+              <dt className="text-warm-olive">{t("customer:cropProgress")}</dt>
+              <dd className="mt-1 font-medium text-forest">
                 {t("customer:careWeekOfTotal", { week: guide.currentWeek, total: guide.totalWeeks })}
               </dd>
             </div>
@@ -267,35 +270,35 @@ function RentalTab({
 }) {
   return (
     <div className="space-y-4">
-      <dl className="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
-        <div className="flex items-baseline justify-between gap-4 px-4 py-3">
-          <dt className="text-sm text-gray-500 dark:text-gray-400">{t("customer:rentalPeriod")}</dt>
-          <dd className="text-right font-medium text-gray-900 dark:text-white">
+      <dl className="divide-y divide-beige rounded-2xl border border-beige bg-cream shadow-sm">
+        <div className="flex items-baseline justify-between gap-4 px-5 py-3">
+          <dt className="text-sm text-warm-olive">{t("customer:rentalPeriod")}</dt>
+          <dd className="text-right font-medium text-forest">
             {formatRentalPeriod(rental.startAt, rental.endAt, locale)}
           </dd>
         </div>
-        <div className="flex items-baseline justify-between gap-4 px-4 py-3">
-          <dt className="text-sm text-gray-500 dark:text-gray-400">{t("customer:rentalStatus")}</dt>
-          <dd className="text-right font-medium text-gray-900 dark:text-white">
+        <div className="flex items-baseline justify-between gap-4 px-5 py-3">
+          <dt className="text-sm text-warm-olive">{t("customer:rentalStatus")}</dt>
+          <dd className="text-right font-medium text-forest">
             {guide ? t("customer:rentalActive") : t("customer:rentalInactive")}
           </dd>
         </div>
-        <div className="flex items-baseline justify-between gap-4 px-4 py-3">
-          <dt className="text-sm text-gray-500 dark:text-gray-400">{t("customer:rentalPlotSize")}</dt>
-          <dd className="text-right font-medium text-gray-900 dark:text-white">
+        <div className="flex items-baseline justify-between gap-4 px-5 py-3">
+          <dt className="text-sm text-warm-olive">{t("customer:rentalPlotSize")}</dt>
+          <dd className="text-right font-medium text-forest">
             {formatArea(rental.plot.areaSquareMeters, locale)}
           </dd>
         </div>
         {guide && (
-          <div className="flex items-baseline justify-between gap-4 px-4 py-3">
-            <dt className="text-sm text-gray-500 dark:text-gray-400">{t("customer:rentalField")}</dt>
-            <dd className="text-right font-medium text-gray-900 dark:text-white">{guide.fieldName}</dd>
+          <div className="flex items-baseline justify-between gap-4 px-5 py-3">
+            <dt className="text-sm text-warm-olive">{t("customer:rentalField")}</dt>
+            <dd className="text-right font-medium text-forest">{guide.fieldName}</dd>
           </div>
         )}
       </dl>
 
       <section>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("customer:handoverHeading")}</h2>
+        <h2 className="mb-3 text-xs font-semibold tracking-widest text-warm-olive uppercase">{t("customer:handoverHeading")}</h2>
         {/* Deliberately not faked: nothing in the API stores or serves a
             handover document, so there is no link to give. Same rule as the
             ComingSoon stubs — say it is missing rather than render a dead

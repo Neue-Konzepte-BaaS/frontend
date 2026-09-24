@@ -8,7 +8,7 @@ import type { NavItem } from "~/lib/nav-items";
  */
 export function BottomNav({ items }: { items: NavItem[] }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-gray-200 bg-white md:hidden dark:border-gray-800 dark:bg-gray-950">
+    <nav className="fixed inset-x-0 bottom-0 z-10 flex border-t border-beige bg-paper md:hidden">
       {items.map((item) => {
         const Icon = item.icon;
         return (
@@ -23,8 +23,8 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               // the bar from shifting height as you move between them.
               `flex min-w-0 flex-1 flex-col items-center gap-1 border-t-2 px-1 py-2 text-xs ${
                 isActive
-                  ? "border-emerald-600 font-semibold text-emerald-700 dark:border-emerald-400 dark:text-emerald-400"
-                  : "border-transparent font-medium text-gray-500 dark:text-gray-400"
+                  ? "border-moss font-semibold text-moss"
+                  : "border-transparent font-medium text-olive"
               }`
             }
           >

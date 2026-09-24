@@ -39,4 +39,11 @@ export const common: Shape = {
 
   comingSoonLead: "Demnächst verfügbar.",
   comingSoonBody: "Dieser Bereich ist noch nicht gebaut — die Navigation dorthin schon.",
+
+  plotStatusRented: "Vermietet",
+  plotStatusRequested: "Angefragt",
+  plotStatusFree: "Frei",
+  plotStatusSelected: "Ausgewählt",
+  plotStatusCount: "{{label}} ({{count}})",
+  plotTileLabel: "Parzelle {{number}} · {{status}}",
 };

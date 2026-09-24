@@ -5,7 +5,8 @@ import { findNearestPlots, groupPlotsByFarm, type NearbyFarm, type NearbyPlot } 
 import { getFarm } from "~/lib/farms";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
-import { toBbox, unionBbox } from "~/lib/geo";
+import { toBbox, unionBbox, pointBbox } from "~/lib/geo";
+import { geocodeLocation, FALLBACK_CENTER, type LatLon } from "~/lib/geocode";
 import { formatDistance } from "~/components/plot-card";
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
 
@@ -42,6 +43,9 @@ export function PlotSearch() {
   // The query that produced the current results, reused to link into each
   // farm's own page (see toFarmLink) — that page re-runs this same search.
   const [locationQuery, setLocationQuery] = useState<URLSearchParams>(new URLSearchParams());
+  // The geocoded search location, used to make sure the map always moves
+  // toward where the visitor searched, not just toward the result plots.
+  const [searchCenter, setSearchCenter] = useState<LatLon | null>(null);
   const { t, i18n } = useTranslation(["search", "common"]);
   const numberLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
@@ -51,9 +55,11 @@ export function PlotSearch() {
     try {
       // German postal codes are 4–5 digits; anything else is treated as a city.
       const isPostalCode = /^\d{4,5}$/.test(trimmed);
-      const plots = await findNearestPlots(
-        isPostalCode ? { postalCode: trimmed, limit: 30 } : { city: trimmed, limit: 30 },
-      );
+      const locationForGeocode = isPostalCode ? { postalCode: trimmed } : { city: trimmed };
+      const [plots, geocoded] = await Promise.all([
+        findNearestPlots({ ...locationForGeocode, limit: 30 }),
+        geocodeLocation(locationForGeocode),
+      ]);
       const farmSummaries = groupPlotsByFarm(plots);
       // The nearest-plots endpoint only carries each plot's farm id, not its
       // name — one lookup per distinct nearby farm to fill that in.
@@ -63,6 +69,7 @@ export function PlotSearch() {
       setResults(plots);
       setFarms(farmSummaries.map((f, i) => ({ ...f, name: farmDetails[i].name })));
       setLocationQuery(newLocationQuery);
+      setSearchCenter(geocoded);
       setHasSearched(true);
       // Reflected in the URL so a search survives navigating away and back
       // (e.g. into a farm's page and back — see search/farm.tsx's "back to
@@ -109,7 +116,10 @@ export function PlotSearch() {
   // nearest-first, and the tail can sit tens of kilometres out — fitting to
   // every one of them zooms so far out that the plots the searcher actually
   // cares about become specks. The closest handful keeps the view tight.
-  const fitTo = unionBbox(results.slice(0, MAP_FIT_RESULT_COUNT).map((p) => toBbox(p.coordinates)));
+  // The geocoded search point is unioned in too, so the map always visibly
+  // moves toward where the visitor searched, not just toward the results.
+  const resultBoxes = results.slice(0, MAP_FIT_RESULT_COUNT).map((p) => toBbox(p.coordinates));
+  const fitTo = unionBbox(searchCenter ? [pointBbox(searchCenter.lon, searchCenter.lat), ...resultBoxes] : resultBoxes);
 
   function handleShapeClick(plotId: string) {
     const plot = results.find((p) => p.id === plotId);
@@ -144,14 +154,14 @@ export function PlotSearch() {
       )}
 
       {!hasSearched ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("search:searchAboveHint")}</p>
+        <p className="mt-8 text-wood">{t("search:searchAboveHint")}</p>
       ) : results.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("search:noPlotsFoundNearby")}</p>
+        <p className="mt-8 text-wood">{t("search:noPlotsFoundNearby")}</p>
       ) : (
         <>
-          <div className="mt-6 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+          <div className="mt-6 overflow-hidden rounded-lg border border-beige">
             <FieldMap
-              center={{ lat: results[0].coordinates.coordinates[0][0][1], lon: results[0].coordinates.coordinates[0][0][0] }}
+              center={searchCenter ?? FALLBACK_CENTER}
               shapes={shapes}
               drawMode={null}
               onShapeClick={handleShapeClick}
@@ -159,24 +169,24 @@ export function PlotSearch() {
             />
           </div>
 
-          <p className="mt-4 text-sm text-gray-500">{t("search:browseHint")}</p>
+          <p className="mt-4 text-sm text-warm-olive">{t("search:browseHint")}</p>
 
-          <ul className="mt-2 divide-y divide-gray-200 dark:divide-gray-800">
+          <ul className="mt-2 divide-y divide-beige">
             {farms.map((farm, i) => (
               <li key={farm.farmId}>
                 <Link
                   to={toFarmLink(farm.farmId, locationQuery)}
-                  className="flex items-center gap-3 py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                  className="flex items-center gap-3 py-4 hover:bg-cream"
                 >
                   <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cream text-xs font-semibold text-wood"
                     aria-hidden
                   >
                     {i + 1}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-semibold text-gray-900 dark:text-white">{farm.name}</span>
-                    <span className="block text-sm text-gray-500">
+                    <span className="block font-semibold text-forest">{farm.name}</span>
+                    <span className="block text-sm text-warm-olive">
                       {t("search:farmDistance", { distance: formatDistance(farm.distanceMeters, numberLocale) })}
                       {" · "}
                       {t("search:nearbyPlotCount", { count: farm.plotCount })}

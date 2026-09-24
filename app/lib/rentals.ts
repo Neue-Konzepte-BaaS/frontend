@@ -8,9 +8,17 @@ export type { Crop } from "~/lib/fields";
  * Plot search + rental API wrappers. See backend/openapi.yml for the
  * authoritative contract:
  *
- *   GET  /api/plots/nearest   -> NearbyPlot[]     (public, no auth)
- *   POST /api/rentals         -> Rental           (customer only)
- *   GET  /api/rentals         -> RentalWithPlot[] (customer only)
+ *   GET  /api/plots/nearest          -> NearbyPlot[]     (public, no auth)
+ *   POST /api/rentals                -> Rental           (customer only)
+ *   GET  /api/rentals                -> RentalWithPlot[] (customer only)
+ *   GET  /api/rentals/farm           -> FarmRental[]     (farmer only)
+ *   POST /api/rentals/{id}/approve   -> Rental           (farmer only)
+ *   POST /api/rentals/{id}/decline   -> Rental           (farmer only)
+ *
+ * A rental starts life "requested" and a farmer decides it into "approved"
+ * or "declined" exactly once — see RentalStatus. Renting now requires a
+ * chosen startAt (1-60 days out) and a non-blank message to the farmer,
+ * rather than booking immediately.
  *
  * Unlike fields.ts, these endpoints use camelCase JSON keys (`plotId`,
  * `startAt`, `endAt`, `distanceMeters`) rather than the rest of the API's
@@ -37,6 +45,9 @@ export type NearbyPlot = {
   crops: Crop[];
 };
 
+/** A rental starts Requested, and a farmer decides it into Approved or Declined exactly once. */
+export type RentalStatus = "requested" | "approved" | "declined";
+
 export type Rental = {
   id: string;
   plotId: string;
@@ -45,6 +56,11 @@ export type Rental = {
   startAt: string;
   /** ISO 8601, exclusive. */
   endAt: string;
+  status: RentalStatus;
+  /** The customer's message to the farmer, submitted with the request. */
+  message: string;
+  /** ISO 8601, or null while still `requested`. */
+  decidedAt: string | null;
 };
 
 export type RentalWithPlot = Rental & { plot: Plot; crop: Crop };
@@ -121,15 +137,18 @@ export function findNearestPlots(query: NearestPlotsQuery): Promise<NearbyPlot[]
 }
 
 /**
- * Books a plot for the authenticated customer with the given crop, starting
- * now for that crop's fixed duration. Throws ApiError(409, "plot is already
- * rented") on an overlapping booking — a real race (the backend enforces
- * this with a DB exclusion constraint) — or ApiError(409, "crop is not
- * offered by this plot's field") when the crop isn't one the plot's field
- * offers. Callers must handle both as expected outcomes, not generic errors.
+ * Requests a plot for the authenticated customer with the given crop,
+ * starting at startAt (ISO 8601, must be 1-60 days out) for that crop's
+ * fixed duration, pending the farmer's approval. Throws ApiError(400) if
+ * startAt is out of that window or message is blank, ApiError(409, "plot is
+ * already requested or rented for that period") on an overlapping booking —
+ * a real race (the backend enforces this with a DB exclusion constraint) —
+ * or ApiError(409, "crop is not offered by this plot's field") when the crop
+ * isn't one the plot's field offers. Callers must handle all as expected
+ * outcomes, not generic errors.
  */
-export function rentPlot(plotId: string, cropId: string): Promise<Rental> {
-  return apiClient.post<Rental>("/rentals", { plotId, cropId });
+export function rentPlot(plotId: string, cropId: string, startAt: string, message: string): Promise<Rental> {
+  return apiClient.post<Rental>("/rentals", { plotId, cropId, startAt, message });
 }
 
 /** The authenticated customer's own rentals, newest first, expired included. */
@@ -148,17 +167,45 @@ export function listFarmRentals(): Promise<FarmRental[]> {
 }
 
 /**
- * Keeps only rentals covering right now, keyed by plot — listFarmRentals
- * returns historic ones too, and a plot can only have one *active* rental at
- * a time (the backend rejects overlapping periods). Used by the farmer's own
- * fields pages so they can show which of their plots are currently occupied,
- * and by whom, before the farmer edits crops or regenerates a plot grid.
+ * Approves a still-requested rental on one of the authenticated farmer's own
+ * plots. The response is the bare Rental (no plot/customer/field) — callers
+ * already have that detail from the request they're deciding, so use it for
+ * confirmation only, not to repopulate a row. Throws ApiError(403) if the
+ * farmer doesn't own the plot, ApiError(409) if the rental was already
+ * decided (including by a concurrent request elsewhere).
+ */
+export function approveRental(rentalId: string): Promise<Rental> {
+  return apiClient.post<Rental>(`/rentals/${rentalId}/approve`);
+}
+
+/**
+ * Declines a still-requested rental on one of the authenticated farmer's own
+ * plots, freeing the plot for that period. Same response shape and error
+ * cases as approveRental.
+ */
+export function declineRental(rentalId: string): Promise<Rental> {
+  return apiClient.post<Rental>(`/rentals/${rentalId}/decline`);
+}
+
+/**
+ * Keeps only approved rentals covering right now, keyed by plot —
+ * listFarmRentals returns historic and still-requested ones too, and a plot
+ * can only have one *active* rental at a time (the backend rejects
+ * overlapping periods, requested or approved alike). Used by the farmer's
+ * own fields pages so they can show which of their plots are currently
+ * occupied, and by whom, before the farmer edits crops or regenerates a plot
+ * grid. A still-requested rental doesn't occupy the plot yet — see
+ * RentalStatus — so it's excluded here same as the backend's own statistics.
  */
 export function activeRentalsByPlot(rentals: FarmRental[]): Map<string, FarmRental> {
   const now = Date.now();
   const byPlot = new Map<string, FarmRental>();
   for (const rental of rentals) {
-    if (new Date(rental.startAt).getTime() <= now && now < new Date(rental.endAt).getTime()) {
+    if (
+      rental.status === "approved" &&
+      new Date(rental.startAt).getTime() <= now &&
+      now < new Date(rental.endAt).getTime()
+    ) {
       byPlot.set(rental.plotId, rental);
     }
   }

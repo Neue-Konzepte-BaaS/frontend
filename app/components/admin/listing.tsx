@@ -25,7 +25,7 @@ function withFilter(params: URLSearchParams, key: string, value: string): string
 export function ListingEmpty({ filtered }: { filtered: boolean }) {
   const { t } = useTranslation("admin");
   return (
-    <p className="mt-6 text-gray-600 dark:text-gray-300">{filtered ? t("listNoMatches") : t("listEmpty")}</p>
+    <p className="mt-6 text-wood">{filtered ? t("listNoMatches") : t("listEmpty")}</p>
   );
 }
 
@@ -54,35 +54,35 @@ export function Pager({ total, limit, offset, count }: { total: number; limit: n
   }
 
   const stepClass =
-    "rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium dark:border-gray-800";
+    "rounded-lg border border-beige px-4 py-2 text-sm font-medium";
 
   return (
     <nav className="mt-6 flex flex-wrap items-center justify-between gap-3" aria-label={t("listPagerLabel")}>
-      <p className="text-sm text-gray-500 dark:text-gray-400">{t("listRange", { from, to, total })}</p>
+      <p className="text-sm text-warm-olive">{t("listRange", { from, to, total })}</p>
       <div className="flex items-center gap-2">
         {hasPrevious ? (
           <Link
             to={offsetHref(offset - limit)}
-            className={`${stepClass} text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-900`}
+            className={`${stepClass} text-wood hover:bg-cream`}
           >
             {t("listPrevious")}
           </Link>
         ) : (
           // A disabled <button> rather than a dead link: there is nowhere to go,
           // and a link with no destination is a trap for keyboard navigation.
-          <button type="button" disabled className={`${stepClass} text-gray-400 dark:text-gray-600`}>
+          <button type="button" disabled className={`${stepClass} text-beige`}>
             {t("listPrevious")}
           </button>
         )}
         {hasNext ? (
           <Link
             to={offsetHref(offset + limit)}
-            className={`${stepClass} text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-900`}
+            className={`${stepClass} text-wood hover:bg-cream`}
           >
             {t("listNext")}
           </Link>
         ) : (
-          <button type="button" disabled className={`${stepClass} text-gray-400 dark:text-gray-600`}>
+          <button type="button" disabled className={`${stepClass} text-beige`}>
             {t("listNext")}
           </button>
         )}
@@ -117,8 +117,8 @@ export function FilterTabs({
             aria-current={isActive ? "true" : undefined}
             className={`rounded-lg px-3 py-2 text-sm ${
               isActive
-                ? "bg-emerald-50 font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200"
-                : "font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-900"
+                ? "bg-moss/10 font-semibold text-forest"
+                : "font-medium text-wood hover:bg-cream"
             }`}
           >
             {option.label}

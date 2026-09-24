@@ -7,22 +7,38 @@ export const home: Shape = {
   metaDescription:
     "Die Software hinter Selbsternte-Höfen: Parzellen verwalten, Mieter informieren, wenn die Ernte reif ist, und alle auf einmal erreichen.",
   heroTitle: "Selbsternte-Parzellen, ohne Excel-Tabellen.",
+  heroHeadline1: "Dein Hof.",
+  heroHeadline2: "Deine Kunden.",
+  heroHeadline3: "Weniger Papierkram.",
+  heroSubtitle: "Parzellen, Ernten und Mieter verwalten — ohne Tabellen.",
   heroBody1:
     "Kleine Höfe vermieten Selbsternte-Parzellen und verwalten sie mit Excel, Papier und WhatsApp. Bauer as a Service ist die Software hinter dem Hof: wer welche Parzelle mietet, für wie lange, was angepflanzt ist und wann es reif ist.",
   heroBody2: "Der Hof behält seine eigene Marke und seine eigenen Kunden. Wir stellen nur die Werkzeuge bereit.",
+  getStarted: "Jetzt starten",
+  navHome: "Startseite",
+  navForFarmers: "Für Höfe",
+  navForCustomers: "Für Kunden",
   findPlotCta: "Parzelle in deiner Nähe finden",
-  runFarmCta: "Hof mit BaaS betreiben",
-  featuresTitle: "Das bekommst du",
+  runFarmCta: "Deinen Hof betreiben",
+  builtTitle1: "Gemacht für",
+  builtTitle2: "kleine Höfe.",
+  builtBody:
+    "Dein Hof behält seinen Namen, deine Kunden und deine Arbeitsweise. Wir geben dir die Werkzeuge, um Selbsternte und Hofverwaltung einfach zu machen — damit du dich auf das Wesentliche konzentrieren kannst: gesundes Essen und zufriedene Besucher.",
+  featuresTitle: "Alles, was dein Hof braucht.",
   featurePlotPlannerTitle: "Parzellenplaner",
-  featurePlotPlannerBody:
-    "Jede Parzelle auf einen Blick: frei, vermietet, an wen und bis wann. Keine farbcodierte Tabelle mehr.",
+  featurePlotPlannerBody: "Jede Parzelle, jeden Mieter und jede Ernte auf einen Blick.",
   featureRipenessTitle: "Reifebenachrichtigungen",
-  featureRipenessBody:
-    "Markiere eine Ernte als reif, und alle Mieter dieser Parzelle erfahren es noch am selben Tag, nicht erst am nächsten Wochenende.",
-  featureBulletinTitle: "Schwarzes Brett",
-  featureBulletinBody:
-    "Eine Ankündigung erreicht alle deine Mieter gleichzeitig — statt der Gruppenchat, den niemand liest.",
+  featureRipenessBody: "Informiere Mieter, wenn es Zeit zum Ernten ist.",
+  featureBulletinTitle: "Hofpinnwand",
+  featureBulletinBody: "Eine Nachricht für alle — von deinem Hof.",
+  harvestTitle: "Von der Parzelle zur Ernte.",
+  harvestBody:
+    "Mehr als Software — ein Ort, wo Höfe, Menschen und gutes Essen zusammenkommen.",
+  howItWorks: "So funktioniert's",
   lookingForPlotTitle: "Auf der Suche nach einer Parzelle?",
-  lookingForPlotBody: "Suche nach Postleitzahl oder Stadt, um verfügbare Selbsternte-Parzellen in deiner Nähe zu sehen.",
+  lookingForPlotBody: "Finde ein Stück echten Hof in deiner Nähe.",
+  searchPlaceholder: "Postleitzahl oder Stadt",
   searchPlotsCta: "Parzellen suchen",
+  searchTagline: "Frisches Gemüse. Lokale Höfe. Deine Parzelle.",
+  comingSoon: "Diese Seite ist bald verfügbar.",
 };

@@ -90,6 +90,16 @@ export function unionBbox(boxes: Bbox[]): Bbox | null {
   }));
 }
 
+/** A small bbox centered on a single point, e.g. to fit/frame a geocoded location with no (or few) nearby results. */
+export function pointBbox(lon: number, lat: number, halfSpanDegrees = 0.01): Bbox {
+  return {
+    minLon: lon - halfSpanDegrees,
+    minLat: lat - halfSpanDegrees,
+    maxLon: lon + halfSpanDegrees,
+    maxLat: lat + halfSpanDegrees,
+  };
+}
+
 // --- Rotation-aware rectangle helpers -------------------------------------
 //
 // A rotated rectangle's bounding box is NOT the shape — the Bbox helpers

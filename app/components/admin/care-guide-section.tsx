@@ -9,7 +9,7 @@ import {
   type CareInstruction,
 } from "~/lib/care";
 import { ApiError } from "~/lib/api-client";
-import { Field as FormField, FormError, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
+import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
 
 /**
  * Authoring for the weekly care guide (backend #44): the instructions a tenant
@@ -127,16 +127,16 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
   if (crops.length === 0) {
     return (
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("careGuideHeading")}</h2>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">{t("careGuideNoCrops")}</p>
+        <h2 className="font-serif text-xl font-semibold text-forest">{t("careGuideHeading")}</h2>
+        <p className="mt-2 text-sm text-warm-olive">{t("careGuideNoCrops")}</p>
       </section>
     );
   }
 
   return (
     <section className="mt-10">
-      <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("careGuideHeading")}</h2>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("careGuideBody")}</p>
+      <h2 className="font-serif text-xl font-semibold text-forest">{t("careGuideHeading")}</h2>
+      <p className="mt-1 text-sm text-warm-olive">{t("careGuideBody")}</p>
 
       <div className="mt-4 max-w-sm">
         <FormField label={t("careCropLabel")} htmlFor="care-crop">
@@ -160,25 +160,25 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
       </div>
 
       {loading ? (
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">{t("careLoading")}</p>
+        <p className="mt-4 text-sm text-warm-olive">{t("careLoading")}</p>
       ) : instructions.length === 0 ? (
-        <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">{t("careNoInstructions")}</p>
+        <p className="mt-4 text-sm text-warm-olive">{t("careNoInstructions")}</p>
       ) : (
-        <ul className="mt-4 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+        <ul className="mt-4 divide-y divide-beige rounded-2xl border border-beige bg-cream shadow-sm">
           {instructions.map((instruction) => (
-            <li key={instruction.id} className="flex items-start justify-between gap-4 px-4 py-3">
+            <li key={instruction.id} className="flex items-start justify-between gap-4 px-5 py-3">
               <div className="min-w-0">
-                <p className="text-xs font-semibold tracking-wide text-emerald-700 uppercase dark:text-emerald-400">
+                <p className="text-xs font-semibold tracking-widest text-moss uppercase">
                   {t("careWeekLabelShort", { week: instruction.week })}
                 </p>
-                <p className="mt-1 font-semibold text-gray-900 dark:text-white">{instruction.title}</p>
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{instruction.body}</p>
+                <p className="mt-1 font-medium text-forest">{instruction.title}</p>
+                <p className="mt-1 text-sm text-wood">{instruction.body}</p>
               </div>
               <span className="flex shrink-0 items-center gap-1">
                 <button
                   type="button"
                   onClick={() => startEditing(instruction)}
-                  className="rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                  className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
                 >
                   {t("careEdit")}
                 </button>
@@ -189,14 +189,14 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
                     <button
                       type="button"
                       onClick={() => handleDelete(instruction)}
-                      className="rounded bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700"
+                      className="rounded bg-error px-2 py-1 text-xs font-medium text-ivory hover:opacity-90"
                     >
                       {t("cropDeleteConfirm")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setPendingDeleteId(null)}
-                      className="rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                      className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
                     >
                       {t("cropDeleteCancel")}
                     </button>
@@ -205,7 +205,7 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
                   <button
                     type="button"
                     onClick={() => setPendingDeleteId(instruction.id)}
-                    className="rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+                    className="rounded px-2 py-1 text-xs font-medium text-error hover:bg-error/10"
                   >
                     {t("cropDelete")}
                   </button>
@@ -218,14 +218,7 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
 
       <form onSubmit={handleSubmit} className="mt-4 max-w-sm space-y-4">
         {error && <FormError message={error} />}
-        {success && (
-          <p
-            role="status"
-            className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
-          >
-            {success}
-          </p>
-        )}
+        {success && <FormSuccess message={success} />}
 
         <FormField label={t("careWeekLabel")} htmlFor="care-week">
           <input

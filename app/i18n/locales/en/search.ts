@@ -10,6 +10,8 @@ export const search = {
   // longer has a search box "above" it, hence no mention of one here.
   noRentalsYet: "You haven't rented a plot yet.",
   booked: "Booked",
+  statusRequested: "Awaiting approval",
+  statusDeclined: "Declined",
 
   postalCodeOrCity: "Postal code or city",
   postalCodeOrCityPlaceholder: "e.g. 76133 or Karlsruhe",
@@ -25,18 +27,29 @@ export const search = {
   nearbyPlotCount_other: "{{count}} plots available",
   availableCrops: "What you can grow here",
   cropWithDuration: "{{name}} ({{months}}-month rental)",
-  renting: "Renting…",
-  rentButton: "Rent",
-  rentConflict: "Someone just rented this plot — try another.",
+  renting: "Sending request…",
+  rentButton: "Request to rent",
+  rentStartDateLabel: "Start date",
+  rentMessageLabel: "Message to the farmer",
+  rentMessagePlaceholder: "Introduce yourself and say what you're planning to grow…",
+  invalidRentalRequest: "Choose a start date 1 to 60 days from now and add a message.",
+  rentConflict: "This plot was just requested or rented by someone else — try another.",
   cropNotOffered: "This plot doesn't offer that crop — try another one.",
   chooseCrop: "Choose a crop",
   noCropsOffered: "Not available yet — no crops offered.",
-  loginToRent: "Log in to rent",
+  loginToRent: "Log in to request",
   cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
+  rentPanelHint: "Click a plot on the map or in the grid to request it.",
+  plotNumber: "Plot {{number}}",
+  cropMonths_one: "{{count}} month",
+  cropMonths_other: "{{count}} months",
+  rentStartDateHint: "Earliest tomorrow, at most 60 days from now.",
+  rentPeriodPreview: "Rental period: {{period}}",
+  requestSentBody: "Request sent — the farm will get back to you. You can follow its status on your home page.",
 
   farmMetaTitle: "Farm · BaaS",
   backToSearch: "Back to search",
-  rented: "Rented ✓",
+  requestSent: "Requested ✓",
   aboutFarm: "About this farm",
   noFarmDescriptionYet: "This farm hasn't added a description yet.",
   foundedLabel: "Founded",
@@ -45,10 +58,17 @@ export const search = {
   farmNeedsSearchContext: "Search for a postal code or city to see this farm's available plots.",
   farmHasNoPlotsNearby: "No available plots from this farm near your search right now.",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
-  // "Me" moved out of coming-soon once issue #34 built it — see i18n/locales/*/customer.ts.
   boardMetaTitle: "Board · BaaS",
   boardTitle: "Board",
+  boardEmptySubtitle: "You'll see messages from the farms you rent from here.",
+  // Only ever shown for 2+ farms — a single farm renders its name directly instead (see board.tsx).
+  boardMultipleFarmsSubtitle: "Announcements from {{count}} farms you rent from",
+  noAnnouncementsYet: "No announcements yet.",
+  pinnedBadge: "Pinned",
+  pinAnnouncement: "Pin this message",
+  unpinAnnouncement: "Unpin this message",
+
+  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   inboxMetaTitle: "Inbox · BaaS",
   inboxTitle: "Inbox",
 } as const;

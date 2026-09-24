@@ -44,8 +44,8 @@ export default function AdminAccounts({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("admin:accountsTitle")}</h1>
-      <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{t("admin:accountsBody")}</p>
+      <h1 className="text-2xl font-bold text-forest">{t("admin:accountsTitle")}</h1>
+      <p className="mt-1 text-sm text-warm-olive">{t("admin:accountsBody")}</p>
 
       <div className="mt-4 space-y-3">
         <FilterTabs
@@ -63,7 +63,7 @@ export default function AdminAccounts({ loaderData }: Route.ComponentProps) {
               would submit only its own fields and silently clear the filter. */}
           {role && <input type="hidden" name="role" value={role} />}
           <label className="flex-1 basis-48 text-sm">
-            <span className="mb-1 block font-medium text-gray-700 dark:text-gray-200">
+            <span className="mb-1 block font-medium text-wood">
               {t("admin:accountsSearchLabel")}
             </span>
             <input
@@ -84,22 +84,22 @@ export default function AdminAccounts({ loaderData }: Route.ComponentProps) {
         <ListingEmpty filtered={query !== "" || role !== ""} />
       ) : (
         <>
-          <ul className="mt-6 divide-y divide-gray-200 dark:divide-gray-800">
+          <ul className="mt-6 divide-y divide-beige">
             {page.items.map((account) => (
               <li key={account.id} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
                 <div className="min-w-0">
-                  <p className="font-medium text-gray-900 dark:text-white">
+                  <p className="font-medium text-forest">
                     {account.firstName} {account.lastName}
                   </p>
-                  <p className="truncate text-sm text-gray-500 dark:text-gray-400">{account.email}</p>
+                  <p className="truncate text-sm text-warm-olive">{account.email}</p>
                 </div>
                 <div className="flex items-baseline gap-3 text-sm">
                   {/* A null role is an account with no subtype row at all. Say
                       so rather than showing a blank cell that reads as a bug. */}
-                  <span className={account.role ? "text-gray-700 dark:text-gray-200" : "text-amber-700 dark:text-amber-300"}>
+                  <span className={account.role ? "text-wood" : "text-amber-700"}>
                     {account.role ? roleLabel(t, account.role) : t("admin:accountsNoRole")}
                   </span>
-                  <span className="text-gray-500 dark:text-gray-400">
+                  <span className="text-warm-olive">
                     {dateFormatter.format(new Date(account.createdAt))}
                   </span>
                 </div>

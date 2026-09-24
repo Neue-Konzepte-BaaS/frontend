@@ -5,7 +5,7 @@
  */
 
 export const inputClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-3 text-base text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-900 dark:text-white";
+  "w-full rounded-lg border border-beige bg-ivory px-4 py-3 text-base text-forest focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss";
 
 /**
  * Primary button, sized to its label — for a button that sits in a row with
@@ -15,13 +15,13 @@ export const inputClass =
  * and Tailwind's own order decides which wins.
  */
 export const primaryButtonClass =
-  "rounded-lg bg-emerald-600 px-4 py-3 text-base font-semibold text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60";
+  "rounded-lg bg-moss px-4 py-3 text-base font-semibold text-ivory hover:bg-olive focus:outline-none focus:ring-2 focus:ring-olive disabled:opacity-60";
 
 export const submitClass = `w-full ${primaryButtonClass}`;
 
 /** Secondary/outline button, for a non-primary action next to a submitClass button (e.g. "cancel", "redraw"). */
 export const secondaryButtonClass =
-  "rounded-lg border border-gray-300 px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 disabled:opacity-60 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800";
+  "rounded-lg border border-beige px-4 py-3 text-base font-medium text-wood hover:bg-cream focus:outline-none focus:ring-2 focus:ring-beige disabled:opacity-60";
 
 export function Field({
   label,
@@ -36,7 +36,7 @@ export function Field({
     <div>
       <label
         htmlFor={htmlFor}
-        className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
+        className="mb-1 block text-sm font-medium text-deep-olive"
       >
         {label}
       </label>
@@ -50,7 +50,19 @@ export function FormError({ message }: { message: string }) {
   return (
     <p
       role="alert"
-      className="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200"
+      className="rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-error"
+    >
+      {message}
+    </p>
+  );
+}
+
+/** Shared inline success banner — the FormError of the happy path. */
+export function FormSuccess({ message }: { message: string }) {
+  return (
+    <p
+      role="status"
+      className="rounded-lg border border-moss/40 bg-moss/10 px-4 py-3 text-sm text-moss"
     >
       {message}
     </p>
