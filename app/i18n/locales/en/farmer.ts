@@ -50,6 +50,40 @@ export const farmer = {
 
   mapAriaLabel: "Field map",
 
+  boardMetaTitle: "Board · BaaS",
+  boardTitle: "Board",
+  boardYourPostsTitle: "Your posts",
+  // Ripeness notices never appear here — they have no read-back endpoint of
+  // their own (see lib/ripeness.ts), so this only ever lists announcements.
+  noPostsYet: "No posts yet — announcements you send will show up here.",
+
+  announceSectionTitle: "Post to the board",
+  announceSectionBody:
+    "Send a note to your tenants. Reaches everyone currently renting from you, or narrow it to one field or plot.",
+  announceSubjectLabel: "Subject",
+  announceSubjectPlaceholder: "Harvest on Saturday",
+  announceBodyLabel: "Message",
+  announceBodyPlaceholder: "From 9am on Saturday we'll be harvesting. Please bring your own crates.",
+  announceScopeLabel: "Audience",
+  announceScopeAll: "All current tenants",
+  announceScopeField: "Tenants of one field",
+  announceScopePlot: "Tenant of one plot",
+  announceChooseField: "Choose a field",
+  announceChoosePlot: "Choose a plot",
+  announceSending: "Sending…",
+  announceSend: "Post",
+  announceSuccess: "Posted — queued for {{recipients}} recipient(s).",
+
+  ripenessSectionTitle: "Ready-to-harvest notice",
+  ripenessSectionBody: "Tell the tenants growing a crop on one of your fields that it's ready to pick.",
+  ripenessChooseField: "Choose a field",
+  ripenessChooseCrop: "Choose a crop",
+  ripenessSending: "Sending…",
+  ripenessSend: "Notify",
+  ripenessSuccess: "Sent — queued for {{recipients}} recipient(s).",
+  ripenessNoFieldsYet: "Add a field first — ripeness notices are posted per field.",
+  ripenessNoCropsForField: "This field has no crops offered on any of its plots yet.",
+
   tenantsMetaTitle: "Tenants · BaaS",
   tenantsTitle: "Tenants",
   tenantsActiveSummary: "{{count}} active",
@@ -84,9 +118,6 @@ export const farmer = {
   requestDeciding: "Saving…",
   noRequestsYet: "No open requests — new rental requests from customers will show up here.",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
-  boardMetaTitle: "Board · BaaS",
-  boardTitle: "Board",
   careGuideMetaTitle: "Care guide · BaaS",
   careGuideTitle: "Care guide",
   settingsMetaTitle: "Farm settings · BaaS",
