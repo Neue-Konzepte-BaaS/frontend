@@ -16,4 +16,18 @@ export const customer: Shape = {
   pushNotification: "Push-Benachrichtigung",
   emailNotification: "E-Mail",
   weeklyDigest: "Wöchentliche Pflege-Übersicht",
+
+  inboxMetaTitle: "Posteingang · BaaS",
+  inboxHeading: "Benachrichtigungen",
+  inboxEmpty: "Noch keine Benachrichtigungen.",
+  inboxFilterAll: "Alle",
+  inboxFilterRipeness: "Reife",
+  inboxFilterCare: "Pflege",
+  inboxFilterFarm: "Hof",
+  inboxGroupToday: "Heute",
+  inboxGroupThisWeek: "Diese Woche",
+  inboxGroupOlder: "Älter",
+  inboxKindRipeness: "Reife",
+  inboxKindCare: "Pflege",
+  inboxKindFarm: "Hof",
 };
