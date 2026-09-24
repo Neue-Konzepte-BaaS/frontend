@@ -30,17 +30,22 @@ export const FALLBACK_ZOOM = 12;
 /** Zoom level once a field-drawing map is centred on a real location. */
 export const FIELD_DRAW_ZOOM = 16;
 
-const CACHE_PREFIX = "geo_zip_";
+const ZIP_CACHE_PREFIX = "geo_zip_";
+const CITY_CACHE_PREFIX = "geo_city_";
 
 type CachedEntry = { lat: number; lon: number; cachedAt: string };
 
-function cacheKey(postalCode: number): string {
-  return `${CACHE_PREFIX}${postalCode}`;
+function zipCacheKey(postalCode: number): string {
+  return `${ZIP_CACHE_PREFIX}${postalCode}`;
 }
 
-function readCache(postalCode: number): LatLon | null {
+function cityCacheKey(city: string): string {
+  return `${CITY_CACHE_PREFIX}${city.trim().toLowerCase()}`;
+}
+
+function readCacheByKey(key: string): LatLon | null {
   try {
-    const raw = localStorage.getItem(cacheKey(postalCode));
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const entry = JSON.parse(raw) as CachedEntry;
     if (typeof entry.lat !== "number" || typeof entry.lon !== "number") return null;
@@ -51,10 +56,10 @@ function readCache(postalCode: number): LatLon | null {
   }
 }
 
-function writeCache(postalCode: number, latLon: LatLon) {
+function writeCacheByKey(key: string, latLon: LatLon) {
   try {
     const entry: CachedEntry = { ...latLon, cachedAt: new Date().toISOString() };
-    localStorage.setItem(cacheKey(postalCode), JSON.stringify(entry));
+    localStorage.setItem(key, JSON.stringify(entry));
   } catch {
     // Non-fatal: we just re-geocode next time.
   }
@@ -71,7 +76,7 @@ export async function geocodePostalCode(postalCode: number): Promise<LatLon> {
     return FALLBACK_CENTER;
   }
 
-  const cached = readCache(postalCode);
+  const cached = readCacheByKey(zipCacheKey(postalCode));
   if (cached) return cached;
 
   try {
@@ -102,7 +107,7 @@ export async function geocodePostalCode(postalCode: number): Promise<LatLon> {
       return FALLBACK_CENTER;
     }
 
-    writeCache(postalCode, latLon);
+    writeCacheByKey(zipCacheKey(postalCode), latLon);
     return latLon;
   } catch (err) {
     if (import.meta.env.DEV) {
@@ -110,4 +115,58 @@ export async function geocodePostalCode(postalCode: number): Promise<LatLon> {
     }
     return FALLBACK_CENTER;
   }
+}
+
+/**
+ * Resolve a free-text German city/locality name to a centre point. Same
+ * cache-first, never-throws, FALLBACK_CENTER-on-failure contract as
+ * geocodePostalCode. Only ever called once per submitted search term, never
+ * wired to keystrokes.
+ */
+export async function geocodeCity(city: string): Promise<LatLon> {
+  const trimmed = city.trim();
+  if (!trimmed) return FALLBACK_CENTER;
+
+  const cached = readCacheByKey(cityCacheKey(trimmed));
+  if (cached) return cached;
+
+  try {
+    const url = new URL(NOMINATIM_URL);
+    url.searchParams.set("city", trimmed);
+    url.searchParams.set("countrycodes", "de");
+    url.searchParams.set("format", "jsonv2");
+    url.searchParams.set("limit", "1");
+
+    const res = await fetch(url.toString());
+    if (!res.ok) {
+      if (import.meta.env.DEV) {
+        console.warn(`geocodeCity: Nominatim responded ${res.status}`);
+      }
+      return FALLBACK_CENTER;
+    }
+
+    const results = (await res.json()) as Array<{ lat: string; lon: string }>;
+    const first = results[0];
+    if (!first) {
+      return FALLBACK_CENTER;
+    }
+
+    const latLon: LatLon = { lat: Number(first.lat), lon: Number(first.lon) };
+    if (!Number.isFinite(latLon.lat) || !Number.isFinite(latLon.lon)) {
+      return FALLBACK_CENTER;
+    }
+
+    writeCacheByKey(cityCacheKey(trimmed), latLon);
+    return latLon;
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn("geocodeCity: request failed", err);
+    }
+    return FALLBACK_CENTER;
+  }
+}
+
+/** Geocodes whichever of postal code / city text the search actually used. */
+export function geocodeLocation(query: { postalCode: string } | { city: string }): Promise<LatLon> {
+  return "postalCode" in query ? geocodePostalCode(Number(query.postalCode)) : geocodeCity(query.city);
 }

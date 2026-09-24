@@ -9,7 +9,8 @@ import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals"
 import { formatArea } from "~/components/plot-card";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
-import { toBbox, unionBbox } from "~/lib/geo";
+import { toBbox, unionBbox, pointBbox } from "~/lib/geo";
+import { geocodeLocation, FALLBACK_CENTER, type LatLon } from "~/lib/geocode";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
@@ -27,7 +28,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const city = url.searchParams.get("city");
 
   const account = await me();
-  const [farm, plots, myRentals] = await Promise.all([
+  const [farm, plots, myRentals, searchCenter] = await Promise.all([
     getFarm(farmId),
     postalCode
       ? findNearestPlots({ postalCode, limit: 30 })
@@ -35,6 +36,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
         ? findNearestPlots({ city, limit: 30 })
         : Promise.resolve<NearbyPlot[]>([]),
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
+    postalCode ? geocodeLocation({ postalCode }) : city ? geocodeLocation({ city }) : Promise.resolve<LatLon | null>(null),
   ]);
 
   return {
@@ -42,13 +44,14 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     farm,
     farmPlots: plots.filter((p) => p.farm === farmId),
     hasLocationContext: Boolean(postalCode || city),
+    searchCenter,
     backToSearchQuery: url.searchParams.toString(),
     rentedPlotIds: myRentals.map((r) => r.plotId),
   };
 }
 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
-  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, rentedPlotIds } = loaderData;
+  const { account, farm, farmPlots, hasLocationContext, searchCenter, backToSearchQuery, rentedPlotIds } = loaderData;
   const customer = account?.role === "customer" ? account : null;
   const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
@@ -71,7 +74,10 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
     label: String(i + 1),
     selected: plot.id === selectedPlotId,
   }));
-  const fitTo = unionBbox(farmPlots.map((p) => toBbox(p.coordinates)));
+  // The geocoded search point is unioned in too, so the map always visibly
+  // reflects which postal code/city led here, not just this farm's own plots.
+  const resultBoxes = farmPlots.map((p) => toBbox(p.coordinates));
+  const fitTo = unionBbox(searchCenter ? [pointBbox(searchCenter.lon, searchCenter.lat), ...resultBoxes] : resultBoxes);
 
   const content = (
     <main className="mx-auto w-full max-w-6xl p-6">
@@ -115,7 +121,7 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       {hasLocationContext && farmPlots.length > 0 && (
         <div className="mt-6 overflow-hidden rounded-lg border border-beige">
           <FieldMap
-            center={{ lat: farmPlots[0].coordinates.coordinates[0][0][1], lon: farmPlots[0].coordinates.coordinates[0][0][0] }}
+            center={searchCenter ?? FALLBACK_CENTER}
             shapes={shapes}
             drawMode={null}
             onShapeClick={toggleSelectPlot}
