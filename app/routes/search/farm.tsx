@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { MapPin, Wheat } from "lucide-react";
@@ -7,10 +7,12 @@ import { me, dashboardPath } from "~/lib/auth";
 import { getFarm } from "~/lib/farms";
 import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
-import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
+import { PlotGrid } from "~/components/plot-grid";
+import { PlotRentPanel } from "~/components/plot-rent-panel";
+import { sortPlotsNaturally } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
-import { toBbox, unionBbox, pointBbox } from "~/lib/geo";
-import { geocodeLocation, FALLBACK_CENTER, type LatLon } from "~/lib/geocode";
+import { toBbox, unionBbox } from "~/lib/geo";
+import { FALLBACK_CENTER } from "~/lib/geocode";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
@@ -28,7 +30,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const city = url.searchParams.get("city");
 
   const account = await me();
-  const [farm, plots, myRentals, searchCenter] = await Promise.all([
+  const [farm, plots, myRentals] = await Promise.all([
     getFarm(farmId),
     postalCode
       ? findNearestPlots({ postalCode, limit: 30 })
@@ -36,7 +38,6 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
         ? findNearestPlots({ city, limit: 30 })
         : Promise.resolve<NearbyPlot[]>([]),
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
-    postalCode ? geocodeLocation({ postalCode }) : city ? geocodeLocation({ city }) : Promise.resolve<LatLon | null>(null),
   ]);
 
   return {
@@ -44,14 +45,13 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     farm,
     farmPlots: plots.filter((p) => p.farm === farmId),
     hasLocationContext: Boolean(postalCode || city),
-    searchCenter,
     backToSearchQuery: url.searchParams.toString(),
     rentedPlotIds: myRentals.map((r) => r.plotId),
   };
 }
 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
-  const { account, farm, farmPlots, hasLocationContext, searchCenter, backToSearchQuery, rentedPlotIds } = loaderData;
+  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, rentedPlotIds } = loaderData;
   const customer = account?.role === "customer" ? account : null;
   const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
@@ -59,25 +59,41 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
 
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
   const [rented, setRented] = useState<Set<string>>(() => new Set(rentedPlotIds));
+  const panelRef = useRef<HTMLDivElement>(null);
+  const plots = sortPlotsNaturally(farmPlots);
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
   }
 
+  // On narrow screens the panel sits below the grid — bring it into view so
+  // a click on the map visibly does something.
+  useEffect(() => {
+    if (selectedPlotId && window.matchMedia("(max-width: 1023px)").matches) {
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedPlotId]);
+
   const backToSearchLink = backToSearchQuery ? `/search?${backToSearchQuery}` : "/search";
   const farmPageUrl = backToSearchQuery ? `/search/farms/${farm.id}?${backToSearchQuery}` : `/search/farms/${farm.id}`;
 
-  const shapes: MapShape[] = farmPlots.map((plot, i) => ({
+  const shapes: MapShape[] = plots.map((plot, i) => ({
     id: plot.id,
     polygon: plot.coordinates,
     variant: "plot",
     label: String(i + 1),
     selected: plot.id === selectedPlotId,
+    requested: rented.has(plot.id),
   }));
-  // The geocoded search point is unioned in too, so the map always visibly
-  // reflects which postal code/city led here, not just this farm's own plots.
-  const resultBoxes = farmPlots.map((p) => toBbox(p.coordinates));
-  const fitTo = unionBbox(searchCenter ? [pointBbox(searchCenter.lon, searchCenter.lat), ...resultBoxes] : resultBoxes);
+  const selectedIndex = plots.findIndex((p) => p.id === selectedPlotId);
+  const selected = selectedIndex >= 0 ? { plot: plots[selectedIndex], number: selectedIndex + 1 } : null;
+  // Framed tightly on this farm's plots so they're big enough to click —
+  // picking a plot on the map is this page's main job.
+  const fitTo = unionBbox(farmPlots.map((p) => toBbox(p.coordinates)));
+  // Only a first-paint value — fitTo takes over as soon as the map loads.
+  const initialCenter = fitTo
+    ? { lat: (fitTo.minLat + fitTo.maxLat) / 2, lon: (fitTo.minLon + fitTo.maxLon) / 2 }
+    : FALLBACK_CENTER;
 
   const content = (
     <main className="mx-auto w-full max-w-6xl p-6">
@@ -118,18 +134,6 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         </dl>
       </section>
 
-      {hasLocationContext && farmPlots.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-lg border border-beige">
-          <FieldMap
-            center={searchCenter ?? FALLBACK_CENTER}
-            shapes={shapes}
-            drawMode={null}
-            onShapeClick={toggleSelectPlot}
-            fitTo={fitTo}
-          />
-        </div>
-      )}
-
       <h2 className="mt-8 font-serif text-lg font-semibold text-forest">{t("search:availablePlots")}</h2>
 
       {!hasLocationContext ? (
@@ -142,55 +146,36 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       ) : farmPlots.length === 0 ? (
         <p className="mt-2 text-wood">{t("search:farmHasNoPlotsNearby")}</p>
       ) : (
-        <ul className="mt-2 divide-y divide-beige">
-          {farmPlots.map((plot, i) => {
-            const isSelected = plot.id === selectedPlotId;
-            const isRented = rented.has(plot.id);
-            return (
-              <li key={plot.id}>
-                <button
-                  type="button"
-                  onClick={() => toggleSelectPlot(plot.id)}
-                  aria-expanded={isSelected}
-                  disabled={isRented}
-                  className="flex w-full items-center gap-3 py-3 text-left disabled:cursor-default"
-                >
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-beige text-xs font-semibold text-wood"
-                    aria-hidden
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-medium text-forest">{plot.name}</span>
-                    <span className="block text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
-                  </span>
-                  {isRented ? (
-                    <span className="shrink-0 text-sm font-medium text-moss">
-                      {t("search:rented")}
-                    </span>
-                  ) : (
-                    <span className="shrink-0 text-warm-olive" aria-hidden>
-                      {isSelected ? "▾" : "▸"}
-                    </span>
-                  )}
-                </button>
-
-                {isSelected && !isRented && (
-                  <div className="pb-3 pl-9">
-                    <PlotCropsAndRent
-                      plotId={plot.id}
-                      crops={plot.crops}
-                      account={account}
-                      loginRedirectTo={farmPageUrl}
-                      onRented={() => setRented((prev) => new Set(prev).add(plot.id))}
-                    />
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+        <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div>
+            <div className="overflow-hidden rounded-lg border border-beige">
+              <FieldMap
+                center={initialCenter}
+                shapes={shapes}
+                drawMode={null}
+                onShapeClick={toggleSelectPlot}
+                fitTo={fitTo}
+              />
+            </div>
+            <div className="mt-4">
+              <PlotGrid
+                plots={plots.map((p) => ({ id: p.id, status: rented.has(p.id) ? "requested" : "free" }))}
+                selectedIds={new Set(selectedPlotId ? [selectedPlotId] : [])}
+                onSelect={toggleSelectPlot}
+                legendStatuses={["free", "requested"]}
+              />
+            </div>
+          </div>
+          <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
+            <PlotRentPanel
+              selected={selected}
+              alreadyRequested={selected ? rented.has(selected.plot.id) : false}
+              account={account}
+              loginRedirectTo={farmPageUrl}
+              onRented={(rental) => setRented((prev) => new Set(prev).add(rental.plotId))}
+            />
+          </div>
+        </div>
       )}
     </main>
   );
