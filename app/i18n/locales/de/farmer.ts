@@ -120,9 +120,6 @@ export const farmer: Shape = {
   requestDeciding: "Wird gespeichert…",
   noRequestsYet: "Keine offenen Anfragen — neue Mietanfragen von Kunden erscheinen hier.",
 
-  boardMetaTitle: "Pinnwand · BaaS",
-  boardTitle: "Pinnwand",
-
   careGuideMetaTitle: "Pflegehinweise · BaaS",
   careGuideTitle: "Pflegehinweise",
   settingsMetaTitle: "Hofeinstellungen · BaaS",

@@ -118,9 +118,6 @@ export const farmer = {
   requestDeciding: "Saving…",
   noRequestsYet: "No open requests — new rental requests from customers will show up here.",
 
-  // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
-  boardMetaTitle: "Board · BaaS",
-  boardTitle: "Board",
   careGuideMetaTitle: "Care guide · BaaS",
   careGuideTitle: "Care guide",
   settingsMetaTitle: "Farm settings · BaaS",
