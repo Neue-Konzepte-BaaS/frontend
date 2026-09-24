@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { MapPin, Wheat } from "lucide-react";
@@ -7,9 +7,12 @@ import { me, dashboardPath } from "~/lib/auth";
 import { getFarm } from "~/lib/farms";
 import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
-import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
+import { PlotGrid } from "~/components/plot-grid";
+import { PlotRentPanel } from "~/components/plot-rent-panel";
+import { sortPlotsNaturally } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
+import { FALLBACK_CENTER } from "~/lib/geocode";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
@@ -56,22 +59,41 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
 
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
   const [rented, setRented] = useState<Set<string>>(() => new Set(rentedPlotIds));
+  const panelRef = useRef<HTMLDivElement>(null);
+  const plots = sortPlotsNaturally(farmPlots);
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
   }
 
+  // On narrow screens the panel sits below the grid — bring it into view so
+  // a click on the map visibly does something.
+  useEffect(() => {
+    if (selectedPlotId && window.matchMedia("(max-width: 1023px)").matches) {
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedPlotId]);
+
   const backToSearchLink = backToSearchQuery ? `/search?${backToSearchQuery}` : "/search";
   const farmPageUrl = backToSearchQuery ? `/search/farms/${farm.id}?${backToSearchQuery}` : `/search/farms/${farm.id}`;
 
-  const shapes: MapShape[] = farmPlots.map((plot, i) => ({
+  const shapes: MapShape[] = plots.map((plot, i) => ({
     id: plot.id,
     polygon: plot.coordinates,
     variant: "plot",
     label: String(i + 1),
     selected: plot.id === selectedPlotId,
+    requested: rented.has(plot.id),
   }));
+  const selectedIndex = plots.findIndex((p) => p.id === selectedPlotId);
+  const selected = selectedIndex >= 0 ? { plot: plots[selectedIndex], number: selectedIndex + 1 } : null;
+  // Framed tightly on this farm's plots so they're big enough to click —
+  // picking a plot on the map is this page's main job.
   const fitTo = unionBbox(farmPlots.map((p) => toBbox(p.coordinates)));
+  // Only a first-paint value — fitTo takes over as soon as the map loads.
+  const initialCenter = fitTo
+    ? { lat: (fitTo.minLat + fitTo.maxLat) / 2, lon: (fitTo.minLon + fitTo.maxLon) / 2 }
+    : FALLBACK_CENTER;
 
   const content = (
     <main className="mx-auto w-full max-w-6xl p-6">
@@ -111,18 +133,6 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
           </div>
         </dl>
       </section>
-
-      {hasLocationContext && farmPlots.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-lg border border-beige">
-          <FieldMap
-            center={{ lat: farmPlots[0].coordinates.coordinates[0][0][1], lon: farmPlots[0].coordinates.coordinates[0][0][0] }}
-            shapes={shapes}
-            drawMode={null}
-            onShapeClick={toggleSelectPlot}
-            fitTo={fitTo}
-          />
-        </div>
-      )}
 
       <h2 className="mt-8 font-serif text-lg font-semibold text-forest">{t("search:availablePlots")}</h2>
 
@@ -187,6 +197,36 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             );
           })}
         </ul>
+        <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div>
+            <div className="overflow-hidden rounded-lg border border-beige">
+              <FieldMap
+                center={initialCenter}
+                shapes={shapes}
+                drawMode={null}
+                onShapeClick={toggleSelectPlot}
+                fitTo={fitTo}
+              />
+            </div>
+            <div className="mt-4">
+              <PlotGrid
+                plots={plots.map((p) => ({ id: p.id, status: rented.has(p.id) ? "requested" : "free" }))}
+                selectedIds={new Set(selectedPlotId ? [selectedPlotId] : [])}
+                onSelect={toggleSelectPlot}
+                legendStatuses={["free", "requested"]}
+              />
+            </div>
+          </div>
+          <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
+            <PlotRentPanel
+              selected={selected}
+              alreadyRequested={selected ? rented.has(selected.plot.id) : false}
+              account={account}
+              loginRedirectTo={farmPageUrl}
+              onRented={(rental) => setRented((prev) => new Set(prev).add(rental.plotId))}
+            />
+          </div>
+        </div>
       )}
     </main>
   );

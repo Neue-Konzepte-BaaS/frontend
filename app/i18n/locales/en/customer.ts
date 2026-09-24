@@ -12,4 +12,18 @@ export const customer = {
   pushNotification: "Push notification",
   emailNotification: "Email",
   weeklyDigest: "Weekly care digest",
+
+  inboxMetaTitle: "Inbox · BaaS",
+  inboxHeading: "Notifications",
+  inboxEmpty: "No notifications yet.",
+  inboxFilterAll: "All",
+  inboxFilterRipeness: "Ripeness",
+  inboxFilterCare: "Care",
+  inboxFilterFarm: "Farm",
+  inboxGroupToday: "Today",
+  inboxGroupThisWeek: "This week",
+  inboxGroupOlder: "Older",
+  inboxKindRipeness: "Ripeness",
+  inboxKindCare: "Care",
+  inboxKindFarm: "Farm",
 } as const;

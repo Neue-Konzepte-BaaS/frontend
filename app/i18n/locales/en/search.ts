@@ -39,6 +39,13 @@ export const search = {
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to request",
   cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
+  rentPanelHint: "Click a plot on the map or in the grid to request it.",
+  plotNumber: "Plot {{number}}",
+  cropMonths_one: "{{count}} month",
+  cropMonths_other: "{{count}} months",
+  rentStartDateHint: "Earliest tomorrow, at most 60 days from now.",
+  rentPeriodPreview: "Rental period: {{period}}",
+  requestSentBody: "Request sent — the farm will get back to you. You can follow its status on your home page.",
 
   farmMetaTitle: "Farm · BaaS",
   backToSearch: "Back to search",
