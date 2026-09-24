@@ -22,10 +22,10 @@ export function Switch({
   return (
     <div className="flex items-center justify-between gap-4 py-4">
       <div className="min-w-0">
-        <p id={`${id}-label`} className="font-medium text-gray-900 dark:text-white">
+        <p id={`${id}-label`} className="font-medium text-forest">
           {label}
         </p>
-        {description && <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>}
+        {description && <p className="mt-1 text-sm text-warm-olive">{description}</p>}
       </div>
       <button
         type="button"
@@ -34,8 +34,8 @@ export function Switch({
         aria-labelledby={`${id}-label`}
         onClick={() => onChange(!checked)}
         className={
-          "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-gray-950 " +
-          (checked ? "bg-emerald-600" : "bg-gray-300 dark:bg-gray-700")
+          "relative inline-flex h-7 w-12 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-moss focus:ring-offset-2 " +
+          (checked ? "bg-moss" : "bg-beige")
         }
       >
         <span

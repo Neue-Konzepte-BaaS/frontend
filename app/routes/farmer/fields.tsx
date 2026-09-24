@@ -47,40 +47,40 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("yourFieldsTitle")}</h1>
+      <h1 className="text-2xl font-bold text-forest">{t("yourFieldsTitle")}</h1>
 
       {fields.length === 0 ? (
-        <p className="mt-6 text-gray-600 dark:text-gray-300">{t("noFieldsYet")}</p>
+        <p className="mt-6 text-wood">{t("noFieldsYet")}</p>
       ) : (
         <>
-          <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+          <div className="mt-4 overflow-hidden rounded-lg border border-beige">
             <FieldMap center={center} shapes={shapes} drawMode={null} fitTo={fitTo} />
           </div>
 
-          <ul className="mt-6 divide-y divide-gray-200 dark:divide-gray-800">
+          <ul className="mt-6 divide-y divide-beige">
             {fields.map((field) => (
               <li key={field.id}>
                 <Link
                   to={`/farmer/fields/${field.id}`}
-                  className="block py-4 hover:bg-gray-50 dark:hover:bg-gray-900"
+                  className="block py-4 hover:bg-cream"
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="font-semibold text-gray-900 dark:text-white">{field.name}</p>
-                    <span className="flex shrink-0 items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
+                    <p className="font-semibold text-forest">{field.name}</p>
+                    <span className="flex shrink-0 items-center gap-1 text-sm text-warm-olive">
                       <Pencil className="h-3.5 w-3.5" aria-hidden />
                       {t("editPlots")}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500">{t("plot", { count: field.plots.length })}</p>
+                  <p className="text-sm text-warm-olive">{t("plot", { count: field.plots.length })}</p>
                   {field.plots.length > 0 && (
-                    <ul className="mt-1 space-y-0.5 text-sm text-gray-500">
+                    <ul className="mt-1 space-y-0.5 text-sm text-warm-olive">
                       {field.plots.map((plot) => {
                         const rental = rentalByPlot.get(plot.id);
                         return (
                           <li key={plot.id}>
                             {plot.name}
                             {rental && (
-                              <span className="text-rose-600 dark:text-rose-400">
+                              <span className="text-rose-600">
                                 {" — "}
                                 {t("rentedTo", { name: `${rental.customer.firstName} ${rental.customer.lastName}` })}
                               </span>

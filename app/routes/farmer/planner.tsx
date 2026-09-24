@@ -92,7 +92,7 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("farmer:newFieldTitle")}</h1>
+      <h1 className="text-2xl font-bold text-forest">{t("farmer:newFieldTitle")}</h1>
 
       <StepInstructions step={step} />
 
@@ -102,7 +102,7 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="mt-4 overflow-hidden rounded-lg border border-beige">
         <FieldMap
           center={center}
           zoom={FIELD_DRAW_ZOOM}
@@ -147,5 +147,5 @@ function StepInstructions({ step }: { step: Step }) {
   const { t } = useTranslation("farmer");
   const text = step === "draw-field" ? t("drawFieldInstructions") : t("nameFieldInstructions");
 
-  return <p className="mt-1 text-gray-600 dark:text-gray-300">{text}</p>;
+  return <p className="mt-1 text-wood">{text}</p>;
 }

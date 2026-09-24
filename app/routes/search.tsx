@@ -3,10 +3,9 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/search";
 import { me, dashboardPath } from "~/lib/auth";
 import { PlotSearch } from "~/components/plot-search";
-import { submitClass } from "~/components/form";
-import { LogoutButton } from "~/components/logout-button";
-import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
+import { LanguageSwitcher } from "~/components/language-switcher";
+import { LogoutButton } from "~/components/logout-button";
 import { useTenantNavItems } from "~/lib/nav-items";
 import i18n from "~/i18n";
 
@@ -14,15 +13,6 @@ export function meta() {
   return [{ title: i18n.t("search:searchMetaTitle") }];
 }
 
-/**
- * The public plot search — open to everyone, including anonymous visitors.
- *
- * Deliberately resolves the session with `me()` rather than `requireRole`:
- * a farmer or admin following the landing page's CTA should be able to
- * browse public search without being ejected to their own dashboard. Every
- * role (and nobody at all) renders the same page; only the header, the
- * tenant nav shell, and the per-result action differ.
- */
 export async function clientLoader() {
   const account = await me();
   return { account };
@@ -30,63 +20,82 @@ export async function clientLoader() {
 
 export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const { account } = loaderData;
-  // Only a customer's session gets the tenant nav rail/bar — an anonymous
-  // visitor or a farmer/admin browsing public search isn't in the tenant
-  // nav's world (no Board/Inbox/Me to show them).
   const customer = account?.role === "customer" ? account : null;
-  const { t } = useTranslation(["search", "common"]);
+  const { t } = useTranslation(["search", "common", "home"]);
   const tenantNavItems = useTenantNavItems();
 
   const content = (
-    <main className="mx-auto w-full max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("search:searchTitle")}</h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">{t("search:searchSubtitle")}</p>
-
+    <main className="mx-auto w-full max-w-5xl p-6">
+      <h1 className="font-serif text-3xl font-bold text-forest">{t("search:searchTitle")}</h1>
+      <p className="mt-2 text-wood">{t("search:searchSubtitle")}</p>
       <PlotSearch />
     </main>
   );
 
-  return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b border-gray-200 dark:border-gray-800">
-        {/* A signed-in customer gets AppShell's full-bleed sidebar layout below,
-            so the header must also go edge to edge to line up with it — unlike
-            the anonymous case, whose content stays centered at max-w-5xl with
-            no sidebar (see customer/layout.tsx's header for the same full-bleed
-            pattern once AppShell is in play). */}
-        <div className={`flex items-center justify-between p-4 ${customer ? "" : "mx-auto max-w-5xl"}`}>
-          <Link to="/" className="text-sm text-gray-500 hover:underline dark:text-gray-400">
-            {t("common:brand")}
-          </Link>
-          {account ? (
-            <div className="flex items-center gap-3">
+  if (customer) {
+    return (
+      <div className="flex min-h-screen flex-col">
+        <header className="border-b border-beige bg-cream">
+          <div className="flex items-center justify-between px-6 py-4">
+            <Link to="/" className="flex items-center gap-2">
+              <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none">
+                <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
+                <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
+              </svg>
+              <div className="leading-tight">
+                <span className="block text-sm font-bold uppercase tracking-widest text-forest">BAUER</span>
+                <span className="block text-[10px] text-forest/60">as a service</span>
+              </div>
+            </Link>
+            <div className="flex items-center gap-4">
               <LanguageSwitcher />
-              <Link
-                to={dashboardPath(account.role)}
-                className="whitespace-nowrap text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
-              >
-                {t("common:goToDashboard")}
-              </Link>
+              <span className="hidden text-sm font-medium text-wood sm:block">
+                {customer.firstName} {customer.lastName}
+              </span>
               <LogoutButton />
             </div>
-          ) : (
-            <div className="flex items-center gap-3">
-              <LanguageSwitcher />
-              <Link
-                to="/login?redirect=/search"
-                className="whitespace-nowrap text-sm font-medium text-gray-700 hover:underline dark:text-gray-200"
-              >
-                {t("common:signIn")}
-              </Link>
-              <Link to="/register?redirect=/search" className={`${submitClass} inline-block w-auto px-4 py-2 text-sm`}>
-                {t("common:createAccount")}
-              </Link>
+          </div>
+        </header>
+        <AppShell items={tenantNavItems}>{content}</AppShell>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen flex-col bg-paper">
+      <header className="bg-cream">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
+          <Link to="/" className="flex items-center gap-3">
+            <svg viewBox="0 0 32 32" className="h-10 w-10" fill="none">
+              <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
+              <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
+            </svg>
+            <div className="leading-tight">
+              <span className="block text-base font-bold uppercase tracking-widest text-forest">BAUER</span>
+              <span className="block text-xs text-forest/60">as a service</span>
             </div>
-          )}
+          </Link>
+          <nav className="hidden items-center gap-8 md:flex">
+            <Link to="/" className="text-sm text-wood hover:text-forest">{t("home:navHome")}</Link>
+            <Link to="/for-farmers" className="text-sm text-wood hover:text-forest">{t("home:navForFarmers")}</Link>
+            <Link to="/search" className="text-sm text-wood hover:text-forest">{t("home:navForCustomers")}</Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <LanguageSwitcher />
+            {account ? (
+              <Link to={dashboardPath(account.role)} className="rounded-full bg-deep-olive px-6 py-2.5 text-sm font-semibold text-ivory hover:bg-moss">
+                {t("common:goToDashboard")}
+              </Link>
+            ) : (
+              <>
+                <Link to="/login" className="text-sm font-medium text-wood hover:text-forest">{t("common:signIn")}</Link>
+                <Link to="/register" className="rounded-full bg-deep-olive px-6 py-2.5 text-sm font-semibold text-ivory hover:bg-moss">{t("home:getStarted")}</Link>
+              </>
+            )}
+          </div>
         </div>
       </header>
-
-      {customer ? <AppShell items={tenantNavItems}>{content}</AppShell> : content}
+      {content}
     </div>
   );
 }

@@ -81,16 +81,16 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-3xl p-4">
       {/* No per-farm photo exists yet — same themed-banner stand-in as search/farm.tsx. */}
-      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-emerald-600 to-emerald-800 dark:from-emerald-800 dark:to-emerald-950">
+      <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-moss to-forest">
         <Wheat className="absolute -top-8 -right-8 h-44 w-44 text-white/10" aria-hidden />
         <div className="relative p-6 md:p-10">
           <h1 className="text-3xl font-bold text-white">{t("search:boardTitle")}</h1>
-          <p className="mt-2 text-emerald-50">{subtitle}</p>
+          <p className="mt-2 text-ivory">{subtitle}</p>
         </div>
       </div>
 
       {announcements.length === 0 ? (
-        <p className="mt-8 text-gray-600 dark:text-gray-300">{t("search:noAnnouncementsYet")}</p>
+        <p className="mt-8 text-wood">{t("search:noAnnouncementsYet")}</p>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
           {sorted.map((announcement) => (
@@ -128,39 +128,39 @@ function AnnouncementCard({
     <li
       className={`rounded-xl border p-4 ${
         pinned
-          ? "border-emerald-300 bg-emerald-50/60 dark:border-emerald-800 dark:bg-emerald-950/40"
-          : "border-gray-200 dark:border-gray-800"
+          ? "border-moss/40 bg-moss/10"
+          : "border-beige"
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2">
           {pinned && (
-            <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200">
+            <span className="inline-flex items-center rounded-full bg-moss/10 px-2.5 py-0.5 text-xs font-medium text-forest">
               {t("pinnedBadge")}
             </span>
           )}
           {showFarmChip && (
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+            <span className="inline-flex items-center rounded-full bg-cream px-2.5 py-0.5 text-xs font-medium text-wood">
               {announcement.farmName}
             </span>
           )}
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <time className="text-sm text-gray-500 dark:text-gray-400">{dateLabel}</time>
+          <time className="text-sm text-warm-olive">{dateLabel}</time>
           {/* p-3 + size 20 ≈ 44px hit target — context.md requires large tap targets for elderly tenants. */}
           <button
             type="button"
             onClick={onTogglePin}
             aria-label={t(pinned ? "unpinAnnouncement" : "pinAnnouncement")}
             aria-pressed={pinned}
-            className="-m-3 rounded-full p-3 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+            className="-m-3 rounded-full p-3 text-warm-olive hover:bg-cream hover:text-wood"
           >
-            <Pin size={20} className={pinned ? "fill-emerald-600 text-emerald-600" : undefined} />
+            <Pin size={20} className={pinned ? "fill-moss text-moss" : undefined} />
           </button>
         </div>
       </div>
-      <h2 className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{announcement.subject}</h2>
-      <p className="mt-1 whitespace-pre-line text-gray-600 dark:text-gray-300">{announcement.body}</p>
+      <h2 className="mt-2 text-lg font-bold text-forest">{announcement.subject}</h2>
+      <p className="mt-1 whitespace-pre-line text-wood">{announcement.body}</p>
     </li>
   );
 }

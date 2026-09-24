@@ -40,12 +40,12 @@ export default function AdminOverview({ loaderData }: Route.ComponentProps) {
     <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
 
-      <p className="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400">
+      <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
         {stats.scope === "platform" ? t("scopePlatform") : t("scopeFarm")}
       </p>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t("overviewTitle")}</h1>
-        <p className="text-xs text-gray-400 dark:text-gray-500">{t("generatedAt", { time: generatedAt })}</p>
+        <h1 className="text-2xl font-bold text-forest">{t("overviewTitle")}</h1>
+        <p className="text-xs text-warm-olive">{t("generatedAt", { time: generatedAt })}</p>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -96,7 +96,7 @@ export default function AdminOverview({ loaderData }: Route.ComponentProps) {
           has no slot for Broadcast (five items max) — these cards are how it
           stays reachable on a phone. */}
       <section className="mt-10">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t("systemTitle")}</h2>
+        <h2 className="text-lg font-semibold text-forest">{t("systemTitle")}</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           {systemItems.map((item) => {
             const Icon = item.icon;
@@ -104,10 +104,10 @@ export default function AdminOverview({ loaderData }: Route.ComponentProps) {
               <Link
                 key={item.to}
                 to={item.to}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 p-4 hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-900"
+                className="flex items-center gap-3 rounded-lg border border-beige p-4 hover:bg-cream"
               >
-                <Icon className="h-5 w-5 shrink-0 text-gray-500 dark:text-gray-400" aria-hidden />
-                <span className="font-medium text-gray-900 dark:text-white">{item.label}</span>
+                <Icon className="h-5 w-5 shrink-0 text-warm-olive" aria-hidden />
+                <span className="font-medium text-forest">{item.label}</span>
               </Link>
             );
           })}

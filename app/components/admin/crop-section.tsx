@@ -64,10 +64,10 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
   return (
     <section>
       {cropList.length > 0 && (
-        <ul className="mt-4 divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-800 dark:border-gray-800">
+        <ul className="mt-4 divide-y divide-beige rounded-lg border border-beige">
           {cropList.map((crop) => (
             <li key={crop.id} className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-gray-700 dark:text-gray-200">
+              <span className="text-sm text-wood">
                 {t("cropDuration", { name: crop.name, months: crop.durationMonths })}
               </span>
               {/* Deleting a crop is platform-wide and immediate, so the first
@@ -87,7 +87,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
                   <button
                     type="button"
                     onClick={() => setPendingDeleteId(null)}
-                    className="rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+                    className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-cream"
                   >
                     {t("cropDeleteCancel")}
                   </button>
@@ -96,7 +96,7 @@ export function CropSection({ initialCrops }: { initialCrops: Crop[] }) {
                 <button
                   type="button"
                   onClick={() => setPendingDeleteId(crop.id)}
-                  className="ml-4 shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950"
+                  className="ml-4 shrink-0 rounded px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-50"
                 >
                   {t("cropDelete")}
                 </button>

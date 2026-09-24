@@ -3,13 +3,43 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-serif: "Lora", ui-serif, Georgia, serif;
+
+  --color-forest: #31311B;
+  --color-deep-olive: #34371D;
+  --color-moss: #524A26;
+  --color-olive: #797449;
+  --color-sage: #848662;
+  --color-warm-olive: #9B8D5B;
+  --color-wood: #5F572E;
+  --color-beige: #B4AF8A;
+  --color-cream: #E5D7B4;
+  --color-ivory: #F3E7C8;
+  --color-paper: #F7F1DF;
+  --color-error: #A96F4A;
+}
+
+@layer components {
+  /* Headings */
+  .h1 { @apply font-serif text-5xl font-bold leading-tight tracking-tight text-forest; }
+  .h2 { @apply font-serif text-3xl font-bold text-forest; }
+  .h3 { @apply font-serif text-xl font-semibold text-forest; }
+  .h4 { @apply font-serif text-lg font-semibold text-deep-olive; }
+
+  /* Body text */
+  .body-lg  { @apply text-lg leading-relaxed text-wood; }
+  .body-md  { @apply text-base leading-relaxed text-wood; }
+  .body-sm  { @apply text-sm leading-relaxed text-olive; }
+
+  /* Muted / captions */
+  .text-muted { @apply text-sm text-warm-olive; }
 }
 
 html,
 body {
-  @apply bg-white dark:bg-gray-950;
+  @apply bg-paper;
+}
 
-  @media (prefers-color-scheme: dark) {
-    color-scheme: dark;
-  }
+@layer base {
+  button, [role="button"] { cursor: pointer; }
 }

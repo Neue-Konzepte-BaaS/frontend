@@ -23,7 +23,7 @@ export const links: Route.LinksFunction = () => [
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
 
@@ -67,7 +67,7 @@ export default function App() {
 // clientLoaders (auth checks, redirects) run.
 export function HydrateFallback() {
   return (
-    <main className="flex min-h-screen items-center justify-center p-8 text-gray-500">
+    <main className="flex min-h-screen items-center justify-center p-8 text-warm-olive">
       Loading…
     </main>
   );
@@ -92,16 +92,16 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6 text-center">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{message}</h1>
-      <p className="mt-1 text-gray-600 dark:text-gray-300">{details}</p>
+      <h1 className="text-2xl font-bold text-forest">{message}</h1>
+      <p className="mt-1 text-wood">{details}</p>
       <Link
         to="/"
-        className="mt-6 font-medium text-emerald-700 underline dark:text-emerald-400"
+        className="mt-6 font-medium text-moss underline hover:text-olive"
       >
         {t("common:backToHome")}
       </Link>
       {stack && (
-        <pre className="mt-6 w-full overflow-x-auto rounded-lg border border-gray-200 p-4 text-left text-xs dark:border-gray-800">
+        <pre className="mt-6 w-full overflow-x-auto rounded-lg border border-beige p-4 text-left text-xs">
           <code>{stack}</code>
         </pre>
       )}
