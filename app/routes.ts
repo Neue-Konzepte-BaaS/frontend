@@ -33,6 +33,7 @@ export default [
     route("customer/board", "routes/customer/board.tsx"),
     route("customer/inbox", "routes/customer/inbox.tsx"),
     route("customer/me", "routes/customer/me.tsx"),
+    route("customer/request-sent", "routes/customer/request-sent.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/
   // Care guide, plus Farm settings pinned separately (issue #27). A layout

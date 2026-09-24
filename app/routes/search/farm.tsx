@@ -174,6 +174,8 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                   <div className="pb-3 pl-9">
                     <PlotCropsAndRent
                       plotId={plot.id}
+                      plotName={plot.name}
+                      farmName={farm.name}
                       crops={plot.crops}
                       account={account}
                       loginRedirectTo={farmPageUrl}

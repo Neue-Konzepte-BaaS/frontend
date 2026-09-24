@@ -64,4 +64,12 @@ export const search: Shape = {
 
   inboxMetaTitle: "Posteingang · BaaS",
   inboxTitle: "Posteingang",
+
+  requestSentMetaTitle: "Anfrage gesendet · BaaS",
+  requestSentHeading: "Anfrage an {{farmName}} gesendet.",
+  requestSentSubtitle: "Anfrage für {{plotName}} gesendet. Der Hof antwortet in der Regel innerhalb von zwei Tagen.",
+  requestSentStep1: "Der Hof bestätigt deine Anfrage.",
+  requestSentStep2: "{{plotName}} erscheint auf deiner Startseite.",
+  requestSentStep3: "Du erhältst Reifebenachrichtigungen und Pflegehinweise vom Hof.",
+  requestSentCta: "Zur Startseite",
 };
