@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { rentPlot, type Crop, type Rental } from "~/lib/rentals";
 import { ApiError } from "~/lib/api-client";
@@ -16,6 +16,8 @@ function isoDateOffset(days: number): string {
 
 type PlotCropsAndRentProps = {
   plotId: string;
+  plotName: string;
+  farmName: string;
   crops: Crop[];
   /** Whoever is viewing, any role — a customer gets the request form,
    *  `null` (anonymous) gets "Log in to rent", any other signed-in role
@@ -34,13 +36,15 @@ type RentState = { status: "renting" } | { status: "error"; message: string };
  * customer, the request form (crop, start date, message) with a preview of
  * the resulting rental period, since each crop fixes how long the rental runs.
  */
-export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRented }: PlotCropsAndRentProps) {
+export function PlotCropsAndRent({ plotId, plotName, farmName, crops, account, loginRedirectTo, onRented }: PlotCropsAndRentProps) {
   const [selectedCropId, setSelectedCropId] = useState(crops[0]?.id ?? "");
   const [startAt, setStartAt] = useState("");
   const [message, setMessage] = useState("");
   const [rentState, setRentState] = useState<RentState | null>(null);
+
   const { t, i18n } = useTranslation(["search", "common", "auth"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
+  const navigate = useNavigate();
   const isCustomer = account?.role === "customer";
   const renting = rentState?.status === "renting";
 
@@ -69,6 +73,9 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
       const rental = await rentPlot(plotId, selectedCrop.id, startAtIso, message.trim());
       onRented?.(rental, selectedCrop);
       setRentState(null);
+      navigate(
+        `/customer/request-sent?farmName=${encodeURIComponent(farmName)}&plotName=${encodeURIComponent(plotName)}`
+      );
     } catch (err) {
       // A 409 covers two distinct, expected outcomes here: a real race on the
       // plot (the backend enforces non-overlapping rentals with a DB

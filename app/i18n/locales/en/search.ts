@@ -71,4 +71,12 @@ export const search = {
   // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   inboxMetaTitle: "Inbox · BaaS",
   inboxTitle: "Inbox",
+
+  requestSentMetaTitle: "Request sent · BaaS",
+  requestSentHeading: "Request sent to {{farmName}}.",
+  requestSentSubtitle: "Request for {{plotName}} sent. The farm usually answers within two days.",
+  requestSentStep1: "The farm approves your request.",
+  requestSentStep2: "{{plotName}} appears on your home screen.",
+  requestSentStep3: "You get ripeness and care messages from the farm.",
+  requestSentCta: "Go to my home",
 } as const;

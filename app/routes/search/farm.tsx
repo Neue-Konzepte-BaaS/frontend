@@ -9,6 +9,7 @@ import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals"
 import { formatArea } from "~/components/plot-card";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
+import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { sortPlotsNaturally } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
@@ -146,6 +147,58 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       ) : farmPlots.length === 0 ? (
         <p className="mt-2 text-wood">{t("search:farmHasNoPlotsNearby")}</p>
       ) : (
+        <>
+        <ul className="mt-2 divide-y divide-beige">
+          {farmPlots.map((plot, i) => {
+            const isSelected = plot.id === selectedPlotId;
+            const isRented = rented.has(plot.id);
+            return (
+              <li key={plot.id}>
+                <button
+                  type="button"
+                  onClick={() => toggleSelectPlot(plot.id)}
+                  aria-expanded={isSelected}
+                  disabled={isRented}
+                  className="flex w-full items-center gap-3 py-3 text-left disabled:cursor-default"
+                >
+                  <span
+                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-beige text-xs font-semibold text-wood"
+                    aria-hidden
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium text-forest">{plot.name}</span>
+                    <span className="block text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
+                  </span>
+                  {isRented ? (
+                    <span className="shrink-0 text-sm font-medium text-moss">
+                      {t("search:rented")}
+                    </span>
+                  ) : (
+                    <span className="shrink-0 text-warm-olive" aria-hidden>
+                      {isSelected ? "▾" : "▸"}
+                    </span>
+                  )}
+                </button>
+
+                {isSelected && !isRented && (
+                  <div className="pb-3 pl-9">
+                    <PlotCropsAndRent
+                      plotId={plot.id}
+                      plotName={plot.name}
+                      farmName={farm.name}
+                      crops={plot.crops}
+                      account={account}
+                      loginRedirectTo={farmPageUrl}
+                      onRented={() => setRented((prev) => new Set(prev).add(plot.id))}
+                    />
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
         <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div>
             <div className="overflow-hidden rounded-lg border border-beige">
@@ -170,12 +223,14 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             <PlotRentPanel
               selected={selected}
               alreadyRequested={selected ? rented.has(selected.plot.id) : false}
+              farmName={farm.name}
               account={account}
               loginRedirectTo={farmPageUrl}
               onRented={(rental) => setRented((prev) => new Set(prev).add(rental.plotId))}
             />
           </div>
         </div>
+        </>
       )}
     </main>
   );
