@@ -108,10 +108,15 @@ export function groupPlotsByFarm(plots: NearbyPlot[]): NearbyFarm[] {
   return [...byFarm.values()];
 }
 
-export type NearestPlotsQuery =
-  | { lat: number; lon: number; limit?: number }
-  | { postalCode: string; limit?: number }
-  | { city: string; limit?: number };
+/** `farm` restricts the results to that one farm's free plots. */
+export type NearestPlotsQuery = (
+  | { lat: number; lon: number }
+  | { postalCode: string }
+  | { city: string }
+) & { limit?: number; farm?: string };
+
+/** The API's maximum page size for the nearest-plots search. */
+export const MAX_NEAREST_PLOTS = 100;
 
 /**
  * Finds the plots nearest to a search point, nearest first. Already-rented
@@ -132,6 +137,9 @@ export function findNearestPlots(query: NearestPlotsQuery): Promise<NearbyPlot[]
   }
   if (query.limit != null) {
     params.set("limit", String(query.limit));
+  }
+  if (query.farm) {
+    params.set("farm", query.farm);
   }
   return apiClient.get<NearbyPlot[]>(`/plots/nearest?${params.toString()}`);
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { findNearestPlots, groupPlotsByFarm, type NearbyFarm, type NearbyPlot } from "~/lib/rentals";
+import { findNearestPlots, groupPlotsByFarm, MAX_NEAREST_PLOTS, type NearbyFarm, type NearbyPlot } from "~/lib/rentals";
 import { getFarm } from "~/lib/farms";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
@@ -17,8 +17,7 @@ import { Field as FormField, FormError, inputClass, submitClass } from "~/compon
  * browser — what a farm offers and the rent flow live on its own page
  * (search/farm.tsx, reached by clicking a farm here). The same postalCode/
  * city query is carried along in that link (see toFarmLink below), since
- * that page re-runs this same search scoped to one farm rather than calling
- * a dedicated "this farm's plots" endpoint, which doesn't exist.
+ * that page re-runs this same search scoped to one farm (`farm` param).
  */
 
 type FarmResult = NearbyFarm & { name: string };
@@ -57,7 +56,9 @@ export function PlotSearch() {
       const isPostalCode = /^\d{4,5}$/.test(trimmed);
       const locationForGeocode = isPostalCode ? { postalCode: trimmed } : { city: trimmed };
       const [plots, geocoded] = await Promise.all([
-        findNearestPlots({ ...locationForGeocode, limit: 30 }),
+        // As many as the API allows: the list is per farm, and one big farm's
+        // plots alone would otherwise fill a small limit and hide the rest.
+        findNearestPlots({ ...locationForGeocode, limit: MAX_NEAREST_PLOTS }),
         geocodeLocation(locationForGeocode),
       ]);
       const farmSummaries = groupPlotsByFarm(plots);

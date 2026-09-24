@@ -1,10 +1,22 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
-import { listMyRentals } from "~/lib/rentals";
+import { listMyRentals, type RentalStatus } from "~/lib/rentals";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
+
+const STATUS_LABEL_KEY = {
+  requested: "search:statusRequested",
+  approved: "search:booked",
+  declined: "search:statusDeclined",
+} as const satisfies Record<RentalStatus, string>;
+
+const STATUS_BADGE_CLASS: Record<RentalStatus, string> = {
+  requested: "bg-lime-100 text-lime-900",
+  approved: "bg-rose-100 text-rose-900",
+  declined: "bg-cream text-warm-olive",
+};
 
 export function meta() {
   return [{ title: i18n.t("search:customerMetaTitle") }];
@@ -46,7 +58,11 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
                 key={rental.id}
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
-                action={<span className="text-sm text-warm-olive">{t("search:booked")}</span>}
+                action={
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
+                    {t(STATUS_LABEL_KEY[rental.status])}
+                  </span>
+                }
               />
             ))}
           </ul>

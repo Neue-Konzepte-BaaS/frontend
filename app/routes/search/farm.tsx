@@ -5,7 +5,7 @@ import { MapPin, Wheat } from "lucide-react";
 import type { Route } from "./+types/farm";
 import { me, dashboardPath } from "~/lib/auth";
 import { getFarm } from "~/lib/farms";
-import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals";
+import { findNearestPlots, listMyRentals, MAX_NEAREST_PLOTS, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
@@ -32,10 +32,12 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const account = await me();
   const [farm, plots, myRentals] = await Promise.all([
     getFarm(farmId),
+    // Scoped to this farm server-side — filtering the overall nearest plots
+    // instead would show a farm outside the top N as having none.
     postalCode
-      ? findNearestPlots({ postalCode, limit: 30 })
+      ? findNearestPlots({ postalCode, farm: farmId, limit: MAX_NEAREST_PLOTS })
       : city
-        ? findNearestPlots({ city, limit: 30 })
+        ? findNearestPlots({ city, farm: farmId, limit: MAX_NEAREST_PLOTS })
         : Promise.resolve<NearbyPlot[]>([]),
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
   ]);
@@ -43,7 +45,7 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   return {
     account,
     farm,
-    farmPlots: plots.filter((p) => p.farm === farmId),
+    farmPlots: plots,
     hasLocationContext: Boolean(postalCode || city),
     backToSearchQuery: url.searchParams.toString(),
     rentedPlotIds: myRentals.map((r) => r.plotId),
