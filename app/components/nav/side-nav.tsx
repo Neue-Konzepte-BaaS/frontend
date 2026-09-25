@@ -6,7 +6,7 @@ import type { NavItem } from "~/lib/nav-items";
  * app-shell.tsx for why width, not orientation, decides which nav shows).
  */
 export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem | NavItem[] }) {
-  // One item (the farmer's "Farm settings") or a group (the admin's System
+  // One item (the farmer's "My farm") or a group (the admin's System
   // tools) — both render below the same divider.
   const pinnedItems = pinned ? (Array.isArray(pinned) ? pinned : [pinned]) : [];
 
