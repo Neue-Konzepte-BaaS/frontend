@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   careGuideForPlot,
+  careGuideSource,
   cropStage,
   isoWeek,
   splitInstructionsByWeek,
@@ -12,6 +13,7 @@ function instruction(week: number, title = `Week ${week}`): CareInstruction {
   return {
     id: `i-${week}-${title}`,
     cropId: "crop-1",
+    farmId: null,
     week,
     title,
     body: "...",
@@ -105,5 +107,25 @@ describe("isoWeek", () => {
 
   it("matches a known mid-year week", () => {
     expect(isoWeek(new Date("2026-07-01T00:00:00Z"))).toBe(27);
+  });
+});
+
+describe("careGuideSource", () => {
+  it("trusts the backend's header", () => {
+    expect(careGuideSource("farm", [])).toBe("farm");
+    expect(careGuideSource("default", [{ ...instruction(1), farmId: "farm-1" }])).toBe("default");
+  });
+
+  it("falls back to the steps' farmId when the header is missing", () => {
+    expect(careGuideSource(null, [{ ...instruction(1), farmId: "farm-1" }])).toBe("farm");
+    expect(careGuideSource(null, [instruction(1)])).toBe("default");
+  });
+
+  it("reads an empty guide without a header as the default", () => {
+    expect(careGuideSource(null, [])).toBe("default");
+  });
+
+  it("ignores an unknown header value", () => {
+    expect(careGuideSource("something-else", [instruction(1)])).toBe("default");
   });
 });
