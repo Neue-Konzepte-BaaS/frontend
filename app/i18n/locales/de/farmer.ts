@@ -144,6 +144,16 @@ export const farmer: Shape = {
 
   careGuideMetaTitle: "Pflegehinweise · BaaS",
   careGuideTitle: "Pflegehinweise",
+  careGuideIntro: "Was deine Mietenden Woche für Woche auf ihrer Parzelle sehen. Jeder Hof startet mit dem Standard-Pflegeplan der Plattform — deine Änderungen gelten nur für deinen Hof.",
+  careGuideBody: "Woche 1 ist die erste Woche der jeweiligen Miete, keine Kalenderwoche.",
+  careGuideNoCrops: "Im Katalog gibt es noch keine Kulturen.",
+  careSourceDefaultBadge: "Standard",
+  careSourceFarmBadge: "Eigene Version",
+  careSourceDefaultHint: "Deine Mietenden sehen den Standard-Pflegeplan. Sobald du etwas änderst, bekommt dein Hof eine eigene Version davon.",
+  careSourceFarmHint: "Deine Mietenden sehen die Version deines Hofs. Spätere Änderungen am Standard kommen hier nicht mehr an.",
+  careReset: "Auf Standard zurücksetzen",
+  careResetConfirm: "Eigene Version löschen",
+  careResetDone: "Zurückgesetzt — deine Mietenden sehen wieder den Standard-Pflegeplan.",
   settingsMetaTitle: "Hofeinstellungen · BaaS",
   settingsTitle: "Hofeinstellungen",
 };

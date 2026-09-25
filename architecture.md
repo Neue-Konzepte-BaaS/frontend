@@ -235,17 +235,29 @@ follow-ups.
 care tab is bookmarkable and Back steps through the tabs rather than off the
 page. `care` is the default and writes no parameter.
 
-**The guide is read, not pushed.** Nothing mails a care instruction and the
-backend emits no `care` item into `GET /api/inbox`, so the tenant inbox's
-`care` filter (`app/lib/notifications.ts` models the kind already) stays empty
-until the backend adds one. A tenant finds this week's tasks by opening their
-plot, which is what issue #33 asks for — don't read the empty filter as a bug
-in this page.
+**The guide is read, not pushed.** Nothing mails a care instruction. Since
+backend #62, `GET /api/inbox` carries one `care` item per step whose rental
+week has begun, which fills the tenant inbox's `care` filter. A tenant still
+finds what lies ahead by opening their plot, which is what issue #33 asks for.
 
-Authoring for the guide is on the admin side:
-`app/components/admin/care-guide-section.tsx`, mounted on `/admin/crops`
-because a guide hangs off a crop and the catalog is admin-owned. A farmer can
-read a crop's guide through the same endpoint but cannot write it.
+**Authoring: one default, one version per farm** (backend #68, issue #65).
+`app/components/care-guide-editor.tsx` (`<CareGuideEditor role=…>`) is
+mounted twice:
+
+- On `/admin/crops` with `role="admin"`: the crop's **default guide**, which
+  every farm starts from. It sits on the catalog page because a guide hangs
+  off a crop.
+- On `/farmer/care-guide` with `role="farmer"`: the version the farmer's own
+  tenants read. A badge says whether that is still the default or the farm's
+  own version, and "Reset to default" drops the farm's version.
+
+A farmer's first write copies the default into the farm, so every step gets a
+new id, including the one just edited. The farmer editor therefore reloads the
+guide after each write instead of patching the list; the admin editor patches.
+Whether the farmer sees the default or their own version comes from the
+`X-Care-Guide-Source` response header, read by `listCareInstructions`
+(`~/lib/care.ts`) through `apiClient.getWithHeaders`. A body alone can't tell
+an empty farm version from an empty default.
 
 ### Plot search lives in one component
 

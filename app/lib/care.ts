@@ -7,9 +7,24 @@ import type { Crop } from "~/lib/fields";
  *
  *   GET    /api/care-guide                          -> PlotCareGuide[]   (customer only)
  *   GET    /api/crops/{cropId}/care-instructions    -> CareInstruction[] (admin or farmer)
- *   POST   /api/crops/{cropId}/care-instructions    -> CareInstruction   (admin only)
- *   PUT    /api/care-instructions/{id}              -> CareInstruction   (admin only)
- *   DELETE /api/care-instructions/{id}              -> 204               (admin only)
+ *   POST   /api/crops/{cropId}/care-instructions    -> CareInstruction   (admin or farmer)
+ *   PUT    /api/care-instructions/{id}              -> CareInstruction   (admin or farmer)
+ *   DELETE /api/care-instructions/{id}              -> 204               (admin or farmer)
+ *   DELETE /api/crops/{cropId}/farm-care-guide      -> 204               (farmer only)
+ *
+ * **Default guide and farm versions (backend #68).** An admin maintains one
+ * default guide per crop, which every farm starts from. A farmer's first write
+ * for a crop copies that default into a version of their own farm, and from
+ * then on their tenants read only the farm's version. Two consequences for a
+ * farmer's client:
+ *
+ * - Editing or deleting a *default* step (the id the farmer was shown) changes
+ *   the farm's copy of it, so the response carries a **different id** — and
+ *   every other step of the guide now has a new id too. Reload the guide after
+ *   a farmer's write rather than patching the list in place.
+ * - The farm's version may be empty, which a body alone can't tell apart from
+ *   an empty default; `listCareInstructions` reads the backend's
+ *   `X-Care-Guide-Source` header for that.
  *
  * The JSON is camelCase — checked against the handlers, not assumed (see
  * architecture.md on the backend's inconsistent casing), so no mapping layer.
@@ -25,6 +40,8 @@ import type { Crop } from "~/lib/fields";
 export type CareInstruction = {
   id: string;
   cropId: string;
+  /** `null` for a step of the default guide; the farm's id for a step of that farm's own version. */
+  farmId: string | null;
   /** Week of the rental, counting from 1. Never a calendar week. */
   week: number;
   title: string;
@@ -69,17 +86,48 @@ export function listCareGuide(): Promise<PlotCareGuide[]> {
   return apiClient.get<PlotCareGuide[]>("/care-guide");
 }
 
-/** One crop's whole guide, in week order. Admin (authoring) or farmer (preview). */
-export function listCareInstructions(cropId: string): Promise<CareInstruction[]> {
-  return apiClient.get<CareInstruction[]>(`/crops/${cropId}/care-instructions`);
+/** Which version of a crop's guide an editor is looking at. */
+export type CareGuideSource = "default" | "farm";
+
+/** One crop's guide as an editor sees it. */
+export type CropCareGuide = {
+  source: CareGuideSource;
+  /** In week order. */
+  instructions: CareInstruction[];
+};
+
+/**
+ * Reads which version a guide is from the `X-Care-Guide-Source` header. A
+ * missing or unknown header (an older backend, or a proxy stripping it) falls
+ * back to the steps themselves: any step with a `farmId` is the farm's.
+ */
+export function careGuideSource(header: string | null, instructions: CareInstruction[]): CareGuideSource {
+  if (header === "farm" || header === "default") return header;
+  return instructions.some((instruction) => instruction.farmId !== null) ? "farm" : "default";
 }
 
-/** Adds one task to a crop's guide. Admin only. */
+/**
+ * One crop's whole guide, in week order: the default for an admin, and for a
+ * farmer the version their tenants read.
+ */
+export async function listCareInstructions(cropId: string): Promise<CropCareGuide> {
+  const { data, headers } = await apiClient.getWithHeaders<CareInstruction[]>(`/crops/${cropId}/care-instructions`);
+  return { source: careGuideSource(headers.get("X-Care-Guide-Source"), data), instructions: data };
+}
+
+/**
+ * Adds one task to a crop's guide: the default for an admin, the farm's own
+ * version for a farmer (taking the guide over first if need be).
+ */
 export function createCareInstruction(cropId: string, input: CareInstructionInput): Promise<CareInstruction> {
   return apiClient.post<CareInstruction>(`/crops/${cropId}/care-instructions`, input);
 }
 
-/** Rewrites one task. The crop is not editable — that would be a different guide. */
+/**
+ * Rewrites one task. The crop is not editable — that would be a different
+ * guide. For a farmer editing a default step, the result is the farm's copy,
+ * with a different id.
+ */
 export function updateCareInstruction(id: string, input: CareInstructionInput): Promise<CareInstruction> {
   return apiClient.put<CareInstruction>(`/care-instructions/${id}`, input);
 }
@@ -87,6 +135,14 @@ export function updateCareInstruction(id: string, input: CareInstructionInput): 
 /** Removes one task. Deleting an id that is already gone throws ApiError(404). */
 export function deleteCareInstruction(id: string): Promise<void> {
   return apiClient.delete<void>(`/care-instructions/${id}`);
+}
+
+/**
+ * Drops the farmer's own version of a crop's guide, so their tenants read the
+ * default again. Farmer only; throws ApiError(404) if there is nothing to reset.
+ */
+export function resetFarmCareGuide(cropId: string): Promise<void> {
+  return apiClient.delete<void>(`/crops/${cropId}/farm-care-guide`);
 }
 
 /** The guide for one plot, or undefined when that plot has no running rental. */
