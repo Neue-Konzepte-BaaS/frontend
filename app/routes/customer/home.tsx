@@ -59,8 +59,24 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                 action={
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
-                    {t(STATUS_LABEL_KEY[rental.status])}
+                  /* Badge and link together: the status is what Home says
+                     about the rental, the link is where the tenant acts on it.
+                     Only an approved rental gets the link — a plot that is
+                     still requested, or was declined, is not theirs to open,
+                     and its plot page would have nothing to show but the
+                     dates. */
+                  <span className="flex items-center gap-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
+                      {t(STATUS_LABEL_KEY[rental.status])}
+                    </span>
+                    {rental.status === "approved" && (
+                      <Link
+                        to={`/customer/plots/${rental.plot.id}`}
+                        className="text-sm font-medium text-moss hover:underline"
+                      >
+                        {t("customer:openPlot")}
+                      </Link>
+                    )}
                   </span>
                 }
               />
