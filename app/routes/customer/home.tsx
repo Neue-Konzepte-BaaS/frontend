@@ -1,10 +1,22 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
-import { listMyRentals } from "~/lib/rentals";
+import { listMyRentals, type RentalStatus } from "~/lib/rentals";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
+
+const STATUS_LABEL_KEY = {
+  requested: "search:statusRequested",
+  approved: "search:booked",
+  declined: "search:statusDeclined",
+} as const satisfies Record<RentalStatus, string>;
+
+const STATUS_BADGE_CLASS: Record<RentalStatus, string> = {
+  requested: "bg-lime-100 text-lime-900",
+  approved: "bg-rose-100 text-rose-900",
+  declined: "bg-cream text-warm-olive",
+};
 
 export function meta() {
   return [{ title: i18n.t("search:customerMetaTitle") }];
@@ -47,17 +59,24 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                 action={
-                  /* The status stays next to the link rather than being
-                     replaced by it: "booked" is the only place Home says
-                     anything about the rental's state. */
+                  /* Badge and link together: the status is what Home says
+                     about the rental, the link is where the tenant acts on it.
+                     Only an approved rental gets the link — a plot that is
+                     still requested, or was declined, is not theirs to open,
+                     and its plot page would have nothing to show but the
+                     dates. */
                   <span className="flex items-center gap-3">
-                    <span className="text-sm text-warm-olive">{t("search:booked")}</span>
-                    <Link
-                      to={`/customer/plots/${rental.plot.id}`}
-                      className="text-sm font-medium text-moss hover:underline"
-                    >
-                      {t("customer:openPlot")}
-                    </Link>
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
+                      {t(STATUS_LABEL_KEY[rental.status])}
+                    </span>
+                    {rental.status === "approved" && (
+                      <Link
+                        to={`/customer/plots/${rental.plot.id}`}
+                        className="text-sm font-medium text-moss hover:underline"
+                      >
+                        {t("customer:openPlot")}
+                      </Link>
+                    )}
                   </span>
                 }
               />
