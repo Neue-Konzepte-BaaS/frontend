@@ -7,7 +7,7 @@ import { apiClient } from "~/lib/api-client";
  *
  * Unlike announcements.ts, this is create-only: a ripeness notice has no
  * board of its own — it appears in the recipients' inbox (`kind:
- * "ripeness_notice"`, once the customer inbox screen exists) and is
+ * "ripeness_notice"`, see notifications.ts) and is
  * otherwise mail-only, so there is nothing here for the farmer to read back.
  *
  * Like announcements.ts, the wire shape is snake_case and gets mapped to
