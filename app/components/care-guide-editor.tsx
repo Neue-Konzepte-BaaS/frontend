@@ -1,33 +1,51 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { Crop } from "~/lib/admin";
+import type { Crop } from "~/lib/fields";
 import {
   createCareInstruction,
   deleteCareInstruction,
   listCareInstructions,
+  resetFarmCareGuide,
   updateCareInstruction,
+  type CareGuideSource,
   type CareInstruction,
 } from "~/lib/care";
 import { ApiError } from "~/lib/api-client";
 import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass, secondaryButtonClass } from "~/components/form";
 
 /**
- * Authoring for the weekly care guide (backend #44): the instructions a tenant
- * reads on their plot page, one crop at a time.
+ * Authoring for the weekly care guide (backend #44, #68): the instructions a
+ * tenant reads on their plot page, one crop at a time.
  *
- * It sits on the crop catalog page rather than getting its own nav entry
- * because the guide hangs off a crop — the catalog is admin-owned, and so is
- * the advice attached to it. A farmer can read a crop's guide through the same
- * endpoint but cannot write it; what is farm-specific is an announcement.
+ * - As an **admin** (on `/admin/crops`) it edits the crop's **default guide**,
+ *   the one every farm starts from.
+ * - As a **farmer** (on `/farmer/care-guide`) it edits the version the
+ *   farmer's own tenants read. Until the farmer changes anything that is the
+ *   default; the first write copies it into a version of their own, which
+ *   they can reset to the default again.
+ *
+ * A farmer's first write replaces every step's id (the steps are now the
+ * farm's copies), so after a farmer's write the guide is reloaded rather than
+ * patched in place. An admin's writes never move ids, so the list is patched.
  *
  * `week` is a week of a *tenant's rental*, not a calendar week: week 1 is the
  * first seven days after they book. The backend caps it at 104.
+ *
+ * The shared labels live in the `admin` namespace, where the editor started;
+ * the farmer-only ones (version badge, reset) in `farmer`.
  */
-export function CareGuideSection({ crops }: { crops: Crop[] }) {
+export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" | "farmer" }) {
   const { t } = useTranslation("admin");
+  const { t: tFarmer } = useTranslation("farmer");
   const [cropId, setCropId] = useState(crops[0]?.id ?? "");
   const [instructions, setInstructions] = useState<CareInstruction[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [source, setSource] = useState<CareGuideSource>("default");
+  /** Bumped to refetch the current crop's guide after a farmer's write. */
+  const [reloadKey, setReloadKey] = useState(0);
+  /** The crop whose guide is on screen; a reload of the same crop keeps it visible. */
+  const [loadedCropId, setLoadedCropId] = useState<string | null>(null);
+  const [pendingReset, setPendingReset] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -42,26 +60,31 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
   useEffect(() => {
     if (!cropId) return;
 
-    // A slow response for a crop the admin has already switched away from must
-    // not overwrite the newer one's guide.
+    // A slow response for a crop the editor has already switched away from
+    // must not overwrite the newer one's guide.
     let current = true;
-    setLoading(true);
-    setError(null);
     listCareInstructions(cropId)
       .then((loaded) => {
-        if (current) setInstructions(loaded);
+        if (!current) return;
+        setInstructions(loaded.instructions);
+        setSource(loaded.source);
+        setLoadedCropId(cropId);
       })
       .catch((err) => {
-        if (current) setError(err instanceof ApiError ? err.message : String(err));
-      })
-      .finally(() => {
-        if (current) setLoading(false);
+        if (!current) return;
+        // Settle on an empty list next to the error rather than a "loading"
+        // line that would never go away.
+        setInstructions([]);
+        setLoadedCropId(cropId);
+        setError(err instanceof ApiError ? err.message : String(err));
       });
 
     return () => {
       current = false;
     };
-  }, [cropId]);
+  }, [cropId, reloadKey]);
+
+  const loading = loadedCropId !== cropId;
 
   function resetForm() {
     setEditingId(null);
@@ -93,7 +116,15 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
     const input = { week: parsedWeek, title: title.trim(), body: body.trim() };
     setSaving(true);
     try {
-      if (editingId) {
+      if (role === "farmer") {
+        if (editingId) {
+          await updateCareInstruction(editingId, input);
+        } else {
+          await createCareInstruction(cropId, input);
+        }
+        setSuccess(editingId ? t("careInstructionUpdated") : t("careInstructionAdded"));
+        setReloadKey((key) => key + 1);
+      } else if (editingId) {
         const updated = await updateCareInstruction(editingId, input);
         setInstructions((prev) => sortByWeek(prev.map((i) => (i.id === updated.id ? updated : i))));
         setSuccess(t("careInstructionUpdated"));
@@ -116,7 +147,11 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
     setPendingDeleteId(null);
     try {
       await deleteCareInstruction(instruction.id);
-      setInstructions((prev) => prev.filter((i) => i.id !== instruction.id));
+      if (role === "farmer") {
+        setReloadKey((key) => key + 1);
+      } else {
+        setInstructions((prev) => prev.filter((i) => i.id !== instruction.id));
+      }
       if (editingId === instruction.id) resetForm();
       setSuccess(t("careInstructionDeleted"));
     } catch (err) {
@@ -124,11 +159,30 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
     }
   }
 
+  async function handleReset() {
+    setError(null);
+    setSuccess(null);
+    setPendingReset(false);
+    setResetting(true);
+    try {
+      await resetFarmCareGuide(cropId);
+      resetForm();
+      setSuccess(tFarmer("careResetDone"));
+      setReloadKey((key) => key + 1);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : String(err));
+    } finally {
+      setResetting(false);
+    }
+  }
+
   if (crops.length === 0) {
     return (
       <section className="mt-10">
         <h2 className="font-serif text-xl font-semibold text-forest">{t("careGuideHeading")}</h2>
-        <p className="mt-2 text-sm text-warm-olive">{t("careGuideNoCrops")}</p>
+        <p className="mt-2 text-sm text-warm-olive">
+          {role === "farmer" ? tFarmer("careGuideNoCrops") : t("careGuideNoCrops")}
+        </p>
       </section>
     );
   }
@@ -136,7 +190,9 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
   return (
     <section className="mt-10">
       <h2 className="font-serif text-xl font-semibold text-forest">{t("careGuideHeading")}</h2>
-      <p className="mt-1 text-sm text-warm-olive">{t("careGuideBody")}</p>
+      <p className="mt-1 text-sm text-warm-olive">
+        {role === "farmer" ? tFarmer("careGuideBody") : t("careGuideBody")}
+      </p>
 
       <div className="mt-4 max-w-sm">
         <FormField label={t("careCropLabel")} htmlFor="care-crop">
@@ -146,7 +202,9 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
             onChange={(e) => {
               setCropId(e.target.value);
               resetForm();
+              setError(null);
               setSuccess(null);
+              setPendingReset(false);
             }}
             className={inputClass}
           >
@@ -158,6 +216,49 @@ export function CareGuideSection({ crops }: { crops: Crop[] }) {
           </select>
         </FormField>
       </div>
+
+      {role === "farmer" && !loading && (
+        <div className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-beige bg-cream px-5 py-3 shadow-sm">
+          <span
+            className={`rounded-full px-3 py-1 text-xs font-semibold ${
+              source === "farm" ? "bg-moss/15 text-moss" : "bg-beige text-wood"
+            }`}
+          >
+            {source === "farm" ? tFarmer("careSourceFarmBadge") : tFarmer("careSourceDefaultBadge")}
+          </span>
+          <p className="min-w-0 flex-1 text-sm text-wood">
+            {source === "farm" ? tFarmer("careSourceFarmHint") : tFarmer("careSourceDefaultHint")}
+          </p>
+          {source === "farm" &&
+            (pendingReset ? (
+              <span className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="rounded bg-error px-2 py-1 text-xs font-medium text-ivory hover:opacity-90"
+                >
+                  {tFarmer("careResetConfirm")}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingReset(false)}
+                  className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
+                >
+                  {t("cropDeleteCancel")}
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                disabled={resetting}
+                onClick={() => setPendingReset(true)}
+                className="rounded px-2 py-1 text-xs font-medium text-error hover:bg-error/10"
+              >
+                {tFarmer("careReset")}
+              </button>
+            ))}
+        </div>
+      )}
 
       {loading ? (
         <p className="mt-4 text-sm text-warm-olive">{t("careLoading")}</p>

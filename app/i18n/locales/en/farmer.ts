@@ -142,6 +142,16 @@ export const farmer = {
 
   careGuideMetaTitle: "Care guide · BaaS",
   careGuideTitle: "Care guide",
+  careGuideIntro: "What your tenants see on their plot, week by week. Every farm starts from the platform's default care guide — your changes apply to your farm only.",
+  careGuideBody: "Week 1 is the first week of each tenant's own rental, not a calendar week.",
+  careGuideNoCrops: "There are no crops in the catalog yet.",
+  careSourceDefaultBadge: "Default",
+  careSourceFarmBadge: "Your version",
+  careSourceDefaultHint: "Your tenants see the default care guide. As soon as you change something, your farm gets its own version of it.",
+  careSourceFarmHint: "Your tenants see your farm's version. Later changes to the default no longer reach it.",
+  careReset: "Reset to default",
+  careResetConfirm: "Delete your version",
+  careResetDone: "Reset — your tenants see the default care guide again.",
   settingsMetaTitle: "Farm settings · BaaS",
   settingsTitle: "Farm settings",
 } as const;
