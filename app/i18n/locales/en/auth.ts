@@ -25,4 +25,19 @@ export const auth = {
   invalidPostalCode: "Please enter a valid postal code.",
   creatingAccount: "Creating account…",
   alreadyHaveAccount: "Already have an account?",
+
+  registerSuccessTitle: "Check your email",
+  registerSuccessSubtitle: "We've sent a verification link to {{email}}. Click it to finish creating your account.",
+
+  verifyEmailMetaTitle: "Verify your email · BaaS",
+  verifyingTitle: "Verifying your email…",
+  verifyingMessage: "Hang on while we confirm your verification link.",
+  verifySuccessTitle: "Email verified",
+  verifySuccessMessage: "Your account is ready. Taking you in…",
+  verifyErrorInvalidTitle: "Invalid or expired link",
+  verifyErrorInvalidMessage: "This verification link is invalid or has expired. Please sign up again to get a new one.",
+  verifyErrorAlreadyRegisteredTitle: "Email already registered",
+  verifyErrorAlreadyRegisteredMessage: "This email is already registered. Please sign in instead.",
+  verifyErrorMissingToken: "This verification link is missing its token. Please use the link from your email.",
+  backToRegister: "Back to sign up",
 } as const;

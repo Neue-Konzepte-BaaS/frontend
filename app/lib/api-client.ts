@@ -31,7 +31,7 @@ export class ApiError extends Error {
  * Auth endpoints must never trigger the 401 refresh loop: a failed login is a
  * real 401, not an expired session, and refreshing during refresh would recurse.
  */
-const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"];
+const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/verify-email", "/auth/refresh", "/auth/logout"];
 
 type RequestOptions = {
   method?: string;
