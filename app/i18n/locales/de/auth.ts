@@ -29,4 +29,19 @@ export const auth: Shape = {
   invalidPostalCode: "Bitte gib eine gültige Postleitzahl ein.",
   creatingAccount: "Konto wird erstellt…",
   alreadyHaveAccount: "Du hast bereits ein Konto?",
+
+  registerSuccessTitle: "Überprüfe deine E-Mails",
+  registerSuccessSubtitle: "Wir haben einen Bestätigungslink an {{email}} gesendet. Klicke darauf, um dein Konto zu erstellen.",
+
+  verifyEmailMetaTitle: "E-Mail bestätigen · BaaS",
+  verifyingTitle: "E-Mail wird bestätigt…",
+  verifyingMessage: "Einen Moment, wir prüfen deinen Bestätigungslink.",
+  verifySuccessTitle: "E-Mail bestätigt",
+  verifySuccessMessage: "Dein Konto ist bereit. Du wirst weitergeleitet…",
+  verifyErrorInvalidTitle: "Ungültiger oder abgelaufener Link",
+  verifyErrorInvalidMessage: "Dieser Bestätigungslink ist ungültig oder abgelaufen. Bitte melde dich erneut an, um einen neuen Link zu erhalten.",
+  verifyErrorAlreadyRegisteredTitle: "E-Mail bereits registriert",
+  verifyErrorAlreadyRegisteredMessage: "Diese E-Mail-Adresse ist bereits registriert. Bitte melde dich stattdessen an.",
+  verifyErrorMissingToken: "Diesem Bestätigungslink fehlt das Token. Bitte verwende den Link aus deiner E-Mail.",
+  backToRegister: "Zurück zur Registrierung",
 };

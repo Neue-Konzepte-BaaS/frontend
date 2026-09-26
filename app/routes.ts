@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("verify-email", "routes/verify-email.tsx"),
   // Public plot search. Open to everyone (no guard) — also the tenant nav's
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).
