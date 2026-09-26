@@ -24,7 +24,7 @@ export function AppShell({
   items: NavItem[];
   mobileItems?: NavItem[];
   /** Rendered separately at the bottom of the sidebar only — one item (the
-   *  farmer's "Farm settings") or a group (the admin's System tools). */
+   *  farmer's "My farm") or a group (the admin's System tools). */
   pinned?: NavItem | NavItem[];
   children: ReactNode;
 }) {

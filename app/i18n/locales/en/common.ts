@@ -27,7 +27,7 @@ export const common = {
   navTenants: "Tenants",
   navRequests: "Requests",
   navCareGuide: "Care guide",
-  navFarmSettings: "Farm settings",
+  navFarmSettings: "My farm",
   navPlatform: "Platform",
   navFarms: "Farms",
   navAccounts: "Accounts",
