@@ -9,16 +9,23 @@ export type { Crop } from "~/lib/fields";
  * authoritative contract:
  *
  *   GET  /api/plots/nearest          -> NearbyPlot[]     (public, no auth)
- *   POST /api/rentals                -> Rental           (customer only)
  *   GET  /api/rentals                -> RentalWithPlot[] (customer only)
  *   GET  /api/rentals/farm           -> FarmRental[]     (farmer only)
  *   POST /api/rentals/{id}/approve   -> Rental           (farmer only)
  *   POST /api/rentals/{id}/decline   -> Rental           (farmer only)
  *
  * A rental starts life "requested" and a farmer decides it into "approved"
- * or "declined" exactly once — see RentalStatus. Renting now requires a
- * chosen startAt (1-60 days out) and a non-blank message to the farmer,
- * rather than booking immediately.
+ * or "declined" exactly once — see RentalStatus. There is deliberately no
+ * `rentPlot`/`POST /api/rentals` wrapper here: a rental is only ever created
+ * as the result of a paid request (see ~/lib/payments.ts's
+ * createCheckoutSession, which replaced it) — the customer is charged via
+ * Stripe Checkout before a "requested" rental exists at all. Declining a
+ * rental refunds that charge server-side (see backend's `DeclineRental`);
+ * approving does nothing payment-related, since the charge already
+ * happened at checkout time. Neither the charged amount nor a payment
+ * status is exposed on `Rental` itself — that detail lives only on the
+ * backend's internal `rental_checkout` record, not on any endpoint this
+ * module calls.
  *
  * Unlike fields.ts, these endpoints use camelCase JSON keys (`plotId`,
  * `startAt`, `endAt`, `distanceMeters`) rather than the rest of the API's
@@ -28,6 +35,17 @@ export type { Crop } from "~/lib/fields";
  * auth.ts needs one for its snake_case boundary; the wire shape and the
  * TS shape happen to already match here.
  */
+
+/**
+ * A crop offering on a specific plot: the crop itself plus the total price
+ * to rent this plot for that crop's fixed duration. `priceCents` is
+ * computed server-side (from the plot's own base rate and the farm's
+ * per-crop rate, both set by the farmer) — the frontend only ever displays
+ * it, never computes or trusts a price of its own. A plot only offers a
+ * crop here once the farmer has priced both halves; an offered-but-unpriced
+ * crop simply doesn't appear in `crops` at all (see NearbyPlot below).
+ */
+export type PlotCropOffering = Crop & { priceCents: number };
 
 export type NearbyPlot = {
   id: string;
@@ -41,8 +59,8 @@ export type NearbyPlot = {
   areaSquareMeters: number;
   /** Distance from the search point to the plot's centroid, in meters. */
   distanceMeters: number;
-  /** The crops this plot's field currently offers — the valid choices for `rentPlot`. */
-  crops: Crop[];
+  /** The priced, rentable crop offerings for this plot — the valid choices for `createCheckoutSession`. */
+  crops: PlotCropOffering[];
 };
 
 /** A rental starts Requested, and a farmer decides it into Approved or Declined exactly once. */
@@ -134,21 +152,6 @@ export function findNearestPlots(query: NearestPlotsQuery): Promise<NearbyPlot[]
     params.set("limit", String(query.limit));
   }
   return apiClient.get<NearbyPlot[]>(`/plots/nearest?${params.toString()}`);
-}
-
-/**
- * Requests a plot for the authenticated customer with the given crop,
- * starting at startAt (ISO 8601, must be 1-60 days out) for that crop's
- * fixed duration, pending the farmer's approval. Throws ApiError(400) if
- * startAt is out of that window or message is blank, ApiError(409, "plot is
- * already requested or rented for that period") on an overlapping booking —
- * a real race (the backend enforces this with a DB exclusion constraint) —
- * or ApiError(409, "crop is not offered by this plot's field") when the crop
- * isn't one the plot's field offers. Callers must handle all as expected
- * outcomes, not generic errors.
- */
-export function rentPlot(plotId: string, cropId: string, startAt: string, message: string): Promise<Rental> {
-  return apiClient.post<Rental>("/rentals", { plotId, cropId, startAt, message });
 }
 
 /** The authenticated customer's own rentals, newest first, expired included. */

@@ -5,7 +5,7 @@ import { MapPin, Wheat } from "lucide-react";
 import type { Route } from "./+types/farm";
 import { me, dashboardPath } from "~/lib/auth";
 import { getFarm } from "~/lib/farms";
-import { findNearestPlots, listMyRentals, type NearbyPlot } from "~/lib/rentals";
+import { findNearestPlots, listMyRentals, type NearbyPlot, type RentalStatus } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
@@ -37,25 +37,33 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
   ]);
 
+  // Only requested/approved rentals block a plot's crop picker — a declined
+  // one frees it up again (the backend's own exclusion constraint agrees:
+  // it's partial, `WHERE status <> 'declined'`), so a customer can simply
+  // try again rather than being stuck looking "rented" forever.
+  const plotStatusById: Record<string, RentalStatus> = {};
+  for (const rental of myRentals) {
+    if (rental.status !== "declined") plotStatusById[rental.plotId] = rental.status;
+  }
+
   return {
     account,
     farm,
     farmPlots: plots.filter((p) => p.farm === farmId),
     hasLocationContext: Boolean(postalCode || city),
     backToSearchQuery: url.searchParams.toString(),
-    rentedPlotIds: myRentals.map((r) => r.plotId),
+    plotStatusById,
   };
 }
 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
-  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, rentedPlotIds } = loaderData;
+  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, plotStatusById } = loaderData;
   const customer = account?.role === "customer" ? account : null;
   const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const tenantNavItems = useTenantNavItems();
 
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
-  const [rented, setRented] = useState<Set<string>>(() => new Set(rentedPlotIds));
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
@@ -139,14 +147,15 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         <ul className="mt-2 divide-y divide-beige">
           {farmPlots.map((plot, i) => {
             const isSelected = plot.id === selectedPlotId;
-            const isRented = rented.has(plot.id);
+            const status = plotStatusById[plot.id];
+            const isTaken = status != null;
             return (
               <li key={plot.id}>
                 <button
                   type="button"
                   onClick={() => toggleSelectPlot(plot.id)}
                   aria-expanded={isSelected}
-                  disabled={isRented}
+                  disabled={isTaken}
                   className="flex w-full items-center gap-3 py-3 text-left disabled:cursor-default"
                 >
                   <span
@@ -159,9 +168,9 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                     <span className="block font-medium text-forest">{plot.name}</span>
                     <span className="block text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
                   </span>
-                  {isRented ? (
+                  {isTaken ? (
                     <span className="shrink-0 text-sm font-medium text-moss">
-                      {t("search:rented")}
+                      {status === "requested" ? t("search:statusRequested") : t("search:booked")}
                     </span>
                   ) : (
                     <span className="shrink-0 text-warm-olive" aria-hidden>
@@ -170,14 +179,22 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                   )}
                 </button>
 
-                {isSelected && !isRented && (
+                {isSelected && !isTaken && (
                   <div className="pb-3 pl-9">
+                    {/* Submitting here only starts a payment (see
+                        PlotCropsAndRent's own docstring) — the plot isn't
+                        actually requested until checkout completes and the
+                        webhook creates the rental. returnTo is where
+                        payment-return.tsx sends the browser back to once
+                        that resolves, so the customer lands back here and
+                        sees the "Awaiting approval" status above instead of
+                        a generic confirmation screen. */}
                     <PlotCropsAndRent
                       plotId={plot.id}
                       crops={plot.crops}
                       account={account}
                       loginRedirectTo={farmPageUrl}
-                      onRented={() => setRented((prev) => new Set(prev).add(plot.id))}
+                      returnTo={farmPageUrl}
                     />
                   </div>
                 )}

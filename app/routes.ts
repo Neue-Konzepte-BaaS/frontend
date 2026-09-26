@@ -33,6 +33,13 @@ export default [
     route("customer/board", "routes/customer/board.tsx"),
     route("customer/inbox", "routes/customer/inbox.tsx"),
     route("customer/me", "routes/customer/me.tsx"),
+    // Stripe Checkout for a rental request (issue #14) — reached only via
+    // PlotCropsAndRent's navigate() carrying the request in router state,
+    // never linked to directly. customer/payment/return is where Stripe's
+    // return_url sends the browser back once the customer completes (or
+    // abandons) checkout.tsx's Payment Element form.
+    route("customer/checkout", "routes/customer/checkout.tsx"),
+    route("customer/payment/return", "routes/customer/payment-return.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/
   // Care guide, plus Farm settings pinned separately (issue #27). A layout

@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { rentPlot, type Crop, type Rental } from "~/lib/rentals";
-import { ApiError } from "~/lib/api-client";
+import type { PlotCropOffering } from "~/lib/rentals";
 import { roleLabel, type Account } from "~/lib/auth";
 import { inputClass, submitClass, secondaryButtonClass } from "~/components/form";
+import { formatPriceCents } from "~/components/plot-card";
+import { rememberCheckoutReturnTo } from "~/lib/payments";
+import type { CheckoutRequest } from "~/routes/customer/checkout";
 
 /** Isoformat (YYYY-MM-DD) date offset from today by the given number of days, for <input type="date"> min/max. */
 function isoDateOffset(days: number): string {
@@ -15,32 +17,45 @@ function isoDateOffset(days: number): string {
 
 type PlotCropsAndRentProps = {
   plotId: string;
-  crops: Crop[];
+  crops: PlotCropOffering[];
   /** Whoever is viewing, any role — a customer gets a real Rent button,
    *  `null` (anonymous) gets "Log in to rent", any other signed-in role
    *  gets a "you can't rent as a farmer" notice. */
   account: Account | null;
   /** Path to return to after logging in, e.g. "/search". Passed to /login?redirect=. */
   loginRedirectTo: string;
-  /** Fired after a successful rent, so a caller holding a rentals list can prepend to it. */
-  onRented?: (rental: Rental, crop: Crop) => void;
+  /**
+   * Where the browser should land once payment resolves — the farm page
+   * this component is rendered on, so the customer sees their plot marked
+   * "Requested" rather than a generic confirmation screen. Stashed via
+   * rememberCheckoutReturnTo before navigating to checkout, since Stripe's
+   * own redirect back drops React Router state (see that function's docs).
+   */
+  returnTo: string;
 };
-
-type RentState = { status: "renting" } | { status: "error"; message: string };
 
 /**
  * The crops-offered list plus whatever rent affordance fits the viewer,
  * shown once a plot is expanded. Shared by the search results list
- * (plot-search.tsx) and the farm detail page (search/farm.tsx) so the rent
- * flow — crop picking, in-flight state, the 409 error-message mapping —
- * exists in exactly one place.
+ * (plot-search.tsx) and the farm detail page (search/farm.tsx) so the
+ * request-a-plot flow — crop picking, date/message collection — exists in
+ * exactly one place.
+ *
+ * Submitting here does NOT create a rental request itself: it navigates to
+ * /customer/checkout carrying the collected {plotId, cropId, startAt,
+ * message} via router state (not a query string — `message` is free text a
+ * customer could write a paragraph into, which doesn't belong URL-encoded
+ * in a bookmarkable link the way e.g. postalCode does elsewhere in this
+ * app). The checkout page is what actually calls createCheckoutSession and
+ * surfaces its 404/409/400 errors — this component no longer talks to the
+ * backend at all.
  */
-export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRented }: PlotCropsAndRentProps) {
+export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, returnTo }: PlotCropsAndRentProps) {
   const [selectedCropId, setSelectedCropId] = useState(crops[0]?.id ?? "");
   const [startAt, setStartAt] = useState("");
   const [message, setMessage] = useState("");
-  const [rentState, setRentState] = useState<RentState | null>(null);
-  const { t } = useTranslation(["search", "common", "auth"]);
+  const { t, i18n } = useTranslation(["search", "common", "auth"]);
+  const navigate = useNavigate();
   const isCustomer = account?.role === "customer";
 
   // The backend requires startAt 1-60 days out — computed once per mount
@@ -48,48 +63,33 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
   const minStartAt = useMemo(() => isoDateOffset(1), []);
   const maxStartAt = useMemo(() => isoDateOffset(60), []);
 
-  async function handleRent() {
+  function handleContinue() {
     const crop = crops.find((c) => c.id === selectedCropId) ?? crops[0];
     if (!crop || !startAt || !message.trim()) return;
 
-    setRentState({ status: "renting" });
-    try {
-      const startAtIso = new Date(`${startAt}T00:00:00`).toISOString();
-      const rental = await rentPlot(plotId, crop.id, startAtIso, message.trim());
-      onRented?.(rental, crop);
-      setRentState(null);
-    } catch (err) {
-      // A 409 covers two distinct, expected outcomes here: a real race on the
-      // plot (the backend enforces non-overlapping rentals with a DB
-      // exclusion constraint) and picking a crop this plot doesn't offer.
-      // Both are told apart by the backend's exact error message. A 400
-      // means the start date or message failed the backend's own validation
-      // (the client-side checks above should normally prevent this).
-      let errorMessage: string;
-      if (err instanceof ApiError && err.status === 409 && err.message.includes("already")) {
-        errorMessage = t("search:rentConflict");
-      } else if (err instanceof ApiError && err.status === 409 && err.message === "crop is not offered by this plot") {
-        errorMessage = t("search:cropNotOffered");
-      } else if (err instanceof ApiError && err.status === 400) {
-        errorMessage = t("search:invalidRentalRequest");
-      } else {
-        errorMessage = err instanceof ApiError ? err.message : t("common:genericError");
-      }
-      setRentState({ status: "error", message: errorMessage });
-    }
+    const startAtIso = new Date(`${startAt}T00:00:00`).toISOString();
+    const state: CheckoutRequest = { plotId, cropId: crop.id, startAt: startAtIso, message: message.trim() };
+    rememberCheckoutReturnTo(returnTo);
+    navigate("/customer/checkout", { state });
   }
+
+  const priceLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
   return (
     <>
-      {rentState?.status === "error" && <p className="mb-2 text-sm text-red-700">{rentState.message}</p>}
-
       <p className="text-sm font-medium text-wood">{t("search:availableCrops")}</p>
       {crops.length === 0 ? (
         <p className="mt-1 text-sm text-warm-olive">{t("search:noCropsOffered")}</p>
       ) : (
         <ul className="mt-1 space-y-0.5 text-sm text-wood">
           {crops.map((crop) => (
-            <li key={crop.id}>{t("search:cropWithDuration", { name: crop.name, months: crop.durationMonths })}</li>
+            <li key={crop.id}>
+              {t("search:cropWithDurationAndPrice", {
+                name: crop.name,
+                months: crop.durationMonths,
+                price: formatPriceCents(crop.priceCents, priceLocale),
+              })}
+            </li>
           ))}
         </ul>
       )}
@@ -101,7 +101,6 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
               aria-label={t("search:chooseCrop")}
               value={selectedCropId || crops[0].id}
               onChange={(e) => setSelectedCropId(e.target.value)}
-              disabled={rentState?.status === "renting"}
               className="rounded-lg border border-beige bg-white px-2 py-2 text-sm text-forest focus:border-moss focus:outline-none focus:ring-2 focus:ring-moss"
             >
               {crops.map((crop) => (
@@ -117,7 +116,6 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
               min={minStartAt}
               max={maxStartAt}
               onChange={(e) => setStartAt(e.target.value)}
-              disabled={rentState?.status === "renting"}
               className={`${inputClass} block text-sm`}
             />
             <textarea
@@ -125,17 +123,16 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, onRe
               placeholder={t("search:rentMessagePlaceholder")}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              disabled={rentState?.status === "renting"}
               rows={3}
               className={`${inputClass} block text-sm`}
             />
             <button
               type="button"
-              disabled={rentState?.status === "renting" || !startAt || !message.trim()}
-              onClick={handleRent}
+              disabled={!startAt || !message.trim()}
+              onClick={handleContinue}
               className={`${submitClass} w-auto px-4 py-2 text-sm`}
             >
-              {rentState?.status === "renting" ? t("search:renting") : t("search:rentButton")}
+              {t("search:continueToPayment")}
             </button>
           </div>
         ) : account ? (

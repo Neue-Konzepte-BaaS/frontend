@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
-import { listMyRentals } from "~/lib/rentals";
+import { listMyRentals, type RentalStatus } from "~/lib/rentals";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
@@ -24,6 +24,11 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
   const { rentals } = loaderData;
   const { t, i18n: i18nInstance } = useTranslation(["search", "customer", "common"]);
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
+  const statusLabel: Record<RentalStatus, string> = {
+    requested: t("search:statusRequested"),
+    approved: t("search:booked"),
+    declined: t("search:statusDeclined"),
+  };
 
   return (
     <main className="mx-auto max-w-5xl p-4">
@@ -46,7 +51,7 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
                 key={rental.id}
                 name={rental.plot.name}
                 meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
-                action={<span className="text-sm text-warm-olive">{t("search:booked")}</span>}
+                action={<span className="text-sm text-warm-olive">{statusLabel[rental.status]}</span>}
               />
             ))}
           </ul>
