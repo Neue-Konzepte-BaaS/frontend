@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/index";
 import { getStatistics } from "~/lib/admin";
 import { AccountTypeNotice } from "~/components/account-type-notice";
-import { StatTile } from "~/components/admin/stat-tile";
+import { StatTile } from "~/components/stat-tile";
 import { useAdminSystemItems } from "~/lib/nav-items";
 import i18n from "~/i18n";
 

@@ -29,6 +29,7 @@ export const common: Shape = {
   navTenants: "Pächter",
   navRequests: "Anfragen",
   navCareGuide: "Pflegehinweise",
+  navStatistics: "Statistiken",
   navFarmSettings: "Hofeinstellungen",
   navPlatform: "Plattform",
   navFarms: "Höfe",
