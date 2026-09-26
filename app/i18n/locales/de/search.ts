@@ -40,6 +40,13 @@ export const search: Shape = {
   noCropsOffered: "Noch nicht verfügbar — keine Pflanzen angeboten.",
   loginToRent: "Zum Anfragen anmelden",
   cannotRentWrongRole: "Du bist als {{role}} angemeldet — nur Kunden-Konten können mieten.",
+  rentPanelHint: "Klicke auf eine Parzelle in der Karte oder im Raster, um sie anzufragen.",
+  plotNumber: "Parzelle {{number}}",
+  cropMonths_one: "{{count}} Monat",
+  cropMonths_other: "{{count}} Monate",
+  rentStartDateHint: "Frühestens morgen, spätestens in 60 Tagen.",
+  rentPeriodPreview: "Mietzeitraum: {{period}}",
+  requestSentBody: "Anfrage gesendet — der Hof meldet sich bei dir. Den Status siehst du auf deiner Startseite.",
 
   farmMetaTitle: "Hof · BaaS",
   backToSearch: "Zurück zur Suche",
@@ -63,4 +70,12 @@ export const search: Shape = {
 
   inboxMetaTitle: "Posteingang · BaaS",
   inboxTitle: "Posteingang",
+
+  requestSentMetaTitle: "Anfrage gesendet · BaaS",
+  requestSentHeading: "Anfrage an {{farmName}} gesendet.",
+  requestSentSubtitle: "Anfrage für {{plotName}} gesendet. Der Hof antwortet in der Regel innerhalb von zwei Tagen.",
+  requestSentStep1: "Der Hof bestätigt deine Anfrage.",
+  requestSentStep2: "{{plotName}} erscheint auf deiner Startseite.",
+  requestSentStep3: "Du erhältst Reifebenachrichtigungen und Pflegehinweise vom Hof.",
+  requestSentCta: "Zur Startseite",
 };

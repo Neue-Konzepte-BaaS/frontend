@@ -31,7 +31,7 @@ export class ApiError extends Error {
  * Auth endpoints must never trigger the 401 refresh loop: a failed login is a
  * real 401, not an expired session, and refreshing during refresh would recurse.
  */
-const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/refresh", "/auth/logout"];
+const NO_REFRESH_PATHS = ["/auth/login", "/auth/register", "/auth/verify-email", "/auth/refresh", "/auth/logout"];
 
 type RequestOptions = {
   method?: string;
@@ -96,6 +96,16 @@ export function forceLogout() {
 }
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  return (await requestWithHeaders<T>(path, options)).data;
+}
+
+/**
+ * `request`, plus the response headers — for the few endpoints that say
+ * something in a header the body cannot carry (e.g. `X-Care-Guide-Source`).
+ * The backend has to list such a header in CORS `ExposedHeaders`, or a
+ * cross-origin client reads it as absent.
+ */
+async function requestWithHeaders<T>(path: string, options: RequestOptions = {}): Promise<{ data: T; headers: Headers }> {
   const { method = "GET", body, _retried = false } = options;
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -110,14 +120,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   if (res.status === 401 && !NO_REFRESH_PATHS.includes(path) && !_retried) {
     const refreshed = await refreshAccessToken();
     if (refreshed) {
-      return request<T>(path, { ...options, _retried: true });
+      return requestWithHeaders<T>(path, { ...options, _retried: true });
     }
     forceLogout();
     throw new ApiError(401, i18next.t("common:sessionExpired"));
   }
 
   if (res.status === 204) {
-    return undefined as T;
+    return { data: undefined as T, headers: res.headers };
   }
 
   // Prefer the backend's `{ error }` message; fall back to a generic one.
@@ -138,11 +148,12 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     throw new ApiError(res.status, message);
   }
 
-  return payload as T;
+  return { data: payload as T, headers: res.headers };
 }
 
 export const apiClient = {
   get: <T>(path: string) => request<T>(path, { method: "GET" }),
+  getWithHeaders: <T>(path: string) => requestWithHeaders<T>(path, { method: "GET" }),
   post: <T>(path: string, body?: unknown) => request<T>(path, { method: "POST", body }),
   put: <T>(path: string, body?: unknown) => request<T>(path, { method: "PUT", body }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: "PATCH", body }),

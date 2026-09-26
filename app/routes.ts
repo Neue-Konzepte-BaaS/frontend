@@ -4,6 +4,7 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("verify-email", "routes/verify-email.tsx"),
   // Public plot search. Open to everyone (no guard) — also the tenant nav's
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).
@@ -30,6 +31,10 @@ export default [
   // except Search — see that route's own comment above.
   layout("routes/customer/layout.tsx", { id: "customer-layout" }, [
     route("customer", "routes/customer/home.tsx"),
+    // One rented plot: care, crops and rental period (issue #33). Reached from
+    // the Home list's "Open plot"; a plot the tenant has never rented
+    // redirects back there rather than rendering an empty page.
+    route("customer/plots/:plotId", "routes/customer/plot.tsx"),
     route("customer/board", "routes/customer/board.tsx"),
     route("customer/inbox", "routes/customer/inbox.tsx"),
     route("customer/me", "routes/customer/me.tsx"),
@@ -40,6 +45,13 @@ export default [
     // abandons) checkout.tsx's Payment Element form.
     route("customer/checkout", "routes/customer/checkout.tsx"),
     route("customer/payment/return", "routes/customer/payment-return.tsx"),
+    // NOTE (merge): request-sent.tsx was built for the direct rentPlot()
+    // submission flow this branch's payment feature retires (a rental is
+    // now only ever created by the checkout webhook, never by an immediate
+    // customer-facing POST). Nothing on this branch navigates here anymore
+    // after this merge -- kept registered rather than deleted so a human
+    // can decide whether to repurpose, wire up, or remove it.
+    route("customer/request-sent", "routes/customer/request-sent.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/
   // Care guide, plus Farm settings pinned separately (issue #27). A layout

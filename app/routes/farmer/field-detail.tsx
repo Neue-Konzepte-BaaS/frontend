@@ -1,14 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { redirect } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
 import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots, type PlotWithCrops } from "~/lib/fields";
-import { activeRentalsByPlot, listFarmRentals } from "~/lib/rentals";
+import { listFarmRentals } from "~/lib/rentals";
+import { plotStatusesByPlot, sortPlotsNaturally } from "~/lib/plots";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-map";
-import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
-import { formatArea, formatPriceCents } from "~/components/plot-card";
+import { Field as FormField, FormError, FormSuccess, inputClass, submitClass } from "~/components/form";
+import { PlotGrid } from "~/components/plot-grid";
+import { PlotDetailPanel, type SelectedPlot } from "~/components/farmer/plot-detail-panel";
 import { ringToCorners, subdivideIntoGrid, toBbox } from "~/lib/geo";
 import type { LatLon } from "~/lib/geocode";
 import i18n from "~/i18n";
@@ -40,7 +42,6 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 
 export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const { catalog, farmRentals } = loaderData;
-  const rentalByPlot = activeRentalsByPlot(farmRentals);
   const [field, setField] = useState<FieldWithPlots>(loaderData.field);
   const [rows, setRows] = useState("");
   const [cols, setCols] = useState("");
@@ -56,10 +57,17 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [basePriceInput, setBasePriceInput] = useState("");
   const [savingCrops, setSavingCrops] = useState(false);
   const [cropsError, setCropsError] = useState<string | null>(null);
-  const { t, i18n: i18nInstance } = useTranslation(["farmer", "common"]);
-  const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
+  const [cropsSaved, setCropsSaved] = useState(false);
+  const [multiSelect, setMultiSelect] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation(["farmer", "common"]);
 
   const hasPlots = field.plots.length > 0;
+  const plots = sortPlotsNaturally(field.plots);
+  const statuses = plotStatusesByPlot(
+    plots.map((p) => p.id),
+    farmRentals,
+  );
 
   async function handleGenerate(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -98,9 +106,15 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     setGenerating(false);
   }
 
-  function togglePlotSelection(plotId: string) {
+  // A click picks just that plot (click it again to deselect); in
+  // multi-select mode clicks add/remove instead, for bulk crop edits.
+  function handlePlotClick(plotId: string) {
     setCropsError(null);
+    setCropsSaved(false);
     setSelectedPlotIds((prev) => {
+      if (!multiSelect) {
+        return prev.size === 1 && prev.has(plotId) ? new Set() : new Set([plotId]);
+      }
       const next = new Set(prev);
       if (next.has(plotId)) {
         next.delete(plotId);
@@ -109,6 +123,12 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
       }
       return next;
     });
+  }
+
+  function setSelection(ids: string[]) {
+    setCropsError(null);
+    setCropsSaved(false);
+    setSelectedPlotIds(new Set(ids));
   }
 
   function toggleCrop(cropId: string) {
@@ -123,7 +143,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     });
   }
 
-  const selectedPlots = field.plots.filter((p) => selectedPlotIds.has(p.id));
+  const selectedPlots = plots.filter((p) => selectedPlotIds.has(p.id));
   // Re-key on the sorted id list (not the Set or selectedPlots itself) so this
   // only re-runs when *which* plots are selected changes — not on every field
   // update (e.g. right after handleSaveCrops writes the new crops back).
@@ -150,6 +170,15 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
       : null;
     setBasePriceInput(commonPrice != null ? (commonPrice / 100).toString() : "");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on selectedPlotsKey intentionally, see above.
+  }, [selectedPlotsKey]);
+
+  // On narrow screens the panel sits below the grid — bring it into view so
+  // a click on the map visibly does something.
+  useEffect(() => {
+    if (selectedPlotIds.size > 0 && window.matchMedia("(max-width: 1023px)").matches) {
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on selection changes.
   }, [selectedPlotsKey]);
 
   async function handleSaveCrops() {
@@ -191,32 +220,36 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     if (failure) {
       setCropsError(failure);
     } else {
-      setSelectedPlotIds(new Set());
+      setCropsSaved(true);
     }
     setSavingCrops(false);
   }
 
   const mapShapes: MapShape[] = [
     { id: field.id, polygon: field.coordinates, variant: "field" as const },
-    ...field.plots.map((p, i) => {
-      const rental = rentalByPlot.get(p.id);
+    ...plots.map((p, i) => {
+      const { status } = statuses.get(p.id)!;
       return {
         id: p.id,
         polygon: p.coordinates,
         variant: "plot" as const,
-        // Keeps the plot's number (still needed to match the checklist below)
-        // while making a rented plot impossible to miss before editing it.
-        label: rental ? `${i + 1}\n${rental.customer.firstName} ${rental.customer.lastName.charAt(0)}.` : String(i + 1),
+        label: String(i + 1),
         selected: selectedPlotIds.has(p.id),
-        rented: Boolean(rental),
+        rented: status === "rented",
+        requested: status === "requested",
       };
     }),
   ];
 
   function handleMapShapeClick(id: string) {
     if (id === field.id) return;
-    togglePlotSelection(id);
+    handlePlotClick(id);
   }
+
+  const selection: SelectedPlot[] = plots.flatMap((plot, i) =>
+    selectedPlotIds.has(plot.id) ? [{ plot, number: i + 1, ...statuses.get(plot.id)! }] : [],
+  );
+  const cropNames = new Map<string, string>(catalog.map((c: Crop) => [c.id, c.name]));
 
   // FieldMap requires an initial `center` before it can fitTo the field's
   // real bounds on the next tick — the bbox midpoint is good enough since
@@ -227,8 +260,92 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     lon: (fieldBbox.minLon + fieldBbox.maxLon) / 2,
   };
 
+  const map = (
+    <div className="overflow-hidden rounded-lg border border-beige">
+      <FieldMap
+        center={initialCenter}
+        shapes={mapShapes}
+        drawMode={null}
+        onShapeClick={handleMapShapeClick}
+        fitTo={fitToPolygon(field.coordinates)}
+      />
+    </div>
+  );
+
+  const cropEditor = (
+    <div>
+      <p className="text-sm font-medium text-wood">{t("farmer:offeredCropsLabel")}</p>
+
+      {cropsError && (
+        <div className="mt-3">
+          <FormError message={cropsError} />
+        </div>
+      )}
+      {cropsSaved && (
+        <div className="mt-3">
+          <FormSuccess message={t("farmer:cropsSaved")} />
+        </div>
+      )}
+
+      <div className="mt-3">
+        <FormField label={t("farmer:basePriceLabel")} htmlFor="basePrice">
+          <input
+            id="basePrice"
+            type="number"
+            min={0}
+            step={0.01}
+            inputMode="decimal"
+            required
+            placeholder={t("farmer:basePricePlaceholder")}
+            value={basePriceInput}
+            onChange={(e) => {
+              setCropsSaved(false);
+              setBasePriceInput(e.target.value);
+            }}
+            className={inputClass}
+          />
+        </FormField>
+      </div>
+
+      {catalog.length === 0 ? (
+        <p className="mt-3 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
+      ) : (
+        <>
+          <ul className="mt-3 space-y-2">
+            {catalog.map((crop: Crop) => (
+              <li key={crop.id}>
+                <label className="flex items-center gap-2 text-sm text-wood">
+                  <input
+                    type="checkbox"
+                    checked={selectedCropIds.has(crop.id)}
+                    onChange={() => {
+                      setCropsSaved(false);
+                      toggleCrop(crop.id);
+                    }}
+                    className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
+                  />
+                  {t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })}
+                </label>
+              </li>
+            ))}
+          </ul>
+          <button
+            type="button"
+            disabled={savingCrops || !basePriceInput.trim()}
+            onClick={handleSaveCrops}
+            className={`${submitClass} mt-4 px-4 py-2 text-sm`}
+          >
+            {savingCrops ? t("farmer:savingCrops") : t("farmer:saveCrops")}
+          </button>
+        </>
+      )}
+    </div>
+  );
+
+  const toolbarButtonClass = "rounded-md px-2.5 py-1 text-sm font-medium text-wood hover:bg-cream";
+
   return (
-    <main className="mx-auto max-w-5xl p-4">
+    <main className="mx-auto max-w-6xl p-4">
       <h1 className="text-2xl font-bold text-forest">{field.name}</h1>
       <p className="mt-1 text-wood">
         {hasPlots ? t("farmer:plot", { count: field.plots.length }) : t("farmer:fieldHasNoPlotsYet")}
@@ -240,17 +357,48 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      <div className="mt-4 overflow-hidden rounded-lg border border-beige">
-        <FieldMap
-          center={initialCenter}
-          shapes={mapShapes}
-          drawMode={null}
-          onShapeClick={handleMapShapeClick}
-          fitTo={fitToPolygon(field.coordinates)}
-        />
-      </div>
+      {hasPlots ? (
+        <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div>
+            {map}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <label className="mr-auto flex cursor-pointer items-center gap-2 text-sm text-wood">
+                <input
+                  type="checkbox"
+                  checked={multiSelect}
+                  onChange={(e) => setMultiSelect(e.target.checked)}
+                  className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
+                />
+                {t("farmer:selectSeveral")}
+              </label>
+              {multiSelect && (
+                <button type="button" onClick={() => setSelection(plots.map((p) => p.id))} className={toolbarButtonClass}>
+                  {t("farmer:selectAll")}
+                </button>
+              )}
+              {selectedPlotIds.size > 0 && (
+                <button type="button" onClick={() => setSelection([])} className={toolbarButtonClass}>
+                  {t("farmer:clearSelection")}
+                </button>
+              )}
+            </div>
+            <div className="mt-3">
+              <PlotGrid
+                plots={plots.map((p) => ({ id: p.id, status: statuses.get(p.id)!.status }))}
+                selectedIds={selectedPlotIds}
+                onSelect={handlePlotClick}
+              />
+            </div>
+          </div>
+          <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
+            <PlotDetailPanel fieldId={field.id} selection={selection} cropNames={cropNames} cropEditor={cropEditor} />
+          </div>
+        </div>
+      ) : (
+        <div className="mt-4">{map}</div>
+      )}
 
-      {!hasPlots ? (
+      {!hasPlots && (
         <form onSubmit={handleGenerate} className="mt-4 max-w-sm space-y-4">
           <p className="text-sm text-wood">{t("farmer:gridInstructions")}</p>
           <div className="flex gap-4">
@@ -287,118 +435,6 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
               : t("farmer:generatePlots")}
           </button>
         </form>
-      ) : (
-        <div className="mt-4">
-          <p className="text-sm font-medium text-wood">{t("farmer:plotsLabel")}</p>
-          <p className="mt-1 text-sm text-wood">{t("farmer:selectPlotsInstructions")}</p>
-          <ul className="mt-3 divide-y divide-beige">
-            {field.plots.map((p, i) => {
-              const rental = rentalByPlot.get(p.id);
-              return (
-              <li key={p.id}>
-                <label className="flex cursor-pointer items-start gap-3 py-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedPlotIds.has(p.id)}
-                    onChange={() => togglePlotSelection(p.id)}
-                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-beige text-moss focus:ring-moss"
-                  />
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cream text-xs font-semibold text-wood"
-                    aria-hidden
-                  >
-                    {i + 1}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-medium text-forest">
-                      {p.name} · {formatArea(p.areaSquareMeters, numberLocale)}
-                    </span>
-                    <span className="block text-sm text-warm-olive">
-                      {p.crops.length > 0 ? p.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
-                    </span>
-                    <span className="block text-sm text-warm-olive">
-                      {p.basePriceCentsPerSqmPerWeek != null
-                        ? t("farmer:basePriceDisplay", { price: formatPriceCents(p.basePriceCentsPerSqmPerWeek, numberLocale) })
-                        : t("farmer:basePriceUnset")}
-                    </span>
-                    {rental && (
-                      <span className="block text-sm font-medium text-rose-600">
-                        {t("farmer:rentedTo", { name: `${rental.customer.firstName} ${rental.customer.lastName}` })}
-                      </span>
-                    )}
-                  </span>
-                </label>
-              </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      {hasPlots && (
-        <div className="mt-8 max-w-sm">
-          <p className="text-sm font-medium text-wood">{t("farmer:offeredCropsLabel")}</p>
-          <p className="mt-1 text-sm text-wood">
-            {selectedPlots.length > 0
-              ? t("farmer:plotsSelected", { count: selectedPlots.length })
-              : t("farmer:noPlotsSelected")}
-          </p>
-
-          {cropsError && (
-            <div className="mt-3">
-              <FormError message={cropsError} />
-            </div>
-          )}
-
-          <div className="mt-3">
-            <FormField label={t("farmer:basePriceLabel")} htmlFor="basePrice">
-              <input
-                id="basePrice"
-                type="number"
-                min={0}
-                step={0.01}
-                inputMode="decimal"
-                required
-                placeholder={t("farmer:basePricePlaceholder")}
-                value={basePriceInput}
-                onChange={(e) => setBasePriceInput(e.target.value)}
-                disabled={selectedPlots.length === 0}
-                className={inputClass}
-              />
-            </FormField>
-          </div>
-
-          {catalog.length === 0 ? (
-            <p className="mt-3 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
-          ) : (
-            <>
-              <ul className="mt-3 space-y-2">
-                {catalog.map((crop: Crop) => (
-                  <li key={crop.id}>
-                    <label className="flex items-center gap-2 text-sm text-wood">
-                      <input
-                        type="checkbox"
-                        checked={selectedCropIds.has(crop.id)}
-                        onChange={() => toggleCrop(crop.id)}
-                        disabled={selectedPlots.length === 0}
-                        className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
-                      />
-                      {t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-              <button
-                type="button"
-                disabled={savingCrops || selectedPlots.length === 0 || !basePriceInput.trim()}
-                onClick={handleSaveCrops}
-                className={`${submitClass} mt-4 w-auto px-4 py-2 text-sm`}
-              >
-                {savingCrops ? t("farmer:savingCrops") : t("farmer:saveCrops")}
-              </button>
-            </>
-          )}
-        </div>
       )}
     </main>
   );

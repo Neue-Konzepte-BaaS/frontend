@@ -4,9 +4,10 @@ import { apiClient, ApiError } from "~/lib/api-client";
  * Auth helpers, thin wrappers over the api client. These mirror the backend's
  * auth endpoints (see backend openapi.yml):
  *
- *   POST /api/auth/register  -> sets cookies, returns { id, role, first_name, last_name, postal_code }
- *   POST /api/auth/login     -> sets cookies, returns { id, role, first_name, last_name, postal_code }
- *   GET  /api/auth/me        -> returns { id, role, first_name, last_name, postal_code } for the cookie
+ *   POST /api/auth/register      -> 202, { message }; no account yet, no cookies
+ *   POST /api/auth/verify-email  -> sets cookies, returns { id, role, first_name, last_name, postal_code }
+ *   POST /api/auth/login         -> sets cookies, returns { id, role, first_name, last_name, postal_code }
+ *   GET  /api/auth/me            -> returns { id, role, first_name, last_name, postal_code } for the cookie
  *
  * The tokens live in HttpOnly cookies the browser can't read; we keep only a
  * minimal `auth_user` in localStorage for fast client-side role checks/redirects.
@@ -108,8 +109,13 @@ export async function login(email: string, password: string): Promise<Account> {
   return account;
 }
 
-export async function register(input: RegisterInput): Promise<Account> {
-  const res = await apiClient.post<SessionAccountResponse>("/auth/register", {
+/**
+ * Submits the registration form. This no longer creates the account or logs
+ * anyone in — the backend sends a verification email and the account is only
+ * created once the visitor clicks that link (see `verifyEmail` below).
+ */
+export async function register(input: RegisterInput): Promise<void> {
+  await apiClient.post<{ message: string }>("/auth/register", {
     first_name: input.firstName,
     last_name: input.lastName,
     email: input.email,
@@ -120,6 +126,15 @@ export async function register(input: RegisterInput): Promise<Account> {
     address: input.address ?? "",
     description: input.description ?? "",
   });
+}
+
+/**
+ * Consumes the token from a verification email link. This is what actually
+ * creates the account and sets the auth cookies — the equivalent of what
+ * `register` used to do in one step.
+ */
+export async function verifyEmail(token: string): Promise<Account> {
+  const res = await apiClient.post<SessionAccountResponse>("/auth/verify-email", { token });
   const account = fromResponse(res);
   rememberUser(account);
   return account;

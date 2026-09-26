@@ -37,4 +37,11 @@ export const common = {
 
   comingSoonLead: "Coming soon.",
   comingSoonBody: "This screen isn't built yet — the navigation to reach it is.",
+
+  plotStatusRented: "Rented",
+  plotStatusRequested: "Requested",
+  plotStatusFree: "Free",
+  plotStatusSelected: "Selected",
+  plotStatusCount: "{{label}} ({{count}})",
+  plotTileLabel: "Plot {{number}} · {{status}}",
 } as const;

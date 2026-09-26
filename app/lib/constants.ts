@@ -35,7 +35,7 @@ export const STRIPE_PUBLISHABLE_KEY: string = import.meta.env.VITE_STRIPE_PUBLIS
  * Matched with `startsWith`, so "/" would match every path — the landing page
  * is handled by the exact-match check in forceLogout() instead of living here.
  */
-export const PUBLIC_PATHS = ["/login", "/register", "/search", "/for-farmers"] as const;
+export const PUBLIC_PATHS = ["/login", "/register", "/verify-email", "/search", "/for-farmers"] as const;
 
 /**
  * MapLibre style for the field/plot map: Esri World Imagery satellite tiles.

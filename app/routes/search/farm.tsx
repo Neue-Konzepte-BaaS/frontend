@@ -1,15 +1,19 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { MapPin, Wheat } from "lucide-react";
 import type { Route } from "./+types/farm";
 import { me, dashboardPath } from "~/lib/auth";
 import { getFarm } from "~/lib/farms";
-import { findNearestPlots, listMyRentals, type NearbyPlot, type RentalStatus } from "~/lib/rentals";
+import { findNearestPlots, listMyRentals, MAX_NEAREST_PLOTS, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
+import { PlotGrid } from "~/components/plot-grid";
+import { PlotRentPanel } from "~/components/plot-rent-panel";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
+import { sortPlotsNaturally, plotStatusesByPlot } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
+import { FALLBACK_CENTER } from "~/lib/geocode";
 import { LogoutButton } from "~/components/logout-button";
 import { LanguageSwitcher } from "~/components/language-switcher";
 import { AppShell } from "~/components/nav/app-shell";
@@ -29,57 +33,81 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
   const account = await me();
   const [farm, plots, myRentals] = await Promise.all([
     getFarm(farmId),
+    // Scoped to this farm server-side — filtering the overall nearest plots
+    // instead would show a farm outside the top N as having none.
     postalCode
-      ? findNearestPlots({ postalCode, limit: 30 })
+      ? findNearestPlots({ postalCode, farm: farmId, limit: MAX_NEAREST_PLOTS })
       : city
-        ? findNearestPlots({ city, limit: 30 })
+        ? findNearestPlots({ city, farm: farmId, limit: MAX_NEAREST_PLOTS })
         : Promise.resolve<NearbyPlot[]>([]),
     account?.role === "customer" ? listMyRentals() : Promise.resolve([]),
   ]);
 
-  // Only requested/approved rentals block a plot's crop picker — a declined
-  // one frees it up again (the backend's own exclusion constraint agrees:
-  // it's partial, `WHERE status <> 'declined'`), so a customer can simply
-  // try again rather than being stuck looking "rented" forever.
-  const plotStatusById: Record<string, RentalStatus> = {};
-  for (const rental of myRentals) {
-    if (rental.status !== "declined") plotStatusById[rental.plotId] = rental.status;
-  }
-
   return {
     account,
     farm,
-    farmPlots: plots.filter((p) => p.farm === farmId),
+    farmPlots: plots,
     hasLocationContext: Boolean(postalCode || city),
     backToSearchQuery: url.searchParams.toString(),
-    plotStatusById,
+    // Passed through raw rather than pre-reduced to a per-plot status here:
+    // plotStatusesByPlot (see ~/lib/plots) needs each rental's own endAt to
+    // tell an approved-but-expired rental apart from one still running, and
+    // to prefer an approved rental over a merely requested one for the same
+    // plot -- logic worth sharing with PlotGrid/PlotRentPanel below rather
+    // than duplicating a simpler version of it here.
+    myRentals,
   };
 }
 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
-  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, plotStatusById } = loaderData;
+  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, myRentals } = loaderData;
   const customer = account?.role === "customer" ? account : null;
   const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const tenantNavItems = useTenantNavItems();
 
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const plots = sortPlotsNaturally(farmPlots);
+  // A declined rental frees its plot up again (the backend's own exclusion
+  // constraint agrees: it's partial, `WHERE status <> 'declined'`), which
+  // plotStatusesByPlot already accounts for -- it only ever returns
+  // "requested" or "rented" from a still-live approved/requested rental.
+  const plotStatusByPlot = plotStatusesByPlot(plots.map((p) => p.id), myRentals);
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
   }
 
+  // On narrow screens the panel sits below the grid — bring it into view so
+  // a click on the map visibly does something.
+  useEffect(() => {
+    if (selectedPlotId && window.matchMedia("(max-width: 1023px)").matches) {
+      panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedPlotId]);
+
   const backToSearchLink = backToSearchQuery ? `/search?${backToSearchQuery}` : "/search";
   const farmPageUrl = backToSearchQuery ? `/search/farms/${farm.id}?${backToSearchQuery}` : `/search/farms/${farm.id}`;
 
-  const shapes: MapShape[] = farmPlots.map((plot, i) => ({
+  const shapes: MapShape[] = plots.map((plot, i) => ({
     id: plot.id,
     polygon: plot.coordinates,
     variant: "plot",
     label: String(i + 1),
     selected: plot.id === selectedPlotId,
+    requested: plotStatusByPlot.get(plot.id)?.status === "requested",
+    rented: plotStatusByPlot.get(plot.id)?.status === "rented",
   }));
+  const selectedIndex = plots.findIndex((p) => p.id === selectedPlotId);
+  const selected = selectedIndex >= 0 ? { plot: plots[selectedIndex], number: selectedIndex + 1 } : null;
+  // Framed tightly on this farm's plots so they're big enough to click —
+  // picking a plot on the map is this page's main job.
   const fitTo = unionBbox(farmPlots.map((p) => toBbox(p.coordinates)));
+  // Only a first-paint value — fitTo takes over as soon as the map loads.
+  const initialCenter = fitTo
+    ? { lat: (fitTo.minLat + fitTo.maxLat) / 2, lon: (fitTo.minLon + fitTo.maxLon) / 2 }
+    : FALLBACK_CENTER;
 
   const content = (
     <main className="mx-auto w-full max-w-6xl p-6">
@@ -120,18 +148,6 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         </dl>
       </section>
 
-      {hasLocationContext && farmPlots.length > 0 && (
-        <div className="mt-6 overflow-hidden rounded-lg border border-beige">
-          <FieldMap
-            center={{ lat: farmPlots[0].coordinates.coordinates[0][0][1], lon: farmPlots[0].coordinates.coordinates[0][0][0] }}
-            shapes={shapes}
-            drawMode={null}
-            onShapeClick={toggleSelectPlot}
-            fitTo={fitTo}
-          />
-        </div>
-      )}
-
       <h2 className="mt-8 font-serif text-lg font-semibold text-forest">{t("search:availablePlots")}</h2>
 
       {!hasLocationContext ? (
@@ -144,11 +160,12 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       ) : farmPlots.length === 0 ? (
         <p className="mt-2 text-wood">{t("search:farmHasNoPlotsNearby")}</p>
       ) : (
+        <>
         <ul className="mt-2 divide-y divide-beige">
-          {farmPlots.map((plot, i) => {
+          {plots.map((plot, i) => {
             const isSelected = plot.id === selectedPlotId;
-            const status = plotStatusById[plot.id];
-            const isTaken = status != null;
+            const status = plotStatusByPlot.get(plot.id)?.status;
+            const isTaken = status !== "free";
             return (
               <li key={plot.id}>
                 <button
@@ -202,6 +219,37 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             );
           })}
         </ul>
+        <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div>
+            <div className="overflow-hidden rounded-lg border border-beige">
+              <FieldMap
+                center={initialCenter}
+                shapes={shapes}
+                drawMode={null}
+                onShapeClick={toggleSelectPlot}
+                fitTo={fitTo}
+              />
+            </div>
+            <div className="mt-4">
+              <PlotGrid
+                plots={plots.map((p) => ({ id: p.id, status: plotStatusByPlot.get(p.id)?.status ?? "free" }))}
+                selectedIds={new Set(selectedPlotId ? [selectedPlotId] : [])}
+                onSelect={toggleSelectPlot}
+                legendStatuses={["free", "requested", "rented"]}
+              />
+            </div>
+          </div>
+          <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
+            <PlotRentPanel
+              selected={selected}
+              alreadyRequested={selected ? plotStatusByPlot.get(selected.plot.id)?.status !== "free" : false}
+              account={account}
+              loginRedirectTo={farmPageUrl}
+              returnTo={farmPageUrl}
+            />
+          </div>
+        </div>
+        </>
       )}
     </main>
   );

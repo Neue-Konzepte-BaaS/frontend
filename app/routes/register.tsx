@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link, redirect, useNavigate, useSearchParams } from "react-router";
+import { Link, redirect, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
+import { Check } from "lucide-react";
 import type { Route } from "./+types/register";
 import { register, me, type RegisterableRole } from "~/lib/auth";
 import { ApiError } from "~/lib/api-client";
@@ -28,11 +29,11 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 }
 
 export default function Register() {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [role, setRole] = useState<RegisterableRole>("customer");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const { t } = useTranslation(["auth", "common", "home"]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -50,11 +51,13 @@ export default function Register() {
       return;
     }
 
+    const email = String(form.get("email") ?? "").trim();
+
     try {
-      const account = await register({
+      await register({
         firstName: String(form.get("first_name") ?? "").trim(),
         lastName: String(form.get("last_name") ?? "").trim(),
-        email: String(form.get("email") ?? "").trim(),
+        email,
         password: String(form.get("password") ?? ""),
         role,
         postalCode,
@@ -62,8 +65,7 @@ export default function Register() {
         address: role === "farmer" ? String(form.get("address") ?? "").trim() : undefined,
         description: role === "farmer" ? String(form.get("description") ?? "").trim() : undefined,
       });
-      const redirectTo = safeRedirectTarget(searchParams.get("redirect"));
-      navigate(postAuthDestination(account, redirectTo, searchParams.get("intent")), { replace: true });
+      setSubmittedEmail(email);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("common:genericError"));
       setSubmitting(false);
@@ -96,6 +98,15 @@ export default function Register() {
           </div>
         </div>
       </header>
+      {submittedEmail ? (
+        <main className="mx-auto max-w-2xl px-6 py-16">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-moss/15">
+            <Check className="h-9 w-9 text-moss" strokeWidth={2.5} />
+          </div>
+          <h1 className="mt-8 font-serif text-4xl font-bold leading-tight text-forest">{t("auth:registerSuccessTitle")}</h1>
+          <p className="mt-3 text-base text-warm-olive">{t("auth:registerSuccessSubtitle", { email: submittedEmail })}</p>
+        </main>
+      ) : (
       <main className="mx-auto flex max-w-md flex-col justify-center px-6 py-16">
         <h1 className="font-serif text-3xl font-bold text-forest">{t("auth:registerTitle")}</h1>
         <p className="mt-2 text-wood">{t("auth:registerSubtitle")}</p>
@@ -170,6 +181,7 @@ export default function Register() {
           </Link>
         </p>
       </main>
+      )}
     </div>
   );
 }

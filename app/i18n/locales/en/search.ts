@@ -38,6 +38,13 @@ export const search = {
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to request",
   cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
+  rentPanelHint: "Click a plot on the map or in the grid to request it.",
+  plotNumber: "Plot {{number}}",
+  cropMonths_one: "{{count}} month",
+  cropMonths_other: "{{count}} months",
+  rentStartDateHint: "Earliest tomorrow, at most 60 days from now.",
+  rentPeriodPreview: "Rental period: {{period}}",
+  requestSentBody: "Request sent — the farm will get back to you. You can follow its status on your home page.",
 
   farmMetaTitle: "Farm · BaaS",
   backToSearch: "Back to search",
@@ -63,4 +70,12 @@ export const search = {
   // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
   inboxMetaTitle: "Inbox · BaaS",
   inboxTitle: "Inbox",
+
+  requestSentMetaTitle: "Request sent · BaaS",
+  requestSentHeading: "Request sent to {{farmName}}.",
+  requestSentSubtitle: "Request for {{plotName}} sent. The farm usually answers within two days.",
+  requestSentStep1: "The farm approves your request.",
+  requestSentStep2: "{{plotName}} appears on your home screen.",
+  requestSentStep3: "You get ripeness and care messages from the farm.",
+  requestSentCta: "Go to my home",
 } as const;
