@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import {
+  BarChart3,
   BookOpen,
   Building2,
   CircleUser,
@@ -56,13 +57,14 @@ export function useFarmerNavItems(): NavItem[] {
     { to: "/farmer/requests", label: t("navRequests"), icon: ListChecks },
     { to: "/farmer/board", label: t("navBoard"), icon: ClipboardList },
     { to: "/farmer/care-guide", label: t("navCareGuide"), icon: BookOpen },
+    { to: "/farmer/statistics", label: t("navStatistics"), icon: BarChart3 },
   ];
 }
 
 /**
  * Farmer nav for the mobile bottom bar — a curated subset, not the full
  * sidebar list: past ~5 items a bottom bar stops being usable on a phone.
- * Plot planner/Requests/Care guide are still reachable from Home/Fields.
+ * Plot planner/Requests/Care guide/Statistics are still reachable from Home/Fields.
  * The last slot swaps in as "Me" (pointing at the same /farmer/settings page
  * the desktop sidebar pins separately as "Farm settings") so the farmer has
  * *some* way to reach their own account/farm settings on mobile too.

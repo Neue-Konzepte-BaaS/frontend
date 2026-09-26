@@ -41,7 +41,7 @@ export default [
     route("customer/request-sent", "routes/customer/request-sent.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/
-  // Care guide, plus Farm settings pinned separately (issue #27). A layout
+  // Care guide/Statistics, plus Farm settings pinned separately (issue #27). A layout
   // owns the requireRole("farmer") guard and shared chrome; children render
   // in its <Outlet />.
   layout("routes/farmer/layout.tsx", { id: "farmer-layout" }, [
@@ -60,6 +60,9 @@ export default [
     route("farmer/requests", "routes/farmer/requests.tsx"),
     route("farmer/board", "routes/farmer/board.tsx"),
     route("farmer/care-guide", "routes/farmer/care-guide.tsx"),
+    // The farmer's own numbers (issue #22): headline tiles from GET
+    // /api/statistics, plus breakdowns computed client-side from rentals/fields.
+    route("farmer/statistics", "routes/farmer/statistics.tsx"),
     route("farmer/settings", "routes/farmer/settings.tsx"),
   ]),
 ] satisfies RouteConfig;
