@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
 import { me, dashboardPath } from "~/lib/auth";
 import { LanguageSwitcher } from "~/components/language-switcher";
@@ -33,9 +33,9 @@ export default function ForFarmers({ loaderData }: Route.ComponentProps) {
             </div>
           </Link>
           <nav className="hidden items-center gap-8 md:flex">
-            <Link to="/" className="text-sm text-wood hover:text-forest">{t("home:navHome")}</Link>
-            <Link to="/for-farmers" className="text-sm font-semibold text-forest">{t("home:navForFarmers")}</Link>
-            <Link to="/search" className="text-sm text-wood hover:text-forest">{t("home:navForCustomers")}</Link>
+            <NavLink to="/" end className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navHome")}</NavLink>
+            <NavLink to="/for-farmers" className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navForFarmers")}</NavLink>
+            <NavLink to="/search" className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navForCustomers")}</NavLink>
           </nav>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />

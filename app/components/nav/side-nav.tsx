@@ -36,10 +36,10 @@ function SideNavLink({ item }: { item: NavItem }) {
         to={item.to}
         end={item.end}
         className={({ isActive }) =>
-          `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+          `flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
             isActive
               ? "bg-forest/20 text-forest font-semibold"
-              : "text-forest/80 hover:bg-forest/10 hover:text-forest"
+              : "text-forest hover:bg-forest/10"
           }`
         }
       >
