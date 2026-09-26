@@ -47,6 +47,11 @@ export const farmer = {
   cropDuration: "{{name}} ({{months}}-month rental)",
   savingCrops: "Saving…",
   saveCrops: "Save",
+  basePriceLabel: "Base rate for the selected plots (€ per m² per week)",
+  basePricePlaceholder: "e.g. 0.05",
+  basePriceDisplay: "Base rate: {{price}}/m²/week",
+  basePriceUnset: "Base rate not set yet",
+  invalidBasePrice: "Enter a base rate greater than 0.",
 
   mapAriaLabel: "Field map",
 
@@ -122,4 +127,11 @@ export const farmer = {
   careGuideTitle: "Care guide",
   settingsMetaTitle: "Farm settings · BaaS",
   settingsTitle: "Farm settings",
+  cropRatesInstructions:
+    "Set what each crop costs to grow, per square meter per week — combined with each plot's own base rate (set on its field's page) to price what a customer pays. A crop with no rate here won't be rentable on any of your plots yet.",
+  cropRatePlaceholder: "e.g. 0.02",
+  invalidCropRate: "Enter a rate greater than 0 for {{name}}, or leave it blank.",
+  savingCropRates: "Saving…",
+  saveCropRates: "Save rates",
+  cropRatesSaved: "Crop rates saved.",
 } as const;

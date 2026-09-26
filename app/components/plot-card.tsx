@@ -44,3 +44,13 @@ export function formatRentalPeriod(startAt: string, endAt: string, locale: strin
   const dateFormatter = new Intl.DateTimeFormat(locale, { day: "2-digit", month: "short", year: "numeric" });
   return `${dateFormatter.format(new Date(startAt))} – ${dateFormatter.format(new Date(endAt))}`;
 }
+
+/**
+ * Formats a price in cents as EUR, e.g. "€45.00". Every price in this app is
+ * EUR (see backend/openapi.yml — no currency field exists anywhere, this
+ * product is Germany-only), so unlike the helpers above `locale` only
+ * affects punctuation/symbol placement, never the currency itself.
+ */
+export function formatPriceCents(cents: number, locale: string = "en-GB"): string {
+  return (cents / 100).toLocaleString(locale, { style: "currency", currency: "EUR" });
+}
