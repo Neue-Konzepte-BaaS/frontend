@@ -15,6 +15,15 @@ export const API_BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8080/api";
 
 /**
+ * Stripe's publishable key, safe to ship to the client (unlike the secret
+ * key, which only ever lives on the backend). Required for the Payment
+ * Element on `app/routes/customer/checkout.tsx` to mount at all — set
+ * `VITE_STRIPE_PUBLISHABLE_KEY` in `.env` to a `pk_test_...`/`pk_live_...`
+ * key from the Stripe dashboard. See https://vite.dev/guide/env-and-mode.
+ */
+export const STRIPE_PUBLISHABLE_KEY: string = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "";
+
+/**
  * Public routes that must render without an authenticated session.
  * `/` (landing) and `/search` (public plot search) are open to everyone —
  * /search renders its own logged-out mode for a stale/expired cookie rather

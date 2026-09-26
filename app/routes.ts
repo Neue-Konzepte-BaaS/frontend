@@ -38,6 +38,19 @@ export default [
     route("customer/board", "routes/customer/board.tsx"),
     route("customer/inbox", "routes/customer/inbox.tsx"),
     route("customer/me", "routes/customer/me.tsx"),
+    // Stripe Checkout for a rental request (issue #14) — reached only via
+    // PlotCropsAndRent's navigate() carrying the request in router state,
+    // never linked to directly. customer/payment/return is where Stripe's
+    // return_url sends the browser back once the customer completes (or
+    // abandons) checkout.tsx's Payment Element form.
+    route("customer/checkout", "routes/customer/checkout.tsx"),
+    route("customer/payment/return", "routes/customer/payment-return.tsx"),
+    // NOTE (merge): request-sent.tsx was built for the direct rentPlot()
+    // submission flow this branch's payment feature retires (a rental is
+    // now only ever created by the checkout webhook, never by an immediate
+    // customer-facing POST). Nothing on this branch navigates here anymore
+    // after this merge -- kept registered rather than deleted so a human
+    // can decide whether to repurpose, wire up, or remove it.
     route("customer/request-sent", "routes/customer/request-sent.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/

@@ -48,6 +48,11 @@ export const farmer: Shape = {
   cropDuration: "{{name}} ({{months}} Monate Mietdauer)",
   savingCrops: "Wird gespeichert…",
   saveCrops: "Speichern",
+  basePriceLabel: "Grundpreis für die ausgewählten Parzellen (€ pro m² pro Woche)",
+  basePricePlaceholder: "z. B. 0,05",
+  basePriceDisplay: "Grundpreis: {{price}}/m²/Woche",
+  basePriceUnset: "Grundpreis noch nicht festgelegt",
+  invalidBasePrice: "Gib einen Grundpreis größer als 0 ein.",
 
   mapAriaLabel: "Feldkarte",
 
@@ -156,4 +161,11 @@ export const farmer: Shape = {
   careResetDone: "Zurückgesetzt — deine Mietenden sehen wieder den Standard-Pflegeplan.",
   settingsMetaTitle: "Hofeinstellungen · BaaS",
   settingsTitle: "Hofeinstellungen",
+  cropRatesInstructions:
+    "Lege fest, was der Anbau jeder Pflanze pro Quadratmeter pro Woche kostet — kombiniert mit dem eigenen Grundpreis jeder Parzelle (auf der Seite ihres Feldes festgelegt) ergibt das den Preis für den Kunden. Eine Pflanze ohne Preis hier ist auf keiner deiner Parzellen mietbar.",
+  cropRatePlaceholder: "z. B. 0,02",
+  invalidCropRate: "Gib für {{name}} einen Preis größer als 0 ein oder lass das Feld leer.",
+  savingCropRates: "Wird gespeichert…",
+  saveCropRates: "Preise speichern",
+  cropRatesSaved: "Pflanzenpreise gespeichert.",
 };

@@ -10,7 +10,7 @@ import { formatArea } from "~/components/plot-card";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
-import { sortPlotsNaturally } from "~/lib/plots";
+import { sortPlotsNaturally, plotStatusesByPlot } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox } from "~/lib/geo";
 import { FALLBACK_CENTER } from "~/lib/geocode";
@@ -49,21 +49,31 @@ export async function clientLoader({ params, request }: Route.ClientLoaderArgs) 
     farmPlots: plots,
     hasLocationContext: Boolean(postalCode || city),
     backToSearchQuery: url.searchParams.toString(),
-    rentedPlotIds: myRentals.map((r) => r.plotId),
+    // Passed through raw rather than pre-reduced to a per-plot status here:
+    // plotStatusesByPlot (see ~/lib/plots) needs each rental's own endAt to
+    // tell an approved-but-expired rental apart from one still running, and
+    // to prefer an approved rental over a merely requested one for the same
+    // plot -- logic worth sharing with PlotGrid/PlotRentPanel below rather
+    // than duplicating a simpler version of it here.
+    myRentals,
   };
 }
 
 export default function FarmDetail({ loaderData }: Route.ComponentProps) {
-  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, rentedPlotIds } = loaderData;
+  const { account, farm, farmPlots, hasLocationContext, backToSearchQuery, myRentals } = loaderData;
   const customer = account?.role === "customer" ? account : null;
   const { t, i18n: i18nInstance } = useTranslation(["search", "common", "home"]);
   const numberLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const tenantNavItems = useTenantNavItems();
 
   const [selectedPlotId, setSelectedPlotId] = useState<string | null>(null);
-  const [rented, setRented] = useState<Set<string>>(() => new Set(rentedPlotIds));
   const panelRef = useRef<HTMLDivElement>(null);
   const plots = sortPlotsNaturally(farmPlots);
+  // A declined rental frees its plot up again (the backend's own exclusion
+  // constraint agrees: it's partial, `WHERE status <> 'declined'`), which
+  // plotStatusesByPlot already accounts for -- it only ever returns
+  // "requested" or "rented" from a still-live approved/requested rental.
+  const plotStatusByPlot = plotStatusesByPlot(plots.map((p) => p.id), myRentals);
 
   function toggleSelectPlot(plotId: string) {
     setSelectedPlotId((prev) => (prev === plotId ? null : plotId));
@@ -86,7 +96,8 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
     variant: "plot",
     label: String(i + 1),
     selected: plot.id === selectedPlotId,
-    requested: rented.has(plot.id),
+    requested: plotStatusByPlot.get(plot.id)?.status === "requested",
+    rented: plotStatusByPlot.get(plot.id)?.status === "rented",
   }));
   const selectedIndex = plots.findIndex((p) => p.id === selectedPlotId);
   const selected = selectedIndex >= 0 ? { plot: plots[selectedIndex], number: selectedIndex + 1 } : null;
@@ -151,16 +162,17 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
       ) : (
         <>
         <ul className="mt-2 divide-y divide-beige">
-          {farmPlots.map((plot, i) => {
+          {plots.map((plot, i) => {
             const isSelected = plot.id === selectedPlotId;
-            const isRented = rented.has(plot.id);
+            const status = plotStatusByPlot.get(plot.id)?.status;
+            const isTaken = status !== "free";
             return (
               <li key={plot.id}>
                 <button
                   type="button"
                   onClick={() => toggleSelectPlot(plot.id)}
                   aria-expanded={isSelected}
-                  disabled={isRented}
+                  disabled={isTaken}
                   className="flex w-full items-center gap-3 py-3 text-left disabled:cursor-default"
                 >
                   <span
@@ -173,9 +185,9 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                     <span className="block font-medium text-forest">{plot.name}</span>
                     <span className="block text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, numberLocale)}</span>
                   </span>
-                  {isRented ? (
+                  {isTaken ? (
                     <span className="shrink-0 text-sm font-medium text-moss">
-                      {t("search:rented")}
+                      {status === "requested" ? t("search:statusRequested") : t("search:booked")}
                     </span>
                   ) : (
                     <span className="shrink-0 text-warm-olive" aria-hidden>
@@ -184,16 +196,22 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                   )}
                 </button>
 
-                {isSelected && !isRented && (
+                {isSelected && !isTaken && (
                   <div className="pb-3 pl-9">
+                    {/* Submitting here only starts a payment (see
+                        PlotCropsAndRent's own docstring) — the plot isn't
+                        actually requested until checkout completes and the
+                        webhook creates the rental. returnTo is where
+                        payment-return.tsx sends the browser back to once
+                        that resolves, so the customer lands back here and
+                        sees the "Awaiting approval" status above instead of
+                        a generic confirmation screen. */}
                     <PlotCropsAndRent
                       plotId={plot.id}
-                      plotName={plot.name}
-                      farmName={farm.name}
                       crops={plot.crops}
                       account={account}
                       loginRedirectTo={farmPageUrl}
-                      onRented={() => setRented((prev) => new Set(prev).add(plot.id))}
+                      returnTo={farmPageUrl}
                     />
                   </div>
                 )}
@@ -214,21 +232,20 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             </div>
             <div className="mt-4">
               <PlotGrid
-                plots={plots.map((p) => ({ id: p.id, status: rented.has(p.id) ? "requested" : "free" }))}
+                plots={plots.map((p) => ({ id: p.id, status: plotStatusByPlot.get(p.id)?.status ?? "free" }))}
                 selectedIds={new Set(selectedPlotId ? [selectedPlotId] : [])}
                 onSelect={toggleSelectPlot}
-                legendStatuses={["free", "requested"]}
+                legendStatuses={["free", "requested", "rented"]}
               />
             </div>
           </div>
           <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
             <PlotRentPanel
               selected={selected}
-              alreadyRequested={selected ? rented.has(selected.plot.id) : false}
-              farmName={farm.name}
+              alreadyRequested={selected ? plotStatusByPlot.get(selected.plot.id)?.status !== "free" : false}
               account={account}
               loginRedirectTo={farmPageUrl}
-              onRented={(rental) => setRented((prev) => new Set(prev).add(rental.plotId))}
+              returnTo={farmPageUrl}
             />
           </div>
         </div>

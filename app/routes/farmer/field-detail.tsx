@@ -3,7 +3,7 @@ import { redirect } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
-import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots } from "~/lib/fields";
+import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots, type PlotWithCrops } from "~/lib/fields";
 import { listFarmRentals } from "~/lib/rentals";
 import { plotStatusesByPlot, sortPlotsNaturally } from "~/lib/plots";
 import { ApiError } from "~/lib/api-client";
@@ -50,6 +50,11 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [selectedPlotIds, setSelectedPlotIds] = useState<Set<string>>(new Set());
   const [selectedCropIds, setSelectedCropIds] = useState<Set<string>>(new Set());
+  // Euros, as typed — converted to cents on save. A plot's own €/m²/week
+  // rate, applied to every currently-selected plot in one save alongside
+  // the crop checklist below (see setPlotCrops). Crop *pricing* itself is a
+  // separate, farm-wide setting on farmer/settings.tsx, not per plot.
+  const [basePriceInput, setBasePriceInput] = useState("");
   const [savingCrops, setSavingCrops] = useState(false);
   const [cropsError, setCropsError] = useState<string | null>(null);
   const [cropsSaved, setCropsSaved] = useState(false);
@@ -144,12 +149,14 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   // update (e.g. right after handleSaveCrops writes the new crops back).
   const selectedPlotsKey = [...selectedPlotIds].sort().join(",");
 
-  // Prefill the checkboxes with whatever the selected plots already offer in
-  // common, so selecting a single plot shows exactly its current crops, and
-  // selecting several shows only what they already share.
+  // Prefill the checkboxes (and the base-price input) with whatever the
+  // selected plots already have in common, so selecting a single plot shows
+  // exactly its current crops/price, and selecting several shows only what
+  // they already share.
   useEffect(() => {
     if (selectedPlots.length === 0) {
       setSelectedCropIds(new Set());
+      setBasePriceInput("");
       return;
     }
     const [first, ...rest] = selectedPlots;
@@ -157,6 +164,11 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
       .map((c) => c.id)
       .filter((id) => rest.every((p) => p.crops.some((c) => c.id === id)));
     setSelectedCropIds(new Set(common));
+
+    const commonPrice = rest.every((p) => p.basePriceCentsPerSqmPerWeek === first.basePriceCentsPerSqmPerWeek)
+      ? first.basePriceCentsPerSqmPerWeek
+      : null;
+    setBasePriceInput(commonPrice != null ? (commonPrice / 100).toString() : "");
     // eslint-disable-next-line react-hooks/exhaustive-deps -- keyed on selectedPlotsKey intentionally, see above.
   }, [selectedPlotsKey]);
 
@@ -171,17 +183,28 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
   async function handleSaveCrops() {
     setCropsError(null);
-    setSavingCrops(true);
 
+    // The backend requires a positive base rate on every save, even one
+    // that only changes which crops are offered (400s otherwise) — so this
+    // is a hard requirement here too, not an optional "leave blank to skip
+    // pricing" field.
+    const euros = Number(basePriceInput);
+    if (basePriceInput.trim() === "" || !Number.isFinite(euros) || euros <= 0) {
+      setCropsError(t("farmer:invalidBasePrice"));
+      return;
+    }
+    const basePriceCentsPerSqmPerWeek = Math.round(euros * 100);
+
+    setSavingCrops(true);
     const cropIds = [...selectedCropIds];
-    const updatedByPlot = new Map<string, Crop[]>();
+    const updatedByPlot = new Map<string, PlotWithCrops>();
     let failure: string | null = null;
 
     // Sequential, same reasoning as handleGenerate: no bulk endpoint, and a
     // failure partway through should still keep the plots before it updated.
     for (const plot of selectedPlots) {
       try {
-        updatedByPlot.set(plot.id, await setPlotCrops(plot.id, cropIds));
+        updatedByPlot.set(plot.id, await setPlotCrops(plot.id, basePriceCentsPerSqmPerWeek, cropIds));
       } catch (err) {
         failure = err instanceof ApiError ? err.message : t("common:genericError");
         break;
@@ -191,7 +214,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     if (updatedByPlot.size > 0) {
       setField((prev) => ({
         ...prev,
-        plots: prev.plots.map((p) => (updatedByPlot.has(p.id) ? { ...p, crops: updatedByPlot.get(p.id)! } : p)),
+        plots: prev.plots.map((p) => updatedByPlot.get(p.id) ?? p),
       }));
     }
     if (failure) {
@@ -264,6 +287,26 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
+      <div className="mt-3">
+        <FormField label={t("farmer:basePriceLabel")} htmlFor="basePrice">
+          <input
+            id="basePrice"
+            type="number"
+            min={0}
+            step={0.01}
+            inputMode="decimal"
+            required
+            placeholder={t("farmer:basePricePlaceholder")}
+            value={basePriceInput}
+            onChange={(e) => {
+              setCropsSaved(false);
+              setBasePriceInput(e.target.value);
+            }}
+            className={inputClass}
+          />
+        </FormField>
+      </div>
+
       {catalog.length === 0 ? (
         <p className="mt-3 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
       ) : (
@@ -288,7 +331,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
           </ul>
           <button
             type="button"
-            disabled={savingCrops}
+            disabled={savingCrops || !basePriceInput.trim()}
             onClick={handleSaveCrops}
             className={`${submitClass} mt-4 px-4 py-2 text-sm`}
           >
