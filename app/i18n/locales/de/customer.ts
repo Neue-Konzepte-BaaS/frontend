@@ -30,4 +30,6 @@ export const customer: Shape = {
   inboxKindRipeness: "Reife",
   inboxKindCare: "Pflege",
   inboxKindFarm: "Hof",
+  inboxRipenessSubject: "{{crop}} ist reif",
+  inboxRipenessBody: "{{crop}} auf {{field}} ist bereit zur Ernte.",
 };

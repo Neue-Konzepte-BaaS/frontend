@@ -126,6 +126,13 @@ export default function CustomerInbox({ loaderData }: Route.ComponentProps) {
 function NotificationCard({ notification, timeLabel: time }: { notification: Notification; timeLabel: string }) {
   const { t } = useTranslation("customer");
 
+  const subject = notification.kind === "ripeness" && notification.cropName
+    ? t("inboxRipenessSubject", { crop: notification.cropName })
+    : notification.subject;
+  const body = notification.kind === "ripeness" && notification.cropName && notification.fieldName
+    ? t("inboxRipenessBody", { crop: notification.cropName, field: notification.fieldName })
+    : notification.body;
+
   return (
     <li className="rounded-2xl border border-beige bg-cream px-5 py-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
@@ -134,8 +141,8 @@ function NotificationCard({ notification, timeLabel: time }: { notification: Not
         </span>
         <time className="shrink-0 text-sm text-warm-olive">{time}</time>
       </div>
-      <p className="mt-3 text-base font-medium text-forest">{notification.subject}</p>
-      <p className="mt-1 text-sm text-wood">{notification.body}</p>
+      <p className="mt-3 text-base font-medium text-forest">{subject}</p>
+      <p className="mt-1 text-sm text-wood">{body}</p>
       <p className="mt-1 text-sm text-warm-olive">{notification.sender}</p>
     </li>
   );

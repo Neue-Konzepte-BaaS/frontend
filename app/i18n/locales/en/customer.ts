@@ -26,4 +26,6 @@ export const customer = {
   inboxKindRipeness: "Ripeness",
   inboxKindCare: "Care",
   inboxKindFarm: "Farm",
+  inboxRipenessSubject: "{{crop}} is ready to harvest",
+  inboxRipenessBody: "{{crop}} on {{field}} is ready to harvest.",
 } as const;
