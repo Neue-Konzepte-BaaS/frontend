@@ -31,6 +31,9 @@ export const customer: Shape = {
   inboxKindCare: "Pflege",
   inboxKindFarm: "Hof",
 
+  inboxRipenessSubject: "{{crop}} ist reif",
+  inboxRipenessBody: "{{crop}} auf {{field}} ist bereit zur Ernte.",
+
   plotMetaTitle: "Meine Parzelle · BaaS",
   openPlot: "Parzelle öffnen",
   backToHome: "Zurück zur Startseite",
