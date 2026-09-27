@@ -8,7 +8,7 @@ export const payment: Shape = {
   missingRequest: "Wir haben den Überblick über deine Mietanfrage verloren — bitte starte erneut von der Parzelle aus.",
   startingCheckout: "Zahlung wird vorbereitet…",
   authorizeNotice:
-    "Du wirst jetzt belastet. Deine Anfrage wird anschließend an den Hof gesendet — lehnt er sie ab, wirst du automatisch erstattet und es entstehen keine Kosten.",
+    "Dein Zahlungsmittel wird jetzt belastet. Deine Anfrage wird anschließend an den Hof gesendet. Falls diese abgelehnt wird, erstatten wir Dir Dein Geld zurück und es enstehen keine Kosten.",
   stripeNotConfigured: "Zahlungen sind noch nicht eingerichtet — bitte versuche es später erneut.",
   payNow: "Jetzt bezahlen",
   processingPayment: "Wird verarbeitet…",
@@ -21,7 +21,7 @@ export const payment: Shape = {
   stillProcessing: "Das dauert etwas länger als gewöhnlich. Deine Zahlung wird möglicherweise noch verarbeitet.",
   checkAgain: "Erneut prüfen",
   paymentSuccess:
-    "Zahlung erhalten — deine Anfrage wurde an den Hof gesendet. Lehnt er sie ab, wirst du automatisch erstattet; in jedem Fall wirst du benachrichtigt.",
+    "Zahlung erhalten — Deine Anfrage wurde an den Hof gesendet. Lehnt er diese ab, wird der Betrag automatisch erstattet. In jedem Fall wirst Du benachrichtigt.",
   continueNow: "Jetzt weiter",
   sessionFailed: "Diese Zahlung konnte nicht abgeschlossen werden. Es wurden keine Kosten berechnet.",
 };
