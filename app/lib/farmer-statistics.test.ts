@@ -13,7 +13,7 @@ function rental(overrides: Partial<FarmRental> = {}): FarmRental {
     status: "approved",
     message: "",
     decidedAt: "2026-01-01T00:00:00Z",
-    plot: { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100 },
+    plot: { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10 },
     fieldName: "North field",
     customer: { id: "c-1", email: "a@b.com", firstName: "Ana", lastName: "B" },
     ...overrides,
@@ -51,7 +51,7 @@ describe("rentalsByCrop", () => {
   const fields = [
     field({
       plots: [
-        { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, crops: [{ id: "crop-1", name: "Tomatoes", durationMonths: 3 }] },
+        { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [{ id: "crop-1", name: "Tomatoes", durationMonths: 3 }] },
       ],
     }),
   ];
@@ -85,8 +85,8 @@ describe("occupancyByField", () => {
     const fields = [
       field({
         plots: [
-          { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, crops: [] },
-          { id: "plot-2", name: "Plot 2", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, crops: [] },
+          { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [] },
+          { id: "plot-2", name: "Plot 2", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [] },
         ],
       }),
     ];
@@ -104,7 +104,7 @@ describe("occupancyByField", () => {
 
   it("excludes a rental whose period doesn't cover now", () => {
     const fields = [
-      field({ plots: [{ id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, crops: [] }] }),
+      field({ plots: [{ id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [] }] }),
     ];
     const now = new Date("2026-05-01T00:00:00Z");
     const rentals = [rental({ plotId: "plot-1", status: "approved", startAt: "2026-01-01T00:00:00Z", endAt: "2026-04-01T00:00:00Z" })];
