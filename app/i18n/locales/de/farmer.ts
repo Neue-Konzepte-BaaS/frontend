@@ -27,6 +27,11 @@ export const farmer: Shape = {
     "Zeichne ein Rechteck um dein gesamtes Feld: klicke auf eine Ecke, klicke auf eine zweite Ecke, um den Winkel festzulegen, und klicke erneut, um abzuschließen. Es kann gedreht werden, um genau zu deinem Feld zu passen.",
   nameFieldInstructions:
     "Gib deinem Feld einen Namen und speichere es — oder zeichne es neu, wenn die Form nicht stimmt. Als Nächstes richtest du die Parzellen ein.",
+  findLocationLabel: "Postleitzahl oder Stadt",
+  findLocationPlaceholder: "z. B. 76133 oder Karlsruhe",
+  findLocationButton: "Finden",
+  findingLocation: "Wird gesucht…",
+  enterPostalCodeOrCity: "Gib eine Postleitzahl oder eine Stadt ein.",
 
   fieldDetailMetaTitle: "Feld · BaaS",
   fieldHasNoPlotsYet: "Dieses Feld hat noch keine Parzellen.",

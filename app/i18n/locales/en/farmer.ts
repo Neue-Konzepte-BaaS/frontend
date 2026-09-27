@@ -23,6 +23,11 @@ export const farmer = {
     "Draw a rectangle around your whole field: click one corner, click a second corner to set the angle, then click again to finish. It can be rotated to match your field exactly.",
   nameFieldInstructions:
     "Give your field a name, then save it — or redraw it if the shape isn't right. You'll set up its plots next.",
+  findLocationLabel: "Postal code or city",
+  findLocationPlaceholder: "e.g. 76133 or Karlsruhe",
+  findLocationButton: "Find",
+  findingLocation: "Finding…",
+  enterPostalCodeOrCity: "Enter a postal code or a city.",
 
   fieldDetailMetaTitle: "Field · BaaS",
   fieldHasNoPlotsYet: "This field has no plots yet.",
