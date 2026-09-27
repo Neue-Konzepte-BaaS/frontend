@@ -175,7 +175,7 @@ export const farmer = {
   settingsMetaTitle: "Farm settings · Farmland",
   settingsTitle: "Farm settings",
 
-  statisticsMetaTitle: "Statistics · BaaS",
+  statisticsMetaTitle: "Statistics · Farmland",
   statisticsTitle: "Statistics",
   statGeneratedAt: "Generated at {{time}}",
   statFields: "Fields",

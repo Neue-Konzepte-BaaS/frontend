@@ -177,7 +177,7 @@ export const farmer: Shape = {
   careResetDone: "Zurückgesetzt — deine Mietenden sehen wieder den Standard-Pflegeplan.",
   settingsTitle: "Hofeinstellungen",
 
-  statisticsMetaTitle: "Statistiken · BaaS",
+  statisticsMetaTitle: "Statistiken · Farmland",
   statisticsTitle: "Statistiken",
   statGeneratedAt: "Erstellt um {{time}}",
   statFields: "Felder",

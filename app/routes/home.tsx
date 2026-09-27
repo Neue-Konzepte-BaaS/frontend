@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
 import { me, dashboardPath } from "~/lib/auth";
@@ -42,6 +42,14 @@ const FEATURES = [
       </svg>
     ),
   },
+  {
+    key: "CareTips",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-6 w-6">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+      </svg>
+    ),
+  },
 ] as const;
 
 export default function Home({ loaderData }: Route.ComponentProps) {
@@ -63,20 +71,9 @@ export default function Home({ loaderData }: Route.ComponentProps) {
       <header className="bg-cream">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-8 py-5">
           <Link to="/" className="flex items-center gap-3">
-            <svg viewBox="0 0 32 32" className="h-10 w-10" fill="none">
-              <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
-              <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
-            </svg>
-            <div className="leading-tight">
-              <span className="block text-base font-bold uppercase tracking-widest text-forest">BAUER</span>
-              <span className="block text-xs text-forest/60">as a service</span>
-            </div>
+            <img src="/farmlandlogo.png" alt="Farmland" className="h-10 w-10 rounded-full" />
+              <span className="-translate-y-1 text-2xl font-bold text-forest" style={{fontFamily: "'Playfair Display', serif"}}>Farmland</span>
           </Link>
-          <nav className="hidden items-center gap-8 md:flex">
-            <NavLink to="/" end className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navHome")}</NavLink>
-            <NavLink to="/for-farmers" className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navForFarmers")}</NavLink>
-            <NavLink to="/search" className={({ isActive }) => isActive ? "text-sm font-bold text-forest" : "text-sm text-wood hover:text-forest"}>{t("home:navForCustomers")}</NavLink>
-          </nav>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
             {account ? (
@@ -85,8 +82,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </Link>
             ) : (
               <>
-                <Link to="/login" className="text-sm font-medium text-wood hover:text-forest">{t("common:signIn")}</Link>
-                <Link to="/register" className="rounded-full bg-deep-olive px-6 py-2.5 text-sm font-semibold text-ivory hover:bg-moss">{t("home:getStarted")}</Link>
+                <Link to="/login" className="min-w-[80px] text-center text-base font-semibold text-forest hover:text-moss">{t("common:signIn")}</Link>
+                <Link to="/register" className="min-w-[130px] rounded-full bg-deep-olive px-6 py-2.5 text-center text-sm font-semibold text-ivory hover:bg-moss">{t("home:getStarted")}</Link>
               </>
             )}
           </div>
@@ -133,9 +130,6 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               </div>
             </div>
 
-            <p className="absolute right-10 bottom-12 text-right text-base italic text-ivory/70">
-              Real farms.<br />Real people.
-            </p>
           </div>
         </div>
       </section>
@@ -176,20 +170,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         <div className="mx-auto max-w-7xl px-8">
           <h2 className="font-serif text-4xl font-bold text-center text-forest">{t("home:featuresTitle")}</h2>
 
-          <ul className="mt-12 grid gap-6 sm:grid-cols-3">
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map(({ key, icon }) => (
               <li
                 key={key}
-                className="flex flex-col items-center rounded-2xl border border-beige/40 bg-paper px-10 py-12 text-center shadow-sm"
+                className="flex flex-col items-center rounded-2xl border border-beige/40 bg-paper px-6 py-10 text-center shadow-sm"
               >
                 <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-deep-olive/10 text-deep-olive">
                   {icon}
                 </div>
                 <h3 className="font-serif text-xl font-semibold text-deep-olive">{t(`home:feature${key}Title`)}</h3>
                 <p className="body-sm mt-3">{t(`home:feature${key}Body`)}</p>
-                <div className="mt-8 flex h-9 w-9 items-center justify-center rounded-full border border-beige text-warm-olive">
-                  →
-                </div>
               </li>
             ))}
           </ul>
