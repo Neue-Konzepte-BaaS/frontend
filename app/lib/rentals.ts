@@ -196,6 +196,22 @@ export function declineRental(rentalId: string): Promise<Rental> {
 }
 
 /**
+ * The still-requested rental starting soonest, or null if there are none.
+ * Used by the farmer's dashboard to point at the one request most worth
+ * looking at first among several pending ones.
+ */
+export function earliestPendingRequest<R extends Rental>(rentals: R[]): R | null {
+  let earliest: R | null = null;
+  for (const rental of rentals) {
+    if (rental.status !== "requested") continue;
+    if (!earliest || new Date(rental.startAt).getTime() < new Date(earliest.startAt).getTime()) {
+      earliest = rental;
+    }
+  }
+  return earliest;
+}
+
+/**
  * Keeps only approved rentals covering right now, keyed by plot —
  * listFarmRentals returns historic and still-requested ones too, and a plot
  * can only have one *active* rental at a time (the backend rejects

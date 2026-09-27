@@ -57,7 +57,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
   const hasFields = fields.length > 0;
 
   return (
-    <section>
+    <section id="ripeness" className="scroll-mt-4">
       <h2 className="text-lg font-semibold text-forest">{t("ripenessSectionTitle")}</h2>
 
       {!hasFields ? (
