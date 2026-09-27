@@ -53,11 +53,11 @@ export const farmer: Shape = {
   cropDuration: "{{name}} ({{months}} Monate Mietdauer)",
   savingCrops: "Wird gespeichert…",
   saveCrops: "Speichern",
+  selectAllCrops: "Alle auswählen",
 
   mapAriaLabel: "Feldkarte",
 
   plotPanelHint: "Klicke auf eine Parzelle in der Karte oder im Raster, um zu sehen, wer sie mietet und was sie anbietet.",
-  selectSeveral: "Mehrere auswählen",
   selectAll: "Alle auswählen",
   clearSelection: "Auswahl aufheben",
   tenantLabel: "Pächter",

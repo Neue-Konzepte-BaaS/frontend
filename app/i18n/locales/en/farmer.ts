@@ -49,11 +49,11 @@ export const farmer = {
   cropDuration: "{{name}} ({{months}}-month rental)",
   savingCrops: "Saving…",
   saveCrops: "Save",
+  selectAllCrops: "Select all",
 
   mapAriaLabel: "Field map",
 
   plotPanelHint: "Click a plot on the map or in the grid to see who rents it and what it offers.",
-  selectSeveral: "Select several",
   selectAll: "Select all",
   clearSelection: "Clear selection",
   tenantLabel: "Tenant",
