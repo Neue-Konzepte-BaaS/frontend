@@ -60,8 +60,7 @@ export const search = {
   boardMetaTitle: "Board · Farmland",
   boardTitle: "Board",
   boardEmptySubtitle: "You'll see messages from the farms you rent from here.",
-  // Only ever shown for 2+ farms — a single farm renders its name directly instead (see board.tsx).
-  boardMultipleFarmsSubtitle: "Announcements from {{count}} farms you rent from",
+  boardMultipleFarmsSubtitle: "Announcements from the farms you rent from",
   noAnnouncementsYet: "No announcements yet.",
   pinnedBadge: "Pinned",
   pinAnnouncement: "Pin this message",

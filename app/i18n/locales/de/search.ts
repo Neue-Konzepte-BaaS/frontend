@@ -62,7 +62,7 @@ export const search: Shape = {
   boardMetaTitle: "Pinnwand · Farmland",
   boardTitle: "Pinnwand",
   boardEmptySubtitle: "Hier siehst du Mitteilungen der Höfe, bei denen du mietest.",
-  boardMultipleFarmsSubtitle: "Mitteilungen von {{count}} Höfen, bei denen du mietest",
+  boardMultipleFarmsSubtitle: "Mitteilungen der Höfe, bei denen du mietest",
   noAnnouncementsYet: "Noch keine Mitteilungen.",
   pinnedBadge: "Angeheftet",
   pinAnnouncement: "Diese Nachricht anheften",
