@@ -76,7 +76,13 @@ export function listCrops(): Promise<Crop[]> {
 /**
  * Replaces the full set of crops the plot offers, returning that set after
  * the update. The plot's field must be owned by the authenticated farmer.
+ *
+ * The backend also requires a basePriceCentsPerSqmPerWeek on this same
+ * endpoint (rejecting anything <= 0) — there's no pricing UI yet, so this
+ * sends the smallest accepted value as a placeholder rather than surface
+ * that requirement to the farmer. Revisit once plot-level pricing has a
+ * real UI.
  */
 export function setPlotCrops(plotId: string, cropIds: string[]): Promise<Crop[]> {
-  return apiClient.put<Crop[]>(`/plots/${plotId}/crops`, { cropIds });
+  return apiClient.put<Crop[]>(`/plots/${plotId}/crops`, { basePriceCentsPerSqmPerWeek: 1, cropIds });
 }
