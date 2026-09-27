@@ -1,17 +1,21 @@
 import { apiClient } from "~/lib/api-client";
+import type { PolygonGeometry } from "~/lib/geo";
 
 /**
  * A farm's public details — what a customer sees after clicking a farm in
  * plot search results (see rentals.ts's NearbyPlot.farm) — and the farmer's
  * own view of it (backend #71):
  *
- *   GET /api/farms/{farmID} -> Farm (public, no auth)
- *   GET /api/farms/me       -> Farm (farmer only; the caller's own farm)
- *   PUT /api/farms/me       -> Farm (farmer only; full replacement of the editable fields)
+ *   GET /api/farms/{farmID}        -> Farm (public, no auth)
+ *   GET /api/farms/{farmID}/fields -> FieldWithPlotStats[] (public, no auth)
+ *   GET /api/farms/me              -> Farm (farmer only; the caller's own farm)
+ *   PUT /api/farms/me              -> Farm (farmer only; full replacement of the editable fields)
  *
  * There is no endpoint to list a farm's own plots directly; the farm detail
  * page instead re-runs the same nearby-plots search and filters to this
- * farm's id — see search/farm.tsx.
+ * farm's id — see search/farm.tsx. Fields are listed separately (this
+ * module's getFarmFields), since a plot only carries its field's id, not its
+ * name or boundary.
  */
 export type Farm = {
   id: string;
@@ -28,6 +32,28 @@ export type Farm = {
 /** Throws ApiError(404, "farm not found") if farmId doesn't exist. */
 export function getFarm(farmId: string): Promise<Farm> {
   return apiClient.get<Farm>(`/farms/${farmId}`);
+}
+
+/**
+ * A field as a customer browsing a farm sees it: its name and boundary, plus
+ * how many of its plots are available to rent right now and their combined
+ * area. plotCount/areaSquareMeters only ever count currently-available
+ * plots — the same predicate GET /api/plots/nearest itself uses — so these
+ * numbers agree with what that search actually returns for the field. A
+ * field with zero available plots is still included, with plotCount 0.
+ */
+export type FieldWithPlotStats = {
+  id: string;
+  name: string;
+  farm: string;
+  coordinates: PolygonGeometry;
+  plotCount: number;
+  areaSquareMeters: number;
+};
+
+/** An unknown farmId returns [] rather than 404 — same as an empty farm would. */
+export function getFarmFields(farmId: string): Promise<FieldWithPlotStats[]> {
+  return apiClient.get<FieldWithPlotStats[]>(`/farms/${farmId}/fields`);
 }
 
 /** What a farmer may change about their own farm. The area is derived from the plots. */

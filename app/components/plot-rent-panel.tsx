@@ -6,7 +6,7 @@ import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { FormSuccess } from "~/components/form";
 
 type PlotRentPanelProps = {
-  selected: { plot: NearbyPlot; number: number } | null;
+  selected: NearbyPlot | null;
   /** The viewer already requested (or rents) this plot. */
   alreadyRequested: boolean;
   account: Account | null;
@@ -28,11 +28,11 @@ export function PlotRentPanel({ selected, alreadyRequested, account, loginRedire
     );
   }
 
-  const { plot, number } = selected;
+  const plot = selected;
   return (
     <div className="rounded-xl border border-beige bg-ivory p-5">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-serif text-xl font-semibold text-forest">{t("search:plotNumber", { number })}</h2>
+        <h2 className="font-serif text-xl font-semibold text-forest">{plot.name}</h2>
         <span
           className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${
             alreadyRequested ? "bg-lime-100 text-lime-900" : "bg-cream text-wood"
@@ -41,9 +41,7 @@ export function PlotRentPanel({ selected, alreadyRequested, account, loginRedire
           {alreadyRequested ? t("common:plotStatusRequested") : t("common:plotStatusFree")}
         </span>
       </div>
-      <p className="mt-1 text-sm text-warm-olive">
-        {plot.name} · {formatArea(plot.areaSquareMeters, locale)}
-      </p>
+      <p className="mt-1 text-sm text-warm-olive">{formatArea(plot.areaSquareMeters, locale)}</p>
 
       <div className="mt-5">
         {alreadyRequested ? (
