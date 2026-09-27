@@ -56,7 +56,7 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
             {announcements.map((announcement) => {
               const scope = scopeLabel(announcement, fields);
               return (
-                <li key={announcement.id} className="rounded-xl border border-beige p-4">
+                <li key={announcement.id} className="rounded-xl border border-beige bg-paper-contrast p-4">
                   <div className="flex items-start justify-between gap-3">
                     {scope ? (
                       <span className="inline-flex items-center rounded-full bg-cream px-2.5 py-0.5 text-xs font-medium text-wood">
