@@ -1,5 +1,5 @@
 export const auth = {
-  loginMetaTitle: "Sign in · BaaS",
+  loginMetaTitle: "Sign in · Farmland",
   loginTitle: "Sign in",
   loginSubtitle: "Welcome back. Sign in to your account.",
   emailLabel: "Email",
@@ -8,7 +8,7 @@ export const auth = {
   noAccountYet: "No account yet?",
   createOne: "Create one",
 
-  registerMetaTitle: "Create account · BaaS",
+  registerMetaTitle: "Create account · Farmland",
   registerTitle: "Create your account",
   registerSubtitle: "Choose how you want to use the platform.",
   accountType: "Account type",
@@ -29,7 +29,7 @@ export const auth = {
   registerSuccessTitle: "Check your email",
   registerSuccessSubtitle: "We've sent a verification link to {{email}}. Click it to finish creating your account.",
 
-  verifyEmailMetaTitle: "Verify your email · BaaS",
+  verifyEmailMetaTitle: "Verify your email · Farmland",
   verifyingTitle: "Verifying your email…",
   verifyingMessage: "Hang on while we confirm your verification link.",
   verifySuccessTitle: "Email verified",

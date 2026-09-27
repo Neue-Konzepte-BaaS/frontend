@@ -3,7 +3,7 @@ import type { home as en } from "~/i18n/locales/en/home";
 type Shape = { [K in keyof typeof en]: string };
 
 export const home: Shape = {
-  metaTitle: "Bauer as a Service — Selbsternte-Parzellen, ohne Excel-Tabellen",
+  metaTitle: "Farmland — Selbsternte-Parzellen, ohne Excel-Tabellen",
   metaDescription:
     "Die Software hinter Selbsternte-Höfen: Parzellen verwalten, Mieter informieren, wenn die Ernte reif ist, und alle auf einmal erreichen.",
   heroTitle: "Selbsternte-Parzellen, ohne Excel-Tabellen.",
@@ -12,7 +12,7 @@ export const home: Shape = {
   heroHeadline3: "Weniger Papierkram.",
   heroSubtitle: "Parzellen, Ernten und Mieter verwalten — ohne Tabellen.",
   heroBody1:
-    "Kleine Höfe vermieten Selbsternte-Parzellen und verwalten sie mit Excel, Papier und WhatsApp. Bauer as a Service ist die Software hinter dem Hof: wer welche Parzelle mietet, für wie lange, was angepflanzt ist und wann es reif ist.",
+    "Kleine Höfe vermieten Selbsternte-Parzellen und verwalten sie mit Excel, Papier und WhatsApp. Farmland ist die Software hinter dem Hof: wer welche Parzelle mietet, für wie lange, was angepflanzt ist und wann es reif ist.",
   heroBody2: "Der Hof behält seine eigene Marke und seine eigenen Kunden. Wir stellen nur die Werkzeuge bereit.",
   getStarted: "Jetzt starten",
   navHome: "Startseite",

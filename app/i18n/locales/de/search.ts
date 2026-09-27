@@ -3,11 +3,11 @@ import type { search as en } from "~/i18n/locales/en/search";
 type Shape = { [K in keyof typeof en]: string };
 
 export const search: Shape = {
-  searchMetaTitle: "Parzelle in deiner Nähe finden · BaaS",
+  searchMetaTitle: "Parzelle in deiner Nähe finden · Farmland",
   searchTitle: "Parzelle in deiner Nähe finden",
   searchSubtitle: "Suche nach einer deutschen Postleitzahl oder Stadt, um verfügbare Selbsternte-Parzellen in der Nähe zu sehen.",
 
-  customerMetaTitle: "Home · BaaS",
+  customerMetaTitle: "Home · Farmland",
   customerTitle: "Home",
   myRentals: "Meine Mieten",
   noRentalsYet: "Du hast noch keine Parzelle gemietet.",
@@ -48,7 +48,7 @@ export const search: Shape = {
   rentPeriodPreview: "Mietzeitraum: {{period}}",
   requestSentBody: "Anfrage gesendet — der Hof meldet sich bei dir. Den Status siehst du auf deiner Startseite.",
 
-  farmMetaTitle: "Hof · BaaS",
+  farmMetaTitle: "Hof · Farmland",
   backToSearch: "Zurück zur Suche",
   requestSent: "Angefragt ✓",
   aboutFarm: "Über diesen Hof",
@@ -59,7 +59,7 @@ export const search: Shape = {
   farmNeedsSearchContext: "Suche nach einer Postleitzahl oder Stadt, um die verfügbaren Parzellen dieses Hofs zu sehen.",
   farmHasNoPlotsNearby: "Momentan keine verfügbaren Parzellen dieses Hofs in der Nähe deiner Suche.",
 
-  boardMetaTitle: "Pinnwand · BaaS",
+  boardMetaTitle: "Pinnwand · Farmland",
   boardTitle: "Pinnwand",
   boardEmptySubtitle: "Hier siehst du Mitteilungen der Höfe, bei denen du mietest.",
   boardMultipleFarmsSubtitle: "Mitteilungen von {{count}} Höfen, bei denen du mietest",
@@ -68,10 +68,10 @@ export const search: Shape = {
   pinAnnouncement: "Diese Nachricht anheften",
   unpinAnnouncement: "Anheftung dieser Nachricht aufheben",
 
-  inboxMetaTitle: "Posteingang · BaaS",
+  inboxMetaTitle: "Posteingang · Farmland",
   inboxTitle: "Posteingang",
 
-  requestSentMetaTitle: "Anfrage gesendet · BaaS",
+  requestSentMetaTitle: "Anfrage gesendet · Farmland",
   requestSentHeading: "Anfrage an {{farmName}} gesendet.",
   requestSentSubtitle: "Anfrage für {{plotName}} gesendet. Der Hof antwortet in der Regel innerhalb von zwei Tagen.",
   requestSentStep1: "Der Hof bestätigt deine Anfrage.",

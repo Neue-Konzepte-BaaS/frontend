@@ -2,7 +2,7 @@ export const admin = {
   roleBadge: "System admin",
 
   // Platform overview
-  overviewMetaTitle: "Platform overview · BaaS",
+  overviewMetaTitle: "Platform overview · Farmland",
   overviewTitle: "Platform overview",
   scopePlatform: "Scope · Platform",
   scopeFarm: "Scope · Farm",
@@ -21,7 +21,7 @@ export const admin = {
   systemTitle: "System",
 
   // Stub page — nav exists, the backend endpoint behind it doesn't yet
-  rentalsMetaTitle: "Rentals · BaaS",
+  rentalsMetaTitle: "Rentals · Farmland",
   rentalsTitle: "Rentals",
 
   // Shared listing chrome (farms, accounts)
@@ -34,7 +34,7 @@ export const admin = {
   listNoMatches: "No matches for that filter.",
 
   // Farms
-  farmsMetaTitle: "Farms · BaaS",
+  farmsMetaTitle: "Farms · Farmland",
   farmsTitle: "Farms",
   farmsBody: "Every farm on the platform, with its owner and what it holds.",
   farmsSearchLabel: "Search",
@@ -42,7 +42,7 @@ export const admin = {
   farmsPostalCodeLabel: "Postal code",
 
   // Accounts
-  accountsMetaTitle: "Accounts · BaaS",
+  accountsMetaTitle: "Accounts · Farmland",
   accountsTitle: "Accounts",
   accountsBody: "Every account on the platform, newest first.",
   accountsSearchLabel: "Search",
@@ -52,7 +52,7 @@ export const admin = {
   accountsNoRole: "No role",
 
   // Notification broadcast
-  broadcastMetaTitle: "Broadcast · BaaS",
+  broadcastMetaTitle: "Broadcast · Farmland",
   notificationsTitle: "Broadcast notification",
   notificationsBody: "Send an email to every farmer and customer on the platform.",
   notifSubjectLabel: "Subject",
@@ -67,7 +67,7 @@ export const admin = {
   notifSuccess: "Queued for {{recipients}} recipient(s).",
 
   // Crop catalog management
-  cropsMetaTitle: "Crop catalog · BaaS",
+  cropsMetaTitle: "Crop catalog · Farmland",
   cropsTitle: "Crop catalog",
   cropsBody: "These crops are available for farmers to assign to their plots.",
   cropNameLabel: "Crop name",

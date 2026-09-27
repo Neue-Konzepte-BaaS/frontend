@@ -3,7 +3,7 @@ import type { auth as en } from "~/i18n/locales/en/auth";
 type Shape = { [K in keyof typeof en]: string };
 
 export const auth: Shape = {
-  loginMetaTitle: "Anmelden · BaaS",
+  loginMetaTitle: "Anmelden · Farmland",
   loginTitle: "Anmelden",
   loginSubtitle: "Willkommen zurück. Melde dich bei deinem Konto an.",
   emailLabel: "E-Mail",
@@ -12,7 +12,7 @@ export const auth: Shape = {
   noAccountYet: "Noch kein Konto?",
   createOne: "Jetzt erstellen",
 
-  registerMetaTitle: "Konto erstellen · BaaS",
+  registerMetaTitle: "Konto erstellen · Farmland",
   registerTitle: "Konto erstellen",
   registerSubtitle: "Wähle, wie du die Plattform nutzen möchtest.",
   accountType: "Kontotyp",
@@ -33,7 +33,7 @@ export const auth: Shape = {
   registerSuccessTitle: "Überprüfe deine E-Mails",
   registerSuccessSubtitle: "Wir haben einen Bestätigungslink an {{email}} gesendet. Klicke darauf, um dein Konto zu erstellen.",
 
-  verifyEmailMetaTitle: "E-Mail bestätigen · BaaS",
+  verifyEmailMetaTitle: "E-Mail bestätigen · Farmland",
   verifyingTitle: "E-Mail wird bestätigt…",
   verifyingMessage: "Einen Moment, wir prüfen deinen Bestätigungslink.",
   verifySuccessTitle: "E-Mail bestätigt",

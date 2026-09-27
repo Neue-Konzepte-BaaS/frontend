@@ -15,6 +15,7 @@ import "./app.css";
 import "~/i18n";
 
 export const links: Route.LinksFunction = () => [
+  { rel: "icon", href: "/farmlandlogo.png", type: "image/png" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",

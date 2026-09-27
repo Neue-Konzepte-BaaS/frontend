@@ -1,5 +1,5 @@
 export const home = {
-  metaTitle: "Bauer as a Service — self-harvest plots, without the spreadsheets",
+  metaTitle: "Farmland — self-harvest plots, without the spreadsheets",
   metaDescription:
     "The software behind pick-your-own farms: manage self-harvest plots, tell renters when their crop is ripe, and reach everyone at once.",
   heroTitle: "Self-harvest plots, without the spreadsheets.",
@@ -8,7 +8,7 @@ export const home = {
   heroHeadline3: "Less paperwork.",
   heroSubtitle: "Manage plots, harvests and renters without spreadsheets.",
   heroBody1:
-    "Small farms rent out pick-your-own plots and manage them with Excel, paper, and WhatsApp. Bauer as a Service is the software behind the farm: who rents which plot, for how long, what's planted, and when it's ripe.",
+    "Small farms rent out pick-your-own plots and manage them with Excel, paper, and WhatsApp. Farmland is the software behind the farm: who rents which plot, for how long, what's planted, and when it's ripe.",
   heroBody2: "The farm keeps its own brand and its own customers. We just provide the tooling.",
   getStarted: "Get started",
   navHome: "Home",
