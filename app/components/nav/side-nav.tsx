@@ -6,7 +6,7 @@ import type { NavItem } from "~/lib/nav-items";
  * app-shell.tsx for why width, not orientation, decides which nav shows).
  */
 export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem | NavItem[] }) {
-  // One item (the farmer's "Farm settings") or a group (the admin's System
+  // One item (the farmer's "My farm") or a group (the admin's System
   // tools) — both render below the same divider.
   const pinnedItems = pinned ? (Array.isArray(pinned) ? pinned : [pinned]) : [];
 
@@ -36,10 +36,10 @@ function SideNavLink({ item }: { item: NavItem }) {
         to={item.to}
         end={item.end}
         className={({ isActive }) =>
-          `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium ${
+          `flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
             isActive
               ? "bg-forest/20 text-forest font-semibold"
-              : "text-forest/80 hover:bg-forest/10 hover:text-forest"
+              : "text-forest hover:bg-forest/10"
           }`
         }
       >

@@ -39,9 +39,12 @@ export default function FarmerLayout({ loaderData }: Route.ComponentProps) {
           </Link>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <span className="hidden text-sm font-medium text-wood sm:block">
+            <Link
+              to="/farmer/settings"
+              className="hidden text-base font-semibold text-forest hover:underline sm:block"
+            >
               {account.firstName} {account.lastName}
-            </span>
+            </Link>
             <LogoutButton />
           </div>
         </div>

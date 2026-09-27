@@ -64,8 +64,8 @@ export function useFarmerNavItems(): NavItem[] {
  * sidebar list: past ~5 items a bottom bar stops being usable on a phone.
  * Plot planner/Requests/Care guide are still reachable from Home/Fields.
  * The last slot swaps in as "Me" (pointing at the same /farmer/settings page
- * the desktop sidebar pins separately as "Farm settings") so the farmer has
- * *some* way to reach their own account/farm settings on mobile too.
+ * the desktop sidebar pins separately as "My farm") so the farmer has *some*
+ * way to reach their own account/farm details on mobile too.
  */
 export function useFarmerMobileNavItems(): NavItem[] {
   const { t } = useTranslation("common");
