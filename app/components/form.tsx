@@ -62,7 +62,7 @@ export function FormSuccess({ message }: { message: string }) {
   return (
     <p
       role="status"
-      className="rounded-lg border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200"
+      className="rounded-lg border border-moss/40 bg-moss/10 px-4 py-3 text-sm text-moss"
     >
       {message}
     </p>

@@ -31,6 +31,10 @@ export default [
   // except Search — see that route's own comment above.
   layout("routes/customer/layout.tsx", { id: "customer-layout" }, [
     route("customer", "routes/customer/home.tsx"),
+    // One rented plot: care, crops and rental period (issue #33). Reached from
+    // the Home list's "Open plot"; a plot the tenant has never rented
+    // redirects back there rather than rendering an empty page.
+    route("customer/plots/:plotId", "routes/customer/plot.tsx"),
     route("customer/board", "routes/customer/board.tsx"),
     route("customer/inbox", "routes/customer/inbox.tsx"),
     route("customer/me", "routes/customer/me.tsx"),

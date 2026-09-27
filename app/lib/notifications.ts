@@ -5,9 +5,10 @@ import { apiClient } from "~/lib/api-client";
  *
  *   GET /api/inbox -> InboxItem[] (customer only — farmer/admin receive 403)
  *
- * The backend merges platform broadcasts and farm announcements into one
- * newest-first feed. `ripeness` and `care` kinds are not yet emitted by the
- * backend — they are modelled here for when the backend adds them.
+ * The backend merges platform broadcasts, farm announcements, ripeness
+ * notices and (once backend #62 lands) care instructions into one
+ * newest-first feed. The wire kind for a ripeness notice is
+ * `ripeness_notice`; it is mapped to the UI's shorter `ripeness` here.
  *
  * Like announcements.ts, the wire shape is snake_case (`farm_name`,
  * `created_at`) and gets mapped to camelCase at this module's boundary.
@@ -40,7 +41,9 @@ type InboxItemResponse = {
   created_at: string;
 };
 
-function kindFromResponse(kind: InboxItemResponse["kind"]): NotificationKind {
+export function kindFromResponse(
+  kind: InboxItemResponse["kind"],
+): NotificationKind {
   if (kind === "ripeness_notice") return "ripeness";
   if (kind === "care") return "care";
   return "farm";
