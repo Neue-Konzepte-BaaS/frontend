@@ -157,6 +157,10 @@ function RequestActions({
   onDecide: (rental: FarmRental, decision: Decision) => void;
 }) {
   const { t } = useTranslation("farmer");
+  // Approving here does nothing payment-related — the customer was already
+  // charged when they submitted the request (see checkout.tsx). Declining
+  // triggers a server-side refund (backend's DeclineRental), which this UI
+  // doesn't need to special-case beyond the existing generic error handling.
   return (
     <div>
       <div className="flex items-center gap-2">

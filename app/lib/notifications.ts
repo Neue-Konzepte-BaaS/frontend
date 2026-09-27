@@ -25,6 +25,9 @@ export type Notification = {
   sender: string;
   /** ISO 8601. Parse with `new Date(...)` at render time. */
   createdAt: string;
+  /** Set for ripeness and care notifications */
+  cropName?: string;
+  fieldName?: string;
 };
 
 type InboxItemResponse = {
@@ -33,6 +36,8 @@ type InboxItemResponse = {
   subject: string;
   body: string;
   farm_name?: string;
+  field_name?: string;
+  crop_name?: string;
   created_at: string;
 };
 
@@ -52,6 +57,8 @@ function fromResponse(r: InboxItemResponse): Notification {
     body: r.body,
     sender: r.farm_name ?? "Bauer as a Service",
     createdAt: r.created_at,
+    cropName: r.crop_name,
+    fieldName: r.field_name,
   };
 }
 

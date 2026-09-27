@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { Account } from "~/lib/auth";
-import type { Crop, NearbyPlot, Rental } from "~/lib/rentals";
+import type { NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
 import { PlotCropsAndRent } from "~/components/plot-crops-and-rent";
 import { FormSuccess } from "~/components/form";
@@ -9,14 +9,14 @@ type PlotRentPanelProps = {
   selected: { plot: NearbyPlot; number: number } | null;
   /** The viewer already requested (or rents) this plot. */
   alreadyRequested: boolean;
-  farmName: string;
   account: Account | null;
   loginRedirectTo: string;
-  onRented: (rental: Rental, crop: Crop) => void;
+  /** Where the browser should land once payment resolves — see PlotCropsAndRent's own docs. */
+  returnTo: string;
 };
 
 /** The customer's side panel on a farm page: the selected plot and how to rent it. */
-export function PlotRentPanel({ selected, alreadyRequested, farmName, account, loginRedirectTo, onRented }: PlotRentPanelProps) {
+export function PlotRentPanel({ selected, alreadyRequested, account, loginRedirectTo, returnTo }: PlotRentPanelProps) {
   const { t, i18n } = useTranslation(["search", "common"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
@@ -52,12 +52,10 @@ export function PlotRentPanel({ selected, alreadyRequested, farmName, account, l
           <PlotCropsAndRent
             key={plot.id}
             plotId={plot.id}
-            plotName={plot.name}
-            farmName={farmName}
             crops={plot.crops}
             account={account}
             loginRedirectTo={loginRedirectTo}
-            onRented={onRented}
+            returnTo={returnTo}
           />
         )}
       </div>

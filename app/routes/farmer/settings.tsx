@@ -3,6 +3,8 @@ import { Link, useRouteLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/settings";
 import type { clientLoader as farmerLayoutLoader } from "./layout";
+import { requireRole } from "~/lib/guards";
+import { listCrops, getFarmCropRates, setFarmCropRates, resolveCropRatesToSave, type Crop } from "~/lib/fields";
 import { ApiError } from "~/lib/api-client";
 import { roleLabel } from "~/lib/auth";
 import {
@@ -14,23 +16,12 @@ import {
   updateMyFarm,
   type Farm,
 } from "~/lib/farms";
-import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass } from "~/components/form";
+import { Field as FormField, FormError, FormSuccess, inputClass, submitClass, primaryButtonClass } from "~/components/form";
 import { LogoutButton } from "~/components/logout-button";
 import i18n from "~/i18n";
 
 export function meta() {
   return [{ title: i18n.t("farmer:settingsMetaTitle") }];
-}
-
-/**
- * The farmer's "My farm" page (issue #68): their counterpart to the tenant's
- * Me page, reached from the sidebar, the mobile "Me" tab and the name in the
- * header. The account itself comes from the layout's loader; the farm from
- * GET /api/farms/me (backend #71), which resolves it from the caller.
- */
-export async function clientLoader() {
-  const farm = await getMyFarm();
-  return { farm };
 }
 
 const LANGUAGES = [
@@ -52,11 +43,32 @@ function localToday(): string {
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
+/**
+ * The farmer's "My farm" page (issue #68): their counterpart to the tenant's
+ * Me page, reached from the sidebar, the mobile "Me" tab and the name in the
+ * header. The account itself comes from the layout's loader; the farm from
+ * GET /api/farms/me (backend #71), which resolves it from the caller.
+ *
+ * Also carries farm-wide crop pricing (issue #14): one €/m²/week rate per
+ * crop, set once regardless of how many plots grow it — combined with each
+ * plot's own base rate (set in field-detail.tsx) to compute what a customer
+ * actually pays. A crop with no rate here simply won't be rentable on any of
+ * this farm's plots, even if a plot lists it as offered.
+ */
+export async function clientLoader() {
+  await requireRole("farmer");
+  const [farm, catalog, rates] = await Promise.all([getMyFarm(), listCrops(), getFarmCropRates()]);
+  return { farm, catalog, rates };
+}
+
 export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
   const account = useRouteLoaderData<typeof farmerLayoutLoader>("farmer-layout")?.account;
   const { t, i18n: i18nInstance } = useTranslation(["farmer", "auth", "common"]);
   const currentLanguage = i18nInstance.language.startsWith("de") ? "de" : "en";
   const numberLocale = currentLanguage === "de" ? "de-DE" : "en-GB";
+
+  const { catalog } = loaderData;
+  const existingRates = loaderData.rates;
 
   const [farm, setFarm] = useState<Farm>(loaderData.farm);
   const [name, setName] = useState(farm.name);
@@ -68,6 +80,29 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
   const [success, setSuccess] = useState<string | null>(null);
 
   const today = localToday();
+
+  // Euros, as typed, keyed by crop id — converted to cents on save. Prefilled
+  // from whatever rate already exists for that crop; a crop the farmer has
+  // never priced starts blank.
+  const [rateInputs, setRateInputs] = useState<Map<string, string>>(() => {
+    const initial = new Map<string, string>();
+    for (const rate of existingRates) {
+      initial.set(rate.cropId, (rate.priceCentsPerSqmPerWeek / 100).toString());
+    }
+    return initial;
+  });
+  const [ratesSaving, setRatesSaving] = useState(false);
+  const [ratesError, setRatesError] = useState<string | null>(null);
+  const [ratesSuccess, setRatesSuccess] = useState(false);
+
+  function setRateInput(cropId: string, value: string) {
+    setRatesSuccess(false);
+    setRateInputs((prev) => {
+      const next = new Map(prev);
+      next.set(cropId, value);
+      return next;
+    });
+  }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -93,6 +128,30 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
       setError(err instanceof ApiError ? err.message : String(err));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleSaveRates(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setRatesError(null);
+    setRatesSuccess(false);
+
+    // Full-replace, but a blank input must never delete an already-set
+    // rate — see resolveCropRatesToSave's own docs for why.
+    const result = resolveCropRatesToSave(catalog, rateInputs, existingRates);
+    if (!result.ok) {
+      setRatesError(t("farmer:invalidCropRate", { name: result.invalidCrop.name }));
+      return;
+    }
+
+    setRatesSaving(true);
+    try {
+      await setFarmCropRates(result.rates);
+      setRatesSuccess(true);
+    } catch (err) {
+      setRatesError(err instanceof ApiError ? err.message : t("common:genericError"));
+    } finally {
+      setRatesSaving(false);
     }
   }
 
@@ -179,6 +238,44 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
             {saving ? t("farmer:farmSaving") : t("farmer:farmSave")}
           </button>
         </form>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold tracking-wide text-warm-olive uppercase">{t("farmer:cropRatesHeading")}</h2>
+        <p className="mt-1 text-sm text-warm-olive">{t("farmer:cropRatesInstructions")}</p>
+
+        {catalog.length === 0 ? (
+          <p className="mt-6 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
+        ) : (
+          <form onSubmit={handleSaveRates} className="mt-4 space-y-4">
+            {ratesError && <FormError message={ratesError} />}
+            {ratesSuccess && <FormSuccess message={t("farmer:cropRatesSaved")} />}
+
+            <ul className="space-y-3">
+              {catalog.map((crop: Crop) => (
+                <li key={crop.id}>
+                  <FormField label={t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })} htmlFor={`rate-${crop.id}`}>
+                    <input
+                      id={`rate-${crop.id}`}
+                      type="number"
+                      min={0}
+                      step={0.01}
+                      inputMode="decimal"
+                      placeholder={t("farmer:cropRatePlaceholder")}
+                      value={rateInputs.get(crop.id) ?? ""}
+                      onChange={(e) => setRateInput(crop.id, e.target.value)}
+                      className={inputClass}
+                    />
+                  </FormField>
+                </li>
+              ))}
+            </ul>
+
+            <button type="submit" disabled={ratesSaving} className={`${submitClass} w-auto px-4 py-2 text-sm`}>
+              {ratesSaving ? t("farmer:savingCropRates") : t("farmer:saveCropRates")}
+            </button>
+          </form>
+        )}
       </section>
 
       <section className="mt-8">
