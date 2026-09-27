@@ -24,7 +24,7 @@ export function BottomNav({ items }: { items: NavItem[] }) {
               `flex min-w-0 flex-1 flex-col items-center gap-1 border-t-2 px-1 py-2 text-xs ${
                 isActive
                   ? "border-moss font-semibold text-moss"
-                  : "border-transparent font-medium text-olive"
+                  : "border-transparent font-semibold text-forest"
               }`
             }
           >
