@@ -83,6 +83,7 @@ export const farmer = {
   // Ripeness notices never appear here — they have no read-back endpoint of
   // their own (see lib/ripeness.ts), so this only ever lists announcements.
   noPostsYet: "No posts yet — announcements you send will show up here.",
+  boardSentToInbox: "Sent to inbox",
 
   announceSectionTitle: "Post to the board",
   announceSectionBody:
@@ -92,9 +93,9 @@ export const farmer = {
   announceBodyLabel: "Message",
   announceBodyPlaceholder: "From 9am on Saturday we'll be harvesting. Please bring your own crates.",
   announceScopeLabel: "Audience",
-  announceScopeAll: "All current tenants",
-  announceScopeField: "Tenants of one field",
-  announceScopePlot: "Tenant of one plot",
+  announceScopeAll: "All current tenants (board post)",
+  announceScopeField: "Tenants of one field (board post)",
+  announceScopePlot: "Tenant of one plot (sent to inbox)",
   announceChooseField: "Choose a field",
   announceChoosePlot: "Choose a plot",
   announceSending: "Sending…",

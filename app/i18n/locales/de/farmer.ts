@@ -85,6 +85,7 @@ export const farmer: Shape = {
   boardTitle: "Pinnwand",
   boardYourPostsTitle: "Deine Beiträge",
   noPostsYet: "Noch keine Beiträge — gesendete Mitteilungen erscheinen hier.",
+  boardSentToInbox: "An Posteingang gesendet",
 
   announceSectionTitle: "An die Pinnwand posten",
   announceSectionBody:
@@ -94,9 +95,9 @@ export const farmer: Shape = {
   announceBodyLabel: "Nachricht",
   announceBodyPlaceholder: "Am Samstag ab 9 Uhr wird geerntet. Bringt bitte eigene Kisten mit.",
   announceScopeLabel: "Empfänger",
-  announceScopeAll: "Alle aktuellen Pächter",
-  announceScopeField: "Pächter eines Feldes",
-  announceScopePlot: "Pächter einer Parzelle",
+  announceScopeAll: "Alle aktuellen Pächter (Pinnwand)",
+  announceScopeField: "Pächter eines Feldes (Pinnwand)",
+  announceScopePlot: "Pächter einer Parzelle (Posteingang)",
   announceChooseField: "Feld wählen",
   announceChoosePlot: "Parzelle wählen",
   announceSending: "Wird gesendet…",
