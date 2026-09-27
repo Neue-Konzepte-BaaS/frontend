@@ -38,10 +38,11 @@ export const farmer: Shape = {
   invalidRowsColumns: "Zeilen und Spalten müssen beide ganze Zahlen von mindestens 1 sein.",
   plotGenerationFailed:
     "{{message}} — {{created}} von {{total}} Parzellen wurden erstellt, bevor dies fehlschlug. Die bereits erstellten Parzellen können von hier aus nicht entfernt werden.",
-  gridInstructions:
-    "Lege fest, wie viele Zeilen und Spalten gleich großer Parzellen über dieses Feld gelegt werden sollen. Das ist nur einmal möglich — es gibt noch keine Möglichkeit, es später zu ändern.",
+  gridInstructions: "Wähle Zeilen und Spalten — die Karte zeigt dir sofort, wo jede Parzelle landet.",
   rowsLabel: "Zeilen",
   columnsLabel: "Spalten",
+  gridPreviewCount: "Vorschau: {{rows}} Zeilen × {{cols}} Spalten = {{count}} Parzellen.",
+  gridPreviewTooLarge: "Das sind zu viele Parzellen für eine Vorschau — das Raster wird trotzdem erstellt, nur ohne Live-Vorschau oberhalb von {{max}}.",
   creatingPlotProgress: "Parzelle {{done}} von {{total}} wird erstellt…",
   generatePlots: "Parzellen erstellen",
   noCropsForPlot: "Noch keine Pflanzen angeboten",

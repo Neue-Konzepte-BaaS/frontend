@@ -34,10 +34,11 @@ export const farmer = {
   invalidRowsColumns: "Rows and columns must both be whole numbers of at least 1.",
   plotGenerationFailed:
     "{{message}} — {{created}} of {{total}} plots were created before this failed. The plots already created cannot be removed from here.",
-  gridInstructions:
-    "Set how many rows and columns of equal-sized plots to lay out across this field. This can only be done once — there's no way to change it afterwards yet.",
+  gridInstructions: "Pick rows and columns — the map shows you right away where each plot will land.",
   rowsLabel: "Rows",
   columnsLabel: "Columns",
+  gridPreviewCount: "Preview: {{rows}} rows × {{cols}} columns = {{count}} plots.",
+  gridPreviewTooLarge: "That's a lot of plots to preview — the grid will still generate, just without a live preview above {{max}}.",
   creatingPlotProgress: "Creating plot {{done}} of {{total}}…",
   generatePlots: "Generate plots",
   noCropsForPlot: "No crops offered yet",
