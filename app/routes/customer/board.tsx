@@ -64,7 +64,7 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
   // Only plot-scoped messages are private (sent to one tenant's inbox).
   // Farm-wide and field-scoped posts appear on the board.
   const boardAnnouncements = announcements.filter((a) => !a.plotId);
-  const farmNames = [...new Set(announcements.map((a) => a.farmName))];
+  const farmNames = [...new Set(boardAnnouncements.map((a) => a.farmName))];
   const subtitle =
     farmNames.length === 0
       ? t("search:boardEmptySubtitle")
