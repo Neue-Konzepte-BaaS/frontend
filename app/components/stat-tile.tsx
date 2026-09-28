@@ -1,8 +1,11 @@
 /**
- * One headline figure on the Platform overview: a label, the number itself,
+ * One headline figure on a stats/overview page: a label, the number itself,
  * and an optional second line of context ("1 401 rented · 76 %"). Replaces
  * the earlier StatCard/StatRow pair, which packed four label/value rows into
  * each card — the number that matters was never the one you saw first.
+ *
+ * Shared across roles (admin's Platform overview, farmer's Statistics) — not
+ * admin-specific despite where it started.
  */
 export function StatTile({ label, value, detail }: { label: string; value: string; detail?: string }) {
   return (

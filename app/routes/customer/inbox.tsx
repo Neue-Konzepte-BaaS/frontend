@@ -134,7 +134,7 @@ function NotificationCard({ notification, timeLabel: time }: { notification: Not
     : notification.body;
 
   return (
-    <li className="rounded-2xl border border-beige bg-cream px-5 py-4 shadow-sm">
+    <li className="rounded-2xl border border-beige bg-paper-contrast px-5 py-4 shadow-sm">
       <div className="flex items-center justify-between gap-3">
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${kindBadgeClass(notification.kind)}`}>
           {t(KIND_LABEL[notification.kind])}

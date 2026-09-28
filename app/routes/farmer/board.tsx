@@ -57,7 +57,7 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
               const scope = scopeLabel(announcement, fields);
               const isPrivate = !!announcement.plotId;
               return (
-                <li key={announcement.id} className="rounded-xl border border-beige p-4">
+                <li key={announcement.id} className="rounded-xl border border-beige bg-paper-contrast p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex flex-wrap items-center gap-2">
                       {isPrivate && (

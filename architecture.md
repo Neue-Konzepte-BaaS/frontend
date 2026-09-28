@@ -121,7 +121,7 @@ calling `requireRole`/`me()` again.
 - `app/routes/admin/` — `admin-layout`; Platform overview (`index.tsx`),
   Farms, Accounts, Rentals, plus Crop catalog and Broadcast.
 - `app/routes/farmer/` — `farmer-layout`; Home, Fields, a field's detail page,
-  Plot planner, Tenants, Requests, Board, Care guide, Farm settings.
+  Plot planner, Tenants, Requests, Board, Care guide, Statistics, Farm settings.
 - `app/routes/customer/` — `customer-layout`; Home, a rented plot's own page,
   Board, Inbox, Me.
   `/search` stays **outside** this layout (it must render for anonymous
@@ -191,6 +191,44 @@ and Status columns the issue #25 mockup drew on the farms table (the endpoint
 carries the owner's postal code and a free-text address; farm verification is
 backend#49), and that mockup's "needs attention"/season panels (announcements
 are farmer+customer-only on the backend, and there is no season model).
+
+### The farmer statistics page (`/farmer/statistics`)
+
+Issue #22. `GET /api/statistics` (backend#40's farmer half) is already
+role-scoped — a farmer gets `scope: "farm"`, their own fields/plots/rentals
+only — and already wrapped as `~/lib/admin.ts`'s `getStatistics()` (the file
+name is legacy; the function and the endpoint are role-generic, and the admin
+Platform overview and this page both call it). Its headline figures (field/plot
+counts and area, occupancy rate, rental totals/active/last-30-days) need no
+new backend work and are rendered with the same `<StatTile>` the admin
+overview uses — moved from `app/components/admin/` to `app/components/` since
+it was never actually admin-specific.
+
+**The breakdowns below the headline tiles aren't in that payload**, so
+`~/lib/farmer-statistics.ts` computes them client-side from the same two calls
+`farmer/tenants.tsx` already makes, `listFarmRentals()` + `listFields()`:
+request funnel (requested/approved/declined counts — the raw payload only has
+`active`/`total`, collapsing status), rentals by crop (resolved from `cropId`
+via the crops each plot offers, since `FarmRental` doesn't carry the crop
+object the way `RentalWithPlot` does), occupancy by field (using the same
+"approved and covers now" test as `activeRentalsByPlot` in `~/lib/rentals.ts`,
+so it agrees with what Tenants/Requests already call "active"), and upcoming
+rental starts (approved, not yet started — the near-term pipeline, distinct
+from "active now").
+
+**No revenue figures.** Backend issue #40's title mentions revenue, but
+nothing in the API models a price, cost, or payment on a rental — there is no
+data to show, so this page doesn't invent any. Same caution as the tenant
+plot page's `cropStage`: nothing here implies an observation the backend
+doesn't actually make.
+
+No charting library was added — the repo has none, and these breakdowns are
+small counts/ratios that read fine as stat tiles, simple rows, and one-line
+progress bars (Tailwind width percentages, same idiom as the tenant plot
+page's care-week progress bar). Reachable from the farmer desktop sidebar only
+(`useFarmerNavItems`), not the mobile bottom bar — already at its five-item cap,
+and a stats page is a look-up-occasionally destination like Planner/Requests/
+Care guide, which get the same treatment.
 
 ### The tenant plot page (`/customer/plots/:plotId`)
 

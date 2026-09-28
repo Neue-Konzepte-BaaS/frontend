@@ -3,7 +3,7 @@ import type { common as en } from "~/i18n/locales/en/common";
 type Shape = { [K in keyof typeof en]: string };
 
 export const common: Shape = {
-  brand: "Bauer as a Service",
+  brand: "Farmland",
   signIn: "Anmelden",
   createAccount: "Konto erstellen",
   goToDashboard: "Zum Dashboard",
@@ -29,7 +29,8 @@ export const common: Shape = {
   navTenants: "Pächter",
   navRequests: "Anfragen",
   navCareGuide: "Pflegehinweise",
-  navFarmSettings: "Mein Hof",
+  navStatistics: "Statistiken",
+  navFarmSettings: "Hofeinstellungen",
   navPlatform: "Plattform",
   navFarms: "Höfe",
   navAccounts: "Konten",

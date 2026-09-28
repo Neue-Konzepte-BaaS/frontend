@@ -1,5 +1,5 @@
 export const customer = {
-  meMetaTitle: "Me · BaaS",
+  meMetaTitle: "Me · Farmland",
 
   myPlotsHeading: "My plot(s)",
   noRentedPlots: "You're not renting a plot yet.",
@@ -13,7 +13,7 @@ export const customer = {
   emailNotification: "Email",
   weeklyDigest: "Weekly care digest",
 
-  inboxMetaTitle: "Inbox · BaaS",
+  inboxMetaTitle: "Inbox · Farmland",
   inboxHeading: "Notifications",
   inboxEmpty: "No notifications yet.",
   inboxFilterAll: "All",
@@ -29,7 +29,7 @@ export const customer = {
   inboxRipenessSubject: "{{crop}} is ready to harvest",
   inboxRipenessBody: "{{crop}} on {{field}} is ready to harvest.",
 
-  plotMetaTitle: "My plot · BaaS",
+  plotMetaTitle: "My plot · Farmland",
   openPlot: "Open plot",
   backToHome: "Back to home",
 

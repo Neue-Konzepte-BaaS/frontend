@@ -1,5 +1,5 @@
 export const common = {
-  brand: "Bauer as a Service",
+  brand: "Farmland",
   signIn: "Sign in",
   createAccount: "Create account",
   goToDashboard: "Go to dashboard",
@@ -27,7 +27,8 @@ export const common = {
   navTenants: "Tenants",
   navRequests: "Requests",
   navCareGuide: "Care guide",
-  navFarmSettings: "My farm",
+  navStatistics: "Statistics",
+  navFarmSettings: "Farm settings",
   navPlatform: "Platform",
   navFarms: "Farms",
   navAccounts: "Accounts",

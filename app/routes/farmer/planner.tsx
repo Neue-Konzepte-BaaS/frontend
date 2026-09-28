@@ -4,11 +4,11 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/planner";
 import { requireRole } from "~/lib/guards";
 import { createField } from "~/lib/fields";
-import { geocodePostalCode, FIELD_DRAW_ZOOM } from "~/lib/geocode";
+import { geocodePostalCode, geocodeLocation, FIELD_DRAW_ZOOM, type LatLon } from "~/lib/geocode";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { Field as FormField, FormError, inputClass, secondaryButtonClass, submitClass } from "~/components/form";
-import { isDegenerate, toBbox, type PolygonGeometry } from "~/lib/geo";
+import { isDegenerate, pointBbox, toBbox, type Bbox, type PolygonGeometry } from "~/lib/geo";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -40,6 +40,35 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
 
   const [fieldPolygon, setFieldPolygon] = useState<PolygonGeometry | null>(null);
   const [fieldName, setFieldName] = useState("");
+
+  // A farmer's account postal code centres the map by default, but their
+  // field isn't always near their billing address (a second farm, a plot
+  // they're scouting elsewhere) — this lets them jump the map to any other
+  // postal code/city before drawing. Only ever geocoded on submit, never on
+  // keystrokes (see geocode.ts's Nominatim usage-policy note).
+  const [locationQuery, setLocationQuery] = useState("");
+  const [locationSearching, setLocationSearching] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [searchedCenter, setSearchedCenter] = useState<LatLon | null>(null);
+
+  async function handleFindLocation(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const trimmed = locationQuery.trim();
+    if (!trimmed) {
+      setLocationError(t("farmer:enterPostalCodeOrCity"));
+      return;
+    }
+
+    // geocodeLocation never throws or otherwise signals "not found" — a bad
+    // query silently resolves to FALLBACK_CENTER (Karlsruhe), same contract
+    // plot-search.tsx relies on. There's nothing to catch here.
+    setLocationError(null);
+    setLocationSearching(true);
+    const isPostalCode = /^\d{4,5}$/.test(trimmed);
+    const found = await geocodeLocation(isPostalCode ? { postalCode: trimmed } : { city: trimmed });
+    setSearchedCenter(found);
+    setLocationSearching(false);
+  }
 
   function handleFieldRectangle(polygon: PolygonGeometry) {
     setError(null);
@@ -90,6 +119,12 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
     ? [{ id: "draft-field", polygon: fieldPolygon, variant: "field" as const }]
     : [];
 
+  // Only a fresh search actually moves the map — the account's postal code
+  // remains the initial view (via `center` above) until the farmer looks
+  // elsewhere. See field-map.tsx: `fitTo` is the only prop that recentres an
+  // already-mounted map, `center` is just its first paint.
+  const fitTo: Bbox | null = searchedCenter ? pointBbox(searchedCenter.lon, searchedCenter.lat) : null;
+
   return (
     <main className="mx-auto max-w-5xl p-4">
       <h1 className="text-2xl font-bold text-forest">{t("farmer:newFieldTitle")}</h1>
@@ -102,6 +137,33 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
+      {step === "draw-field" && (
+        <form onSubmit={handleFindLocation} className="mt-4 flex max-w-md gap-3" noValidate>
+          <div className="flex-1">
+            <FormField label={t("farmer:findLocationLabel")} htmlFor="location_search">
+              <input
+                id="location_search"
+                value={locationQuery}
+                onChange={(e) => setLocationQuery(e.target.value)}
+                placeholder={t("farmer:findLocationPlaceholder")}
+                className={inputClass}
+              />
+            </FormField>
+          </div>
+          <div className="flex items-end">
+            <button type="submit" disabled={locationSearching} className={`${submitClass} w-auto px-6`}>
+              {locationSearching ? t("farmer:findingLocation") : t("farmer:findLocationButton")}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {locationError && (
+        <div className="mt-3 max-w-md">
+          <FormError message={locationError} />
+        </div>
+      )}
+
       <div className="mt-4 overflow-hidden rounded-lg border border-beige">
         <FieldMap
           center={center}
@@ -109,6 +171,7 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
           shapes={mapShapes}
           drawMode={step === "draw-field" ? "field" : null}
           onRectangleDrawn={handleFieldRectangle}
+          fitTo={fitTo}
         />
       </div>
 
