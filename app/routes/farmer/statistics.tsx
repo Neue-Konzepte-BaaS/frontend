@@ -112,7 +112,7 @@ export default function FarmerStatistics({ loaderData }: Route.ComponentProps) {
                       {t("statFieldOccupancy", { rented: num(row.rented), total: num(row.total) })}
                     </span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-beige/60">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-beige">
                     <div className="h-full rounded-full bg-moss" style={{ width: `${pct}%` }} />
                   </div>
                 </li>

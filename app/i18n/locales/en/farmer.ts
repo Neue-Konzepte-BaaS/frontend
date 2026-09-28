@@ -1,18 +1,18 @@
 export const farmer = {
-  dashboardMetaTitle: "Home · BaaS",
+  dashboardMetaTitle: "Home · Farmland",
   dashboardTitle: "Home",
   dashboardBody: "Manage the fields and land parcels your farm offers for self-harvest rental.",
   yourFieldsTitle: "Your fields",
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
 
-  fieldsListMetaTitle: "Your fields · BaaS",
+  fieldsListMetaTitle: "Your fields · Farmland",
   noFieldsYet: "No fields yet — use the plot planner to draw your first one.",
   plot_one: "{{count}} plot",
   plot_other: "{{count}} plots",
   rentedTo: "rented to {{name}}",
   editPlots: "Edit plots",
 
-  newFieldMetaTitle: "Draw a field · BaaS",
+  newFieldMetaTitle: "Draw a field · Farmland",
   newFieldTitle: "Draw a new field",
   rectangleTooSmall: "That rectangle is too small — try drawing a larger one.",
   fieldNameLabel: "Field name",
@@ -23,16 +23,22 @@ export const farmer = {
     "Draw a rectangle around your whole field: click one corner, click a second corner to set the angle, then click again to finish. It can be rotated to match your field exactly.",
   nameFieldInstructions:
     "Give your field a name, then save it — or redraw it if the shape isn't right. You'll set up its plots next.",
+  findLocationLabel: "Postal code or city",
+  findLocationPlaceholder: "e.g. 76133 or Karlsruhe",
+  findLocationButton: "Find",
+  findingLocation: "Finding…",
+  enterPostalCodeOrCity: "Enter a postal code or a city.",
 
-  fieldDetailMetaTitle: "Field · BaaS",
+  fieldDetailMetaTitle: "Field · Farmland",
   fieldHasNoPlotsYet: "This field has no plots yet.",
   invalidRowsColumns: "Rows and columns must both be whole numbers of at least 1.",
   plotGenerationFailed:
     "{{message}} — {{created}} of {{total}} plots were created before this failed. The plots already created cannot be removed from here.",
-  gridInstructions:
-    "Set how many rows and columns of equal-sized plots to lay out across this field. This can only be done once — there's no way to change it afterwards yet.",
+  gridInstructions: "Pick rows and columns — the map shows you right away where each plot will land.",
   rowsLabel: "Rows",
   columnsLabel: "Columns",
+  gridPreviewCount: "Preview: {{rows}} rows × {{cols}} columns = {{count}} plots.",
+  gridPreviewTooLarge: "That's a lot of plots to preview — the grid will still generate, just without a live preview above {{max}}.",
   creatingPlotProgress: "Creating plot {{done}} of {{total}}…",
   generatePlots: "Generate plots",
   noCropsForPlot: "No crops offered yet",
@@ -44,6 +50,7 @@ export const farmer = {
   cropDuration: "{{name}} ({{months}}-month rental)",
   savingCrops: "Saving…",
   saveCrops: "Save",
+  selectAllCrops: "Select all",
   basePriceLabel: "Base rate for the selected plots (€ per m² per week)",
   basePricePlaceholder: "e.g. 0.05",
   basePriceDisplay: "Base rate: {{price}}/m²/week",
@@ -53,7 +60,6 @@ export const farmer = {
   mapAriaLabel: "Field map",
 
   plotPanelHint: "Click a plot on the map or in the grid to see who rents it and what it offers.",
-  selectSeveral: "Select several",
   selectAll: "Select all",
   clearSelection: "Clear selection",
   tenantLabel: "Tenant",
@@ -77,12 +83,13 @@ export const farmer = {
   cropsSaved: "Crops saved.",
   rentalNotStartedHint: "This rental starts on {{date}}. Messages and ripeness notices reach the tenant from then on.",
 
-  boardMetaTitle: "Board · BaaS",
+  boardMetaTitle: "Board · Farmland",
   boardTitle: "Board",
   boardYourPostsTitle: "Your posts",
   // Ripeness notices never appear here — they have no read-back endpoint of
   // their own (see lib/ripeness.ts), so this only ever lists announcements.
   noPostsYet: "No posts yet — announcements you send will show up here.",
+  boardSentToInbox: "Sent to inbox",
 
   announceSectionTitle: "Post to the board",
   announceSectionBody:
@@ -92,9 +99,9 @@ export const farmer = {
   announceBodyLabel: "Message",
   announceBodyPlaceholder: "From 9am on Saturday we'll be harvesting. Please bring your own crates.",
   announceScopeLabel: "Audience",
-  announceScopeAll: "All current tenants",
-  announceScopeField: "Tenants of one field",
-  announceScopePlot: "Tenant of one plot",
+  announceScopeAll: "All current tenants (board post)",
+  announceScopeField: "Tenants of one field (board post)",
+  announceScopePlot: "Tenant of one plot (sent to inbox)",
   announceChooseField: "Choose a field",
   announceChoosePlot: "Choose a plot",
   announceSending: "Sending…",
@@ -111,7 +118,7 @@ export const farmer = {
   ripenessNoFieldsYet: "Add a field first — ripeness notices are posted per field.",
   ripenessNoCropsForField: "This field has no crops offered on any of its plots yet.",
 
-  tenantsMetaTitle: "Tenants · BaaS",
+  tenantsMetaTitle: "Tenants · Farmland",
   tenantsTitle: "Tenants",
   tenantsActiveSummary: "{{count}} active",
   field_one: "{{count}} field",
@@ -130,7 +137,7 @@ export const farmer = {
   noTenantsYet: "No tenants yet — plots you rent out will show up here.",
   noTenantsMatchSearch: "No tenants match your search.",
 
-  requestsMetaTitle: "Requests · BaaS",
+  requestsMetaTitle: "Requests · Farmland",
   requestsTitle: "Requests",
   requestsOpenSummary: "{{count}} open",
   requestsColApplicant: "Applicant",
@@ -145,7 +152,7 @@ export const farmer = {
   requestDeciding: "Saving…",
   noRequestsYet: "No open requests — new rental requests from customers will show up here.",
 
-  careGuideMetaTitle: "Care guide · BaaS",
+  careGuideMetaTitle: "Care guide · Farmland",
   careGuideTitle: "Care guide",
   farmDetailsHeading: "Farm details",
   farmDetailsBody: "This is how customers see your farm in search and on your farm page.",
@@ -172,10 +179,10 @@ export const farmer = {
   careReset: "Reset to default",
   careResetConfirm: "Delete your version",
   careResetDone: "Reset — your tenants see the default care guide again.",
-  settingsMetaTitle: "Farm settings · BaaS",
+  settingsMetaTitle: "Farm settings · Farmland",
   settingsTitle: "Farm settings",
 
-  statisticsMetaTitle: "Statistics · BaaS",
+  statisticsMetaTitle: "Statistics · Farmland",
   statisticsTitle: "Statistics",
   statGeneratedAt: "Generated at {{time}}",
   statFields: "Fields",

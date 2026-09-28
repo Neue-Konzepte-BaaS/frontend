@@ -132,6 +132,27 @@ export function groupPlotsByFarm(plots: NearbyPlot[]): NearbyFarm[] {
   return [...byFarm.values()];
 }
 
+/**
+ * Groups a farm's nearby plots by field, preserving each plot's position
+ * within its field group (callers should sort `plots` — e.g. with
+ * sortPlotsNaturally — before grouping, same as groupPlotsByFarm expects
+ * nearest-first order). Every plot's own `name` ("Plot 1", "Plot 2", ...) is
+ * already scoped to its field by the farmer, so this is display-ready as-is
+ * — no re-numbering needed, unlike a flat index over the whole farm.
+ */
+export function groupPlotsByField(plots: NearbyPlot[]): Map<string, NearbyPlot[]> {
+  const byField = new Map<string, NearbyPlot[]>();
+  for (const plot of plots) {
+    const existing = byField.get(plot.field);
+    if (existing) {
+      existing.push(plot);
+    } else {
+      byField.set(plot.field, [plot]);
+    }
+  }
+  return byField;
+}
+
 /** `farm` restricts the results to that one farm's free plots. */
 export type NearestPlotsQuery = (
   | { lat: number; lon: number }

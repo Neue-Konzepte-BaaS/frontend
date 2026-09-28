@@ -61,18 +61,18 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
     });
   }
 
-  const farmNames = [...new Set(announcements.map((a) => a.farmName))];
-  const showFarmChip = farmNames.length > 1;
+  // Only plot-scoped messages are private (sent to one tenant's inbox).
+  // Farm-wide and field-scoped posts appear on the board.
+  const boardAnnouncements = announcements.filter((a) => !a.plotId);
+  const farmNames = [...new Set(boardAnnouncements.map((a) => a.farmName))];
   const subtitle =
     farmNames.length === 0
       ? t("search:boardEmptySubtitle")
-      : farmNames.length === 1
-        ? farmNames[0]
-        : t("search:boardMultipleFarmsSubtitle", { count: farmNames.length });
+      : t("search:boardMultipleFarmsSubtitle");
 
   // Array#sort is stable, so within each pinned/unpinned group the API's own
   // newest-first order survives — same approach as farmer/tenants.tsx.
-  const sorted = [...announcements].sort((a, b) => {
+  const sorted = [...boardAnnouncements].sort((a, b) => {
     const aPinned = pinnedIds.has(a.id);
     const bPinned = pinnedIds.has(b.id);
     return aPinned === bPinned ? 0 : aPinned ? -1 : 1;
@@ -89,7 +89,7 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
         </div>
       </div>
 
-      {announcements.length === 0 ? (
+      {boardAnnouncements.length === 0 ? (
         <p className="mt-8 text-wood">{t("search:noAnnouncementsYet")}</p>
       ) : (
         <ul className="mt-6 flex flex-col gap-3">
@@ -98,7 +98,7 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
               key={announcement.id}
               announcement={announcement}
               pinned={pinnedIds.has(announcement.id)}
-              showFarmChip={showFarmChip}
+              showFarmChip={true}
               dateLabel={dateFormatter.format(new Date(announcement.createdAt))}
               onTogglePin={() => togglePin(announcement.id)}
             />
@@ -129,7 +129,7 @@ function AnnouncementCard({
       className={`rounded-xl border p-4 ${
         pinned
           ? "border-moss/40 bg-moss/10"
-          : "border-beige"
+          : "border-beige bg-paper-contrast"
       }`}
     >
       <div className="flex items-start justify-between gap-3">

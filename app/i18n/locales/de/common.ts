@@ -3,7 +3,7 @@ import type { common as en } from "~/i18n/locales/en/common";
 type Shape = { [K in keyof typeof en]: string };
 
 export const common: Shape = {
-  brand: "Bauer as a Service",
+  brand: "Farmland",
   signIn: "Anmelden",
   createAccount: "Konto erstellen",
   goToDashboard: "Zum Dashboard",

@@ -1,5 +1,5 @@
 export const payment = {
-  checkoutMetaTitle: "Payment · BaaS",
+  checkoutMetaTitle: "Payment · Farmland",
   checkoutTitle: "Confirm and pay",
   missingRequest: "We lost track of your rental request — please start again from the plot.",
   startingCheckout: "Preparing payment…",
@@ -12,7 +12,7 @@ export const payment = {
   payNow: "Pay now",
   processingPayment: "Processing…",
 
-  returnMetaTitle: "Confirming payment · BaaS",
+  returnMetaTitle: "Confirming payment · Farmland",
   returnTitle: "Confirming your payment",
   missingSession: "We couldn't find that payment session.",
   goToMyRentals: "Go to my rentals",

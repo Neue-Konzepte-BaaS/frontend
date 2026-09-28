@@ -55,16 +55,22 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
           <ul className="mt-4 flex flex-col gap-3">
             {announcements.map((announcement) => {
               const scope = scopeLabel(announcement, fields);
+              const isPrivate = !!announcement.plotId;
               return (
-                <li key={announcement.id} className="rounded-xl border border-beige p-4">
+                <li key={announcement.id} className="rounded-xl border border-beige bg-paper-contrast p-4">
                   <div className="flex items-start justify-between gap-3">
-                    {scope ? (
-                      <span className="inline-flex items-center rounded-full bg-cream px-2.5 py-0.5 text-xs font-medium text-wood">
-                        {scope}
-                      </span>
-                    ) : (
-                      <span />
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isPrivate && (
+                        <span className="inline-flex items-center rounded-full bg-cream px-2.5 py-0.5 text-xs font-medium text-wood">
+                          {t("boardSentToInbox")}
+                        </span>
+                      )}
+                      {scope && (
+                        <span className="inline-flex items-center rounded-full bg-beige px-2.5 py-0.5 text-xs font-medium text-wood">
+                          {scope}
+                        </span>
+                      )}
+                    </div>
                     <time className="text-sm text-warm-olive">
                       {dateFormatter.format(new Date(announcement.createdAt))}
                     </time>

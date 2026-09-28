@@ -3,20 +3,20 @@ import type { farmer as en } from "~/i18n/locales/en/farmer";
 type Shape = { [K in keyof typeof en]: string };
 
 export const farmer: Shape = {
-  dashboardMetaTitle: "Home · BaaS",
+  dashboardMetaTitle: "Home · Farmland",
   dashboardTitle: "Home",
   dashboardBody: "Verwalte die Felder und Flurstücke, die dein Hof zur Selbsternte anbietet.",
   yourFieldsTitle: "Deine Felder",
   yourFieldsBody: "Sieh dir deine Felder und Flurstücke an oder zeichne ein neues Feld auf der Karte.",
 
-  fieldsListMetaTitle: "Deine Felder · BaaS",
+  fieldsListMetaTitle: "Deine Felder · Farmland",
   noFieldsYet: "Noch keine Felder — nutze den Parzellenplaner, um dein erstes zu zeichnen.",
   plot_one: "{{count}} Parzelle",
   plot_other: "{{count}} Parzellen",
   rentedTo: "vermietet an {{name}}",
   editPlots: "Parzellen bearbeiten",
 
-  newFieldMetaTitle: "Feld zeichnen · BaaS",
+  newFieldMetaTitle: "Feld zeichnen · Farmland",
   newFieldTitle: "Neues Feld zeichnen",
   rectangleTooSmall: "Dieses Rechteck ist zu klein — versuche, ein größeres zu zeichnen.",
   fieldNameLabel: "Feldname",
@@ -27,16 +27,22 @@ export const farmer: Shape = {
     "Zeichne ein Rechteck um dein gesamtes Feld: klicke auf eine Ecke, klicke auf eine zweite Ecke, um den Winkel festzulegen, und klicke erneut, um abzuschließen. Es kann gedreht werden, um genau zu deinem Feld zu passen.",
   nameFieldInstructions:
     "Gib deinem Feld einen Namen und speichere es — oder zeichne es neu, wenn die Form nicht stimmt. Als Nächstes richtest du die Parzellen ein.",
+  findLocationLabel: "Postleitzahl oder Stadt",
+  findLocationPlaceholder: "z. B. 76133 oder Karlsruhe",
+  findLocationButton: "Finden",
+  findingLocation: "Wird gesucht…",
+  enterPostalCodeOrCity: "Gib eine Postleitzahl oder eine Stadt ein.",
 
-  fieldDetailMetaTitle: "Feld · BaaS",
+  fieldDetailMetaTitle: "Feld · Farmland",
   fieldHasNoPlotsYet: "Dieses Feld hat noch keine Parzellen.",
   invalidRowsColumns: "Zeilen und Spalten müssen beide ganze Zahlen von mindestens 1 sein.",
   plotGenerationFailed:
     "{{message}} — {{created}} von {{total}} Parzellen wurden erstellt, bevor dies fehlschlug. Die bereits erstellten Parzellen können von hier aus nicht entfernt werden.",
-  gridInstructions:
-    "Lege fest, wie viele Zeilen und Spalten gleich großer Parzellen über dieses Feld gelegt werden sollen. Das ist nur einmal möglich — es gibt noch keine Möglichkeit, es später zu ändern.",
+  gridInstructions: "Wähle Zeilen und Spalten — die Karte zeigt dir sofort, wo jede Parzelle landet.",
   rowsLabel: "Zeilen",
   columnsLabel: "Spalten",
+  gridPreviewCount: "Vorschau: {{rows}} Zeilen × {{cols}} Spalten = {{count}} Parzellen.",
+  gridPreviewTooLarge: "Das sind zu viele Parzellen für eine Vorschau — das Raster wird trotzdem erstellt, nur ohne Live-Vorschau oberhalb von {{max}}.",
   creatingPlotProgress: "Parzelle {{done}} von {{total}} wird erstellt…",
   generatePlots: "Parzellen erstellen",
   noCropsForPlot: "Noch keine Pflanzen angeboten",
@@ -48,6 +54,7 @@ export const farmer: Shape = {
   cropDuration: "{{name}} ({{months}} Monate Mietdauer)",
   savingCrops: "Wird gespeichert…",
   saveCrops: "Speichern",
+  selectAllCrops: "Alle auswählen",
   basePriceLabel: "Grundpreis für die ausgewählten Parzellen (€ pro m² pro Woche)",
   basePricePlaceholder: "z. B. 0,05",
   basePriceDisplay: "Grundpreis: {{price}}/m²/Woche",
@@ -57,7 +64,6 @@ export const farmer: Shape = {
   mapAriaLabel: "Feldkarte",
 
   plotPanelHint: "Klicke auf eine Parzelle in der Karte oder im Raster, um zu sehen, wer sie mietet und was sie anbietet.",
-  selectSeveral: "Mehrere auswählen",
   selectAll: "Alle auswählen",
   clearSelection: "Auswahl aufheben",
   tenantLabel: "Pächter",
@@ -81,10 +87,11 @@ export const farmer: Shape = {
   cropsSaved: "Pflanzen gespeichert.",
   rentalNotStartedHint: "Diese Miete beginnt am {{date}}. Nachrichten und Reifehinweise erreichen den Pächter ab dann.",
 
-  boardMetaTitle: "Pinnwand · BaaS",
+  boardMetaTitle: "Pinnwand · Farmland",
   boardTitle: "Pinnwand",
   boardYourPostsTitle: "Deine Beiträge",
   noPostsYet: "Noch keine Beiträge — gesendete Mitteilungen erscheinen hier.",
+  boardSentToInbox: "An Posteingang gesendet",
 
   announceSectionTitle: "An die Pinnwand posten",
   announceSectionBody:
@@ -94,9 +101,9 @@ export const farmer: Shape = {
   announceBodyLabel: "Nachricht",
   announceBodyPlaceholder: "Am Samstag ab 9 Uhr wird geerntet. Bringt bitte eigene Kisten mit.",
   announceScopeLabel: "Empfänger",
-  announceScopeAll: "Alle aktuellen Pächter",
-  announceScopeField: "Pächter eines Feldes",
-  announceScopePlot: "Pächter einer Parzelle",
+  announceScopeAll: "Alle aktuellen Pächter (Pinnwand)",
+  announceScopeField: "Pächter eines Feldes (Pinnwand)",
+  announceScopePlot: "Pächter einer Parzelle (Posteingang)",
   announceChooseField: "Feld wählen",
   announceChoosePlot: "Parzelle wählen",
   announceSending: "Wird gesendet…",
@@ -113,7 +120,7 @@ export const farmer: Shape = {
   ripenessNoFieldsYet: "Lege zuerst ein Feld an — Reifehinweise werden pro Feld gepostet.",
   ripenessNoCropsForField: "Für dieses Feld werden auf keiner Parzelle Pflanzen angeboten.",
 
-  tenantsMetaTitle: "Pächter · BaaS",
+  tenantsMetaTitle: "Pächter · Farmland",
   tenantsTitle: "Pächter",
   tenantsActiveSummary: "{{count}} aktiv",
   field_one: "{{count}} Feld",
@@ -132,7 +139,7 @@ export const farmer: Shape = {
   noTenantsYet: "Noch keine Pächter — vermietete Parzellen erscheinen hier.",
   noTenantsMatchSearch: "Keine Pächter entsprechen deiner Suche.",
 
-  requestsMetaTitle: "Anfragen · BaaS",
+  requestsMetaTitle: "Anfragen · Farmland",
   requestsTitle: "Anfragen",
   requestsOpenSummary: "{{count}} offen",
   requestsColApplicant: "Antragsteller",
@@ -147,9 +154,9 @@ export const farmer: Shape = {
   requestDeciding: "Wird gespeichert…",
   noRequestsYet: "Keine offenen Anfragen — neue Mietanfragen von Kunden erscheinen hier.",
 
-  careGuideMetaTitle: "Pflegehinweise · BaaS",
+  careGuideMetaTitle: "Pflegehinweise · Farmland",
   careGuideTitle: "Pflegehinweise",
-  settingsMetaTitle: "Mein Hof · BaaS",
+  settingsMetaTitle: "Mein Hof · Farmland",
   farmDetailsHeading: "Angaben zum Hof",
   farmDetailsBody: "So sehen Kundinnen und Kunden deinen Hof in der Suche und auf deiner Hofseite.",
   farmNameLabel: "Name des Hofs",
@@ -177,7 +184,7 @@ export const farmer: Shape = {
   careResetDone: "Zurückgesetzt — deine Mietenden sehen wieder den Standard-Pflegeplan.",
   settingsTitle: "Hofeinstellungen",
 
-  statisticsMetaTitle: "Statistiken · BaaS",
+  statisticsMetaTitle: "Statistiken · Farmland",
   statisticsTitle: "Statistiken",
   statGeneratedAt: "Erstellt um {{time}}",
   statFields: "Felder",

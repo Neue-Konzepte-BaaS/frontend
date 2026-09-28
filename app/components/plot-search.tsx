@@ -159,8 +159,8 @@ export function PlotSearch() {
       ) : results.length === 0 ? (
         <p className="mt-8 text-wood">{t("search:noPlotsFoundNearby")}</p>
       ) : (
-        <>
-          <div className="mt-6 overflow-hidden rounded-lg border border-beige">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+          <div className="overflow-hidden rounded-lg border border-beige lg:sticky lg:top-4">
             <FieldMap
               center={searchCenter ?? FALLBACK_CENTER}
               shapes={shapes}
@@ -170,34 +170,36 @@ export function PlotSearch() {
             />
           </div>
 
-          <p className="mt-4 text-sm text-warm-olive">{t("search:browseHint")}</p>
+          <div>
+            <p className="text-sm text-warm-olive">{t("search:browseHint")}</p>
 
-          <ul className="mt-2 divide-y divide-beige">
-            {farms.map((farm, i) => (
-              <li key={farm.farmId}>
-                <Link
-                  to={toFarmLink(farm.farmId, locationQuery)}
-                  className="flex items-center gap-3 py-4 hover:bg-cream"
-                >
-                  <span
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cream text-xs font-semibold text-wood"
-                    aria-hidden
+            <ul className="mt-2 divide-y divide-beige">
+              {farms.map((farm, i) => (
+                <li key={farm.farmId}>
+                  <Link
+                    to={toFarmLink(farm.farmId, locationQuery)}
+                    className="flex items-center gap-3 py-4 hover:bg-cream"
                   >
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-semibold text-forest">{farm.name}</span>
-                    <span className="block text-sm text-warm-olive">
-                      {t("search:farmDistance", { distance: formatDistance(farm.distanceMeters, numberLocale) })}
-                      {" · "}
-                      {t("search:nearbyPlotCount", { count: farm.plotCount })}
+                    <span
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-cream text-xs font-semibold text-wood"
+                      aria-hidden
+                    >
+                      {i + 1}
                     </span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold text-forest">{farm.name}</span>
+                      <span className="block text-sm text-warm-olive">
+                        {t("search:farmDistance", { distance: formatDistance(farm.distanceMeters, numberLocale) })}
+                        {" · "}
+                        {t("search:nearbyPlotCount", { count: farm.plotCount })}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       )}
     </>
   );

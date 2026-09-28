@@ -3,7 +3,7 @@ import type { payment as en } from "~/i18n/locales/en/payment";
 type Shape = { [K in keyof typeof en]: string };
 
 export const payment: Shape = {
-  checkoutMetaTitle: "Zahlung · BaaS",
+  checkoutMetaTitle: "Zahlung · Farmland",
   checkoutTitle: "Bestätigen und bezahlen",
   missingRequest: "Wir haben den Überblick über deine Mietanfrage verloren — bitte starte erneut von der Parzelle aus.",
   startingCheckout: "Zahlung wird vorbereitet…",
@@ -13,7 +13,7 @@ export const payment: Shape = {
   payNow: "Jetzt bezahlen",
   processingPayment: "Wird verarbeitet…",
 
-  returnMetaTitle: "Zahlung wird bestätigt · BaaS",
+  returnMetaTitle: "Zahlung wird bestätigt · Farmland",
   returnTitle: "Deine Zahlung wird bestätigt",
   missingSession: "Wir konnten diese Zahlungssitzung nicht finden.",
   goToMyRentals: "Zu meinen Mieten",

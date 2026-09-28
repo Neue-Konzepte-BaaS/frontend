@@ -3,7 +3,7 @@ import type { customer as en } from "~/i18n/locales/en/customer";
 type Shape = { [K in keyof typeof en]: string };
 
 export const customer: Shape = {
-  meMetaTitle: "Ich · BaaS",
+  meMetaTitle: "Ich · Farmland",
 
   myPlotsHeading: "Meine Parzelle(n)",
   noRentedPlots: "Du hast noch keine Parzelle gemietet.",
@@ -17,7 +17,7 @@ export const customer: Shape = {
   emailNotification: "E-Mail",
   weeklyDigest: "Wöchentliche Pflege-Übersicht",
 
-  inboxMetaTitle: "Posteingang · BaaS",
+  inboxMetaTitle: "Posteingang · Farmland",
   inboxHeading: "Benachrichtigungen",
   inboxEmpty: "Noch keine Benachrichtigungen.",
   inboxFilterAll: "Alle",
@@ -34,7 +34,7 @@ export const customer: Shape = {
   inboxRipenessSubject: "{{crop}} ist reif",
   inboxRipenessBody: "{{crop}} auf {{field}} ist bereit zur Ernte.",
 
-  plotMetaTitle: "Meine Parzelle · BaaS",
+  plotMetaTitle: "Meine Parzelle · Farmland",
   openPlot: "Parzelle öffnen",
   backToHome: "Zurück zur Startseite",
 

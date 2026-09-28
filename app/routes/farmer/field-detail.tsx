@@ -11,7 +11,7 @@ import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-ma
 import { Field as FormField, FormError, FormSuccess, inputClass, submitClass } from "~/components/form";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotDetailPanel, type SelectedPlot } from "~/components/farmer/plot-detail-panel";
-import { ringToCorners, subdivideIntoGrid, toBbox } from "~/lib/geo";
+import { ringToCorners, subdivideIntoGrid, toBbox, type PolygonGeometry } from "~/lib/geo";
 import type { LatLon } from "~/lib/geocode";
 import i18n from "~/i18n";
 
@@ -58,7 +58,6 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [savingCrops, setSavingCrops] = useState(false);
   const [cropsError, setCropsError] = useState<string | null>(null);
   const [cropsSaved, setCropsSaved] = useState(false);
-  const [multiSelect, setMultiSelect] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation(["farmer", "common"]);
 
@@ -106,15 +105,38 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     setGenerating(false);
   }
 
-  // A click picks just that plot (click it again to deselect); in
-  // multi-select mode clicks add/remove instead, for bulk crop edits.
+  // "Rows" and "columns" are otherwise meaningless without seeing which of
+  // the field's two edges each one runs along — the field can be drawn at
+  // any rotation, so there's no fixed "rows go top-to-bottom" convention to
+  // rely on. Recomputing subdivideIntoGrid on every keystroke (pure client
+  // math, no network) and drawing the result as preview tiles lets the
+  // farmer just look at the map instead of guessing. Capped well below what
+  // generatePlots itself would ever practically create, since an
+  // in-progress "99999x99999" keystroke would otherwise briefly ask this to
+  // build billions of polygons.
+  const MAX_PREVIEW_CELLS = 400;
+  const parsedRows = Number(rows);
+  const parsedCols = Number(cols);
+  const hasValidGridInput =
+    Number.isInteger(parsedRows) && Number.isInteger(parsedCols) && parsedRows >= 1 && parsedCols >= 1;
+  const gridTooLargeToPreview = hasValidGridInput && parsedRows * parsedCols > MAX_PREVIEW_CELLS;
+
+  let previewCells: PolygonGeometry[] = [];
+  if (!hasPlots && hasValidGridInput && !gridTooLargeToPreview) {
+    try {
+      previewCells = subdivideIntoGrid(ringToCorners(field.coordinates), parsedRows, parsedCols);
+    } catch {
+      previewCells = [];
+    }
+  }
+
+  // Clicking a plot always adds/removes it from the selection, so picking
+  // several plots for a bulk crop edit needs no separate "select several"
+  // mode — a click just toggles that one plot.
   function handlePlotClick(plotId: string) {
     setCropsError(null);
     setCropsSaved(false);
     setSelectedPlotIds((prev) => {
-      if (!multiSelect) {
-        return prev.size === 1 && prev.has(plotId) ? new Set() : new Set([plotId]);
-      }
       const next = new Set(prev);
       if (next.has(plotId)) {
         next.delete(plotId);
@@ -227,6 +249,12 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
 
   const mapShapes: MapShape[] = [
     { id: field.id, polygon: field.coordinates, variant: "field" as const },
+    ...previewCells.map((cell, i) => ({
+      id: `preview-${i}`,
+      polygon: cell,
+      variant: "plot" as const,
+      label: String(i + 1),
+    })),
     ...plots.map((p, i) => {
       const { status } = statuses.get(p.id)!;
       return {
@@ -242,7 +270,10 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   ];
 
   function handleMapShapeClick(id: string) {
-    if (id === field.id) return;
+    // Before plots exist, the map only shows the field outline and the
+    // rows/cols preview tiles — neither is clickable (the preview is a
+    // read-only "here's what you'll get", not a selection).
+    if (!hasPlots || id === field.id) return;
     handlePlotClick(id);
   }
 
@@ -272,9 +303,25 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     </div>
   );
 
+  const toolbarButtonClass = "rounded-md px-2.5 py-1 text-sm font-medium text-wood hover:bg-cream";
+
   const cropEditor = (
     <div>
-      <p className="text-sm font-medium text-wood">{t("farmer:offeredCropsLabel")}</p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-medium text-wood">{t("farmer:offeredCropsLabel")}</p>
+        {catalog.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              setCropsSaved(false);
+              setSelectedCropIds(new Set(catalog.map((c: Crop) => c.id)));
+            }}
+            className={toolbarButtonClass}
+          >
+            {t("farmer:selectAllCrops")}
+          </button>
+        )}
+      </div>
 
       {cropsError && (
         <div className="mt-3">
@@ -342,8 +389,6 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
     </div>
   );
 
-  const toolbarButtonClass = "rounded-md px-2.5 py-1 text-sm font-medium text-wood hover:bg-cream";
-
   return (
     <main className="mx-auto max-w-6xl p-4">
       <h1 className="text-2xl font-bold text-forest">{field.name}</h1>
@@ -361,21 +406,10 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
         <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <div>
             {map}
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <label className="mr-auto flex cursor-pointer items-center gap-2 text-sm text-wood">
-                <input
-                  type="checkbox"
-                  checked={multiSelect}
-                  onChange={(e) => setMultiSelect(e.target.checked)}
-                  className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
-                />
-                {t("farmer:selectSeveral")}
-              </label>
-              {multiSelect && (
-                <button type="button" onClick={() => setSelection(plots.map((p) => p.id))} className={toolbarButtonClass}>
-                  {t("farmer:selectAll")}
-                </button>
-              )}
+            <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+              <button type="button" onClick={() => setSelection(plots.map((p) => p.id))} className={toolbarButtonClass}>
+                {t("farmer:selectAll")}
+              </button>
               {selectedPlotIds.size > 0 && (
                 <button type="button" onClick={() => setSelection([])} className={toolbarButtonClass}>
                   {t("farmer:clearSelection")}
@@ -429,6 +463,15 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
               />
             </FormField>
           </div>
+
+          {hasValidGridInput && (
+            <p className="text-sm text-warm-olive">
+              {gridTooLargeToPreview
+                ? t("farmer:gridPreviewTooLarge", { max: MAX_PREVIEW_CELLS })
+                : t("farmer:gridPreviewCount", { rows: parsedRows, cols: parsedCols, count: parsedRows * parsedCols })}
+            </p>
+          )}
+
           <button type="submit" disabled={generating} className={submitClass}>
             {generating && progress
               ? t("farmer:creatingPlotProgress", { done: progress.done + 1, total: progress.total })

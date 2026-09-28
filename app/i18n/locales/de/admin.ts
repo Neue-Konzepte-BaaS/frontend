@@ -6,7 +6,7 @@ export const admin: Shape = {
   roleBadge: "Systemadmin",
 
   // Plattform-Übersicht
-  overviewMetaTitle: "Plattform-Übersicht · BaaS",
+  overviewMetaTitle: "Plattform-Übersicht · Farmland",
   overviewTitle: "Plattform-Übersicht",
   scopePlatform: "Bereich · Plattform",
   scopeFarm: "Bereich · Hof",
@@ -25,7 +25,7 @@ export const admin: Shape = {
   systemTitle: "System",
 
   // Platzhalterseite — die Navigation steht, der Backend-Endpunkt dahinter noch nicht
-  rentalsMetaTitle: "Mietverträge · BaaS",
+  rentalsMetaTitle: "Mietverträge · Farmland",
   rentalsTitle: "Mietverträge",
 
   // Gemeinsame Listen-Elemente (Höfe, Konten)
@@ -38,7 +38,7 @@ export const admin: Shape = {
   listNoMatches: "Keine Treffer für diesen Filter.",
 
   // Höfe
-  farmsMetaTitle: "Höfe · BaaS",
+  farmsMetaTitle: "Höfe · Farmland",
   farmsTitle: "Höfe",
   farmsBody: "Alle Höfe der Plattform, mit Inhaber und Bestand.",
   farmsSearchLabel: "Suche",
@@ -46,7 +46,7 @@ export const admin: Shape = {
   farmsPostalCodeLabel: "PLZ",
 
   // Konten
-  accountsMetaTitle: "Konten · BaaS",
+  accountsMetaTitle: "Konten · Farmland",
   accountsTitle: "Konten",
   accountsBody: "Alle Konten der Plattform, neueste zuerst.",
   accountsSearchLabel: "Suche",
@@ -56,7 +56,7 @@ export const admin: Shape = {
   accountsNoRole: "Keine Rolle",
 
   // Broadcast-Benachrichtigung
-  broadcastMetaTitle: "Rundnachricht · BaaS",
+  broadcastMetaTitle: "Rundnachricht · Farmland",
   notificationsTitle: "Broadcast-Benachrichtigung",
   notificationsBody: "Sende eine E-Mail an alle Landwirte und Kunden der Plattform.",
   notifSubjectLabel: "Betreff",
@@ -71,7 +71,7 @@ export const admin: Shape = {
   notifSuccess: "Für {{recipients}} Empfänger in die Warteschlange gestellt.",
 
   // Pflanzenkatalog-Verwaltung
-  cropsMetaTitle: "Pflanzenkatalog · BaaS",
+  cropsMetaTitle: "Pflanzenkatalog · Farmland",
   cropsTitle: "Pflanzenkatalog",
   cropsBody: "Diese Pflanzen stehen Landwirten zur Zuweisung an ihre Parzellen zur Verfügung.",
   cropNameLabel: "Pflanzenname",

@@ -55,7 +55,7 @@ function fromResponse(r: InboxItemResponse): Notification {
     kind: kindFromResponse(r.kind),
     subject: r.subject,
     body: r.body,
-    sender: r.farm_name ?? "Bauer as a Service",
+    sender: r.farm_name ?? "Farmland",
     createdAt: r.created_at,
     cropName: r.crop_name,
     fieldName: r.field_name,
