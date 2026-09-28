@@ -23,7 +23,19 @@ const STATUS_LABEL_KEY = {
   free: "common:plotStatusFree",
 } as const;
 
-export type PlotGridItem = { id: string; status: PlotStatus };
+export type PlotGridItem = {
+  id: string;
+  status: PlotStatus;
+  /**
+   * What to print on the tile — defaults to the plot's position (1-based) in
+   * the array, matching the map's own positional labels wherever the caller
+   * numbers plots that way (the farmer's own field-detail page). A caller
+   * whose plots already carry a real, field-scoped name (customer search)
+   * should pass it here instead of relying on position, so the tile matches
+   * that plot's name everywhere else it's shown — not an arbitrary index.
+   */
+  label?: string;
+};
 
 type PlotGridProps = {
   /** In display order — tile N is labelled N, matching the map's labels. */
@@ -45,18 +57,19 @@ export function PlotGrid({ plots, selectedIds, onSelect, legendStatuses = ["rent
       <div className="grid grid-cols-[repeat(auto-fill,minmax(3rem,1fr))] gap-2">
         {plots.map((plot, i) => {
           const selected = selectedIds.has(plot.id);
+          const label = plot.label ?? String(i + 1);
           return (
             <button
               key={plot.id}
               type="button"
               aria-pressed={selected}
-              aria-label={t("plotTileLabel", { number: i + 1, status: t(STATUS_LABEL_KEY[plot.status]) })}
+              aria-label={t("plotTileLabel", { number: label, status: t(STATUS_LABEL_KEY[plot.status]) })}
               onClick={() => onSelect(plot.id)}
               className={`flex aspect-square items-center justify-center rounded-lg border font-mono text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-moss ${
                 selected ? SELECTED_TILE_CLASS : TILE_CLASS[plot.status]
               }`}
             >
-              {i + 1}
+              {label}
             </button>
           );
         })}
