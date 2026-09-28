@@ -256,7 +256,7 @@ function CropsTab({
   );
 }
 
-/** The rental period, and where the handover document would go once one exists. */
+/** The rental period details tab. */
 function RentalTab({
   rental,
   guide,
@@ -296,15 +296,6 @@ function RentalTab({
           </div>
         )}
       </dl>
-
-      <section>
-        <h2 className="mb-3 text-xs font-semibold tracking-widest text-warm-olive uppercase">{t("customer:handoverHeading")}</h2>
-        {/* Deliberately not faked: nothing in the API stores or serves a
-            handover document, so there is no link to give. Same rule as the
-            ComingSoon stubs — say it is missing rather than render a dead
-            button. Needs a backend follow-up. */}
-        <Note>{t("customer:handoverUnavailable")}</Note>
-      </section>
     </div>
   );
 }
