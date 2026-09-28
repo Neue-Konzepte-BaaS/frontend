@@ -1,9 +1,9 @@
 export const search = {
-  searchMetaTitle: "Find a plot near you · BaaS",
+  searchMetaTitle: "Find a plot near you · Farmland",
   searchTitle: "Find a plot near you",
   searchSubtitle: "Search a German postal code or city to see available self-harvest plots nearby.",
 
-  customerMetaTitle: "Home · BaaS",
+  customerMetaTitle: "Home · Farmland",
   customerTitle: "Home",
   myRentals: "My rentals",
   // Plot search moved to its own /search tab (issue #27) — this page no
@@ -45,7 +45,7 @@ export const search = {
   rentPeriodPreview: "Rental period: {{period}}",
   requestSentBody: "Request sent — the farm will get back to you. You can follow its status on your home page.",
 
-  farmMetaTitle: "Farm · BaaS",
+  farmMetaTitle: "Farm · Farmland",
   backToSearch: "Back to search",
   requestSent: "Requested ✓",
   aboutFarm: "About this farm",
@@ -62,7 +62,7 @@ export const search = {
   backToFields: "Back to fields",
   fieldHasNoPlotsNearby: "No available plots in this field right now.",
 
-  boardMetaTitle: "Board · BaaS",
+  boardMetaTitle: "Board · Farmland",
   boardTitle: "Board",
   boardEmptySubtitle: "You'll see messages from the farms you rent from here.",
   // Only ever shown for 2+ farms — a single farm renders its name directly instead (see board.tsx).
@@ -73,10 +73,10 @@ export const search = {
   unpinAnnouncement: "Unpin this message",
 
   // Nav destinations still awaiting a real feature — see issue #27 and coming-soon.tsx.
-  inboxMetaTitle: "Inbox · BaaS",
+  inboxMetaTitle: "Inbox · Farmland",
   inboxTitle: "Inbox",
 
-  requestSentMetaTitle: "Request sent · BaaS",
+  requestSentMetaTitle: "Request sent · Farmland",
   requestSentHeading: "Request sent to {{farmName}}.",
   requestSentSubtitle: "Request for {{plotName}} sent. The farm usually answers within two days.",
   requestSentStep1: "The farm approves your request.",

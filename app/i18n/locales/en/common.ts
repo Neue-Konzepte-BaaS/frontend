@@ -1,5 +1,5 @@
 export const common = {
-  brand: "Bauer as a Service",
+  brand: "Farmland",
   signIn: "Sign in",
   createAccount: "Create account",
   goToDashboard: "Go to dashboard",

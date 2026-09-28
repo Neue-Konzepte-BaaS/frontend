@@ -1,18 +1,18 @@
 export const farmer = {
-  dashboardMetaTitle: "Home · BaaS",
+  dashboardMetaTitle: "Home · Farmland",
   dashboardTitle: "Home",
   dashboardBody: "Manage the fields and land parcels your farm offers for self-harvest rental.",
   yourFieldsTitle: "Your fields",
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
 
-  fieldsListMetaTitle: "Your fields · BaaS",
+  fieldsListMetaTitle: "Your fields · Farmland",
   noFieldsYet: "No fields yet — use the plot planner to draw your first one.",
   plot_one: "{{count}} plot",
   plot_other: "{{count}} plots",
   rentedTo: "rented to {{name}}",
   editPlots: "Edit plots",
 
-  newFieldMetaTitle: "Draw a field · BaaS",
+  newFieldMetaTitle: "Draw a field · Farmland",
   newFieldTitle: "Draw a new field",
   rectangleTooSmall: "That rectangle is too small — try drawing a larger one.",
   fieldNameLabel: "Field name",
@@ -29,7 +29,7 @@ export const farmer = {
   findingLocation: "Finding…",
   enterPostalCodeOrCity: "Enter a postal code or a city.",
 
-  fieldDetailMetaTitle: "Field · BaaS",
+  fieldDetailMetaTitle: "Field · Farmland",
   fieldHasNoPlotsYet: "This field has no plots yet.",
   invalidRowsColumns: "Rows and columns must both be whole numbers of at least 1.",
   plotGenerationFailed:
@@ -83,7 +83,7 @@ export const farmer = {
   cropsSaved: "Crops saved.",
   rentalNotStartedHint: "This rental starts on {{date}}. Messages and ripeness notices reach the tenant from then on.",
 
-  boardMetaTitle: "Board · BaaS",
+  boardMetaTitle: "Board · Farmland",
   boardTitle: "Board",
   boardYourPostsTitle: "Your posts",
   // Ripeness notices never appear here — they have no read-back endpoint of
@@ -117,7 +117,7 @@ export const farmer = {
   ripenessNoFieldsYet: "Add a field first — ripeness notices are posted per field.",
   ripenessNoCropsForField: "This field has no crops offered on any of its plots yet.",
 
-  tenantsMetaTitle: "Tenants · BaaS",
+  tenantsMetaTitle: "Tenants · Farmland",
   tenantsTitle: "Tenants",
   tenantsActiveSummary: "{{count}} active",
   field_one: "{{count}} field",
@@ -136,7 +136,7 @@ export const farmer = {
   noTenantsYet: "No tenants yet — plots you rent out will show up here.",
   noTenantsMatchSearch: "No tenants match your search.",
 
-  requestsMetaTitle: "Requests · BaaS",
+  requestsMetaTitle: "Requests · Farmland",
   requestsTitle: "Requests",
   requestsOpenSummary: "{{count}} open",
   requestsColApplicant: "Applicant",
@@ -151,7 +151,7 @@ export const farmer = {
   requestDeciding: "Saving…",
   noRequestsYet: "No open requests — new rental requests from customers will show up here.",
 
-  careGuideMetaTitle: "Care guide · BaaS",
+  careGuideMetaTitle: "Care guide · Farmland",
   careGuideTitle: "Care guide",
   farmDetailsHeading: "Farm details",
   farmDetailsBody: "This is how customers see your farm in search and on your farm page.",
@@ -178,10 +178,10 @@ export const farmer = {
   careReset: "Reset to default",
   careResetConfirm: "Delete your version",
   careResetDone: "Reset — your tenants see the default care guide again.",
-  settingsMetaTitle: "Farm settings · BaaS",
+  settingsMetaTitle: "Farm settings · Farmland",
   settingsTitle: "Farm settings",
 
-  statisticsMetaTitle: "Statistics · BaaS",
+  statisticsMetaTitle: "Statistics · Farmland",
   statisticsTitle: "Statistics",
   statGeneratedAt: "Generated at {{time}}",
   statFields: "Fields",

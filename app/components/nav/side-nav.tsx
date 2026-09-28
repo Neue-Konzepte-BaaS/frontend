@@ -11,7 +11,7 @@ export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem 
   const pinnedItems = pinned ? (Array.isArray(pinned) ? pinned : [pinned]) : [];
 
   return (
-    <nav className="hidden shrink-0 flex-col justify-between border-r border-beige/50 bg-beige p-4 md:flex md:w-56">
+    <nav className="hidden shrink-0 flex-col justify-between border-r border-beige/50 bg-beige p-4 md:flex md:w-64">
       <ul className="space-y-1">
         {items.map((item) => (
           <SideNavLink key={item.to} item={item} />
@@ -36,14 +36,14 @@ function SideNavLink({ item }: { item: NavItem }) {
         to={item.to}
         end={item.end}
         className={({ isActive }) =>
-          `flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium ${
+          `flex items-center gap-3 rounded-lg px-3 py-2.5 text-lg font-medium ${
             isActive
               ? "bg-forest/20 text-forest font-semibold"
               : "text-forest hover:bg-forest/10"
           }`
         }
       >
-        <Icon className="h-5 w-5 shrink-0" aria-hidden />
+        <Icon className="h-6 w-6 shrink-0" aria-hidden />
         {item.label}
       </NavLink>
     </li>

@@ -31,14 +31,8 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
         <div className="flex items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center gap-2">
-              <svg viewBox="0 0 32 32" className="h-8 w-8" fill="none">
-                <circle cx="16" cy="16" r="16" className="fill-deep-olive" />
-                <path d="M16 6 C10 10 8 16 10 22 C12 18 14 16 16 15 C18 16 20 18 22 22 C24 16 22 10 16 6Z" className="fill-beige" />
-              </svg>
-              <div className="leading-tight">
-                <span className="block text-sm font-bold uppercase tracking-widest text-forest">BAUER</span>
-                <span className="block text-[10px] text-forest/60">as a service</span>
-              </div>
+              <img src="/farmlandlogo.png" alt="Farmland" className="h-10 w-10 rounded-full" />
+              <span className="-translate-y-1 text-2xl font-bold text-forest" style={{fontFamily: "'Playfair Display', serif"}}>Farmland</span>
             </Link>
             <span className="hidden rounded-full bg-moss/10 px-2.5 py-0.5 text-xs font-medium text-moss sm:inline">
               {t("admin:roleBadge")}
@@ -46,7 +40,7 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
           </div>
           <div className="flex items-center gap-4">
             <LanguageSwitcher />
-            <span className="hidden text-sm font-medium text-wood sm:block">
+            <span className="hidden text-base font-semibold text-forest sm:block">
               {account.firstName} {account.lastName}
             </span>
             <LogoutButton />
