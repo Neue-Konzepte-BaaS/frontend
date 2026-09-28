@@ -13,7 +13,7 @@ export async function clientLoader() {
   return { notifications };
 }
 
-type Filter = "all" | NotificationKind;
+type Filter = "all" | "ripeness" | "care" | "farm";
 type Group = "today" | "thisWeek" | "older";
 
 const FILTERS: Filter[] = ["all", "ripeness", "care", "farm"];
@@ -21,6 +21,7 @@ const FILTERS: Filter[] = ["all", "ripeness", "care", "farm"];
 function kindBadgeClass(kind: NotificationKind): string {
   if (kind === "ripeness") return "bg-warm-olive/20 text-warm-olive";
   if (kind === "care") return "bg-moss/15 text-moss";
+  if (kind === "announcement" || kind === "farm") return "bg-warm-olive/20 text-warm-olive";
   return "bg-beige text-wood";
 }
 
@@ -60,9 +61,10 @@ const FILTER_LABEL: Record<Filter, string> = {
 };
 
 const KIND_LABEL: Record<NotificationKind, string> = {
-  ripeness: "inboxKindRipeness",
-  care:     "inboxKindCare",
-  farm:     "inboxKindFarm",
+  ripeness:     "inboxKindRipeness",
+  care:         "inboxKindCare",
+  farm:         "inboxKindFarm",
+  announcement: "inboxKindAnnouncement",
 };
 
 const GROUP_ORDER: { key: Group; labelKey: string }[] = [
@@ -77,7 +79,9 @@ export default function CustomerInbox({ loaderData }: Route.ComponentProps) {
   const locale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const [filter, setFilter] = useState<Filter>("all");
 
-  const filtered = filter === "all" ? notifications : notifications.filter((n) => n.kind === filter);
+  const filtered = filter === "all" ? notifications : notifications.filter((n) =>
+    filter === "farm" ? (n.kind === "farm" || n.kind === "announcement") : n.kind === filter
+  );
   const groups = groupNotifications(filtered);
 
   return (

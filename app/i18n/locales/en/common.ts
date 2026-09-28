@@ -20,6 +20,7 @@ export const common = {
   navHome: "Home",
   navSearch: "Search",
   navBoard: "Board",
+  navMessages: "Messages",
   navInbox: "Inbox",
   navMe: "Me",
   navFields: "Fields",

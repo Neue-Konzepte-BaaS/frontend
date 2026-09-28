@@ -83,24 +83,28 @@ export const farmer = {
   cropsSaved: "Crops saved.",
   rentalNotStartedHint: "This rental starts on {{date}}. Messages and ripeness notices reach the tenant from then on.",
 
-  boardMetaTitle: "Board · Farmland",
-  boardTitle: "Board",
-  boardYourPostsTitle: "Your posts",
-  // Ripeness notices never appear here — they have no read-back endpoint of
-  // their own (see lib/ripeness.ts), so this only ever lists announcements.
+  boardMetaTitle: "Messages · Farmland",
+  boardTitle: "Messages",
+  boardTabSend: "Send",
+  boardTabHistory: "History",
+  boardFilterAll: "All",
+  boardFilterPublic: "Board",
+  boardFilterField: "Field",
+  boardFilterPrivate: "Private",
   noPostsYet: "No posts yet — announcements you send will show up here.",
+  noPostsYetFiltered: "No posts match this filter.",
 
-  announceSectionTitle: "Post to the board",
-  announceSectionBody:
-    "Send a note to your tenants. Reaches everyone currently renting from you, or narrow it to one field or plot.",
+  composeDestBoard: "Post to board",
+  composeDestInbox: "Send to inbox",
+  composeSectionTitle: "Send a message",
+  composeSectionBody: "Post to the board for all tenants, or send a private message to one.",
+
   announceSubjectLabel: "Subject",
   announceSubjectPlaceholder: "Harvest on Saturday",
   announceBodyLabel: "Message",
   announceBodyPlaceholder: "From 9am on Saturday we'll be harvesting. Please bring your own crates.",
-  announceScopeLabel: "Audience",
   announceScopeAll: "All current tenants",
   announceScopeField: "Tenants of one field",
-  announceScopePlot: "Tenant of one plot",
   announceChooseField: "Choose a field",
   announceChoosePlot: "Choose a plot",
   announceSending: "Sending…",

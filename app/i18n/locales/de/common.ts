@@ -22,6 +22,7 @@ export const common: Shape = {
   navHome: "Home",
   navSearch: "Suche",
   navBoard: "Pinnwand",
+  navMessages: "Nachrichten",
   navInbox: "Posteingang",
   navMe: "Ich",
   navFields: "Felder",

@@ -55,7 +55,7 @@ export function useFarmerNavItems(): NavItem[] {
     { to: "/farmer/planner", label: t("navPlanner"), icon: LayoutGrid },
     { to: "/farmer/tenants", label: t("navTenants"), icon: Users },
     { to: "/farmer/requests", label: t("navRequests"), icon: ListChecks },
-    { to: "/farmer/board", label: t("navBoard"), icon: ClipboardList },
+    { to: "/farmer/board", label: t("navMessages"), icon: ClipboardList },
     { to: "/farmer/care-guide", label: t("navCareGuide"), icon: BookOpen },
     { to: "/farmer/statistics", label: t("navStatistics"), icon: BarChart3 },
   ];
@@ -75,7 +75,7 @@ export function useFarmerMobileNavItems(): NavItem[] {
     { to: "/farmer", label: t("navHome"), icon: Home, end: true },
     { to: "/farmer/fields", label: t("navFields"), icon: LandPlot },
     { to: "/farmer/tenants", label: t("navTenants"), icon: Users },
-    { to: "/farmer/board", label: t("navBoard"), icon: ClipboardList },
+    { to: "/farmer/board", label: t("navMessages"), icon: ClipboardList },
     { to: "/farmer/settings", label: t("navMe"), icon: CircleUser },
   ];
 }
