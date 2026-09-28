@@ -46,6 +46,11 @@ export const search: Shape = {
   cropMonths_other: "{{count}} Monate",
   rentStartDateHint: "Frühestens morgen, spätestens in 60 Tagen.",
   rentPeriodPreview: "Mietzeitraum: {{period}}",
+  seasonInfoAriaLabel: "Wann {{name}} mietbar ist",
+  seasonWindow: "Jedes Jahr verfügbar {{window}}.",
+  seasonOutOfRangeWarning: "Diese Kultur ist nur {{window}} im Jahr mietbar — wähle ein Startdatum in diesem Zeitraum.",
+  seasonCheckoutConflict: "Die Saison dieser Kultur hat sich geändert und dein gewähltes Datum passt nicht mehr — geh zurück und wähle ein neues Startdatum.",
+  seasonUnavailableNow: "in den nächsten 60 Tagen nicht verfügbar",
   requestSentBody: "Anfrage gesendet — der Hof meldet sich bei dir. Den Status siehst du auf deiner Startseite.",
 
   farmMetaTitle: "Hof · BaaS",

@@ -78,7 +78,7 @@ export function getCheckoutSessionStatus(sessionId: string): Promise<CheckoutSes
   return apiClient.get<CheckoutSessionResult>(`/payments/checkout-sessions/${sessionId}`);
 }
 
-export type CheckoutRequestErrorKind = "plotConflict" | "cropNotOffered" | "invalidRequest" | "other";
+export type CheckoutRequestErrorKind = "plotConflict" | "cropNotOffered" | "outsideSeason" | "invalidRequest" | "other";
 
 /**
  * Classifies an error thrown by createCheckoutSession into one of its
@@ -97,6 +97,9 @@ export function classifyCheckoutSessionError(err: unknown): { kind: CheckoutRequ
   }
   if (err instanceof ApiError && err.status === 409 && err.message === "crop is not offered by this plot") {
     return { kind: "cropNotOffered", message: err.message };
+  }
+  if (err instanceof ApiError && err.status === 409 && err.message === "rental period is outside the crop's season") {
+    return { kind: "outsideSeason", message: err.message };
   }
   if (err instanceof ApiError && err.status === 400) {
     return { kind: "invalidRequest", message: err.message };

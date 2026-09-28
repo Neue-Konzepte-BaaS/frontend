@@ -101,9 +101,11 @@ export default function Checkout() {
             ? t("search:rentConflict")
             : classified.kind === "cropNotOffered"
               ? t("search:cropNotOffered")
-              : classified.kind === "invalidRequest"
-                ? t("search:invalidRentalRequest")
-                : classified.message || t("common:genericError");
+              : classified.kind === "outsideSeason"
+                ? t("search:seasonCheckoutConflict")
+                : classified.kind === "invalidRequest"
+                  ? t("search:invalidRentalRequest")
+                  : classified.message || t("common:genericError");
         setState({ status: "error", message });
       });
   }, [request, t]);

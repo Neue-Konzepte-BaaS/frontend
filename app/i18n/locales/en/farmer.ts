@@ -202,4 +202,8 @@ export const farmer = {
   savingCropRates: "Saving…",
   saveCropRates: "Save rates",
   cropRatesSaved: "Crop rates saved.",
+
+  seasonsMetaTitle: "Seasons · BaaS",
+  seasonsTitle: "Seasons",
+  seasonsBody: "Restrict when a crop can be rented, and give it your own farm's season if the platform defaults don't fit.",
 } as const;
