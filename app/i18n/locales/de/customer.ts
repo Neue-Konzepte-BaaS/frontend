@@ -29,7 +29,8 @@ export const customer: Shape = {
   inboxGroupOlder: "Älter",
   inboxKindRipeness: "Reife",
   inboxKindCare: "Pflege",
-  inboxKindFarm: "Hof",
+  inboxKindFarm: "Direktnachricht",
+  inboxKindAnnouncement: "Pinnwand",
 
   inboxRipenessSubject: "{{crop}} ist reif",
   inboxRipenessBody: "{{crop}} auf {{field}} ist bereit zur Ernte.",

@@ -38,7 +38,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
   const crops = useMemo(() => (field ? cropsOfferedByField(field) : []), [field]);
   const selectedCropId = crops.some((c) => c.id === cropId) ? cropId : (crops[0]?.id ?? "");
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!field || !selectedCropId) return;
     setError(null);
@@ -57,7 +57,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
   const hasFields = fields.length > 0;
 
   return (
-    <section>
+    <div className="rounded-xl border border-beige bg-paper-contrast p-5">
       <h2 className="text-lg font-semibold text-forest">{t("ripenessSectionTitle")}</h2>
 
       {!hasFields ? (
@@ -66,11 +66,11 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
         <>
           <p className="mt-1 text-sm text-warm-olive">{t("ripenessSectionBody")}</p>
 
-          <form onSubmit={handleSubmit} className="mt-4 max-w-lg space-y-4">
+          <form onSubmit={handleSubmit} className="mt-4 space-y-3">
             {error && <FormError message={error} />}
             {success && <FormSuccess message={success} />}
 
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex flex-col gap-3">
               <select
                 aria-label={t("ripenessChooseField")}
                 value={fieldId}
@@ -79,7 +79,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
                   setCropId("");
                 }}
                 disabled={sending}
-                className={`${inputClass} w-auto py-2`}
+                className={`${inputClass} w-full py-2 bg-paper`}
               >
                 {fields.map((f) => (
                   <option key={f.id} value={f.id}>
@@ -94,7 +94,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
                   value={selectedCropId}
                   onChange={(e) => setCropId(e.target.value)}
                   disabled={sending}
-                  className={`${inputClass} w-auto py-2`}
+                  className={`${inputClass} w-full py-2 bg-paper`}
                 >
                   {crops.map((crop) => (
                     <option key={crop.id} value={crop.id}>
@@ -107,7 +107,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
               <button
                 type="submit"
                 disabled={sending || crops.length === 0}
-                className={`${submitClass} w-auto px-4 py-2 text-sm`}
+                className={`${submitClass} w-full py-2 text-sm`}
               >
                 {sending ? t("ripenessSending") : t("ripenessSend")}
               </button>
@@ -119,6 +119,6 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
           </form>
         </>
       )}
-    </section>
+    </div>
   );
 }

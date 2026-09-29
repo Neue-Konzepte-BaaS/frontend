@@ -10,8 +10,11 @@ describe("kindFromResponse", () => {
     expect(kindFromResponse("care")).toBe("care");
   });
 
-  it("files broadcasts and announcements under farm", () => {
+  it("files broadcasts under farm", () => {
     expect(kindFromResponse("broadcast")).toBe("farm");
-    expect(kindFromResponse("announcement")).toBe("farm");
+  });
+
+  it("maps announcement to announcement", () => {
+    expect(kindFromResponse("announcement")).toBe("announcement");
   });
 });

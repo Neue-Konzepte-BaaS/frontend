@@ -25,7 +25,8 @@ export const customer = {
   inboxGroupOlder: "Older",
   inboxKindRipeness: "Ripeness",
   inboxKindCare: "Care",
-  inboxKindFarm: "Farm",
+  inboxKindFarm: "Direct message",
+  inboxKindAnnouncement: "Board",
   inboxRipenessSubject: "{{crop}} is ready to harvest",
   inboxRipenessBody: "{{crop}} on {{field}} is ready to harvest.",
 

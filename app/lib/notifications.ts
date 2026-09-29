@@ -14,7 +14,7 @@ import { apiClient } from "~/lib/api-client";
  * `created_at`) and gets mapped to camelCase at this module's boundary.
  */
 
-export type NotificationKind = "ripeness" | "care" | "farm";
+export type NotificationKind = "ripeness" | "care" | "farm" | "announcement";
 
 export type Notification = {
   id: string;
@@ -32,7 +32,7 @@ export type Notification = {
 
 type InboxItemResponse = {
   id: string;
-  kind: "broadcast" | "announcement" | "ripeness_notice" | "care";
+  kind: "broadcast" | "announcement" | "private_message" | "ripeness_notice" | "care";
   subject: string;
   body: string;
   farm_name?: string;
@@ -46,6 +46,7 @@ export function kindFromResponse(
 ): NotificationKind {
   if (kind === "ripeness_notice") return "ripeness";
   if (kind === "care") return "care";
+  if (kind === "announcement") return "announcement";
   return "farm";
 }
 
