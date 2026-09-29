@@ -61,6 +61,4 @@ export const customer = {
   rentalInactive: "Not running",
   rentalPlotSize: "Plot size",
   rentalField: "Field",
-  handoverHeading: "Handover document",
-  handoverUnavailable: "There's no handover document to download yet.",
 } as const;

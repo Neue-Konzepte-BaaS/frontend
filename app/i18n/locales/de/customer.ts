@@ -66,6 +66,4 @@ export const customer: Shape = {
   rentalInactive: "Läuft nicht",
   rentalPlotSize: "Parzellengröße",
   rentalField: "Feld",
-  handoverHeading: "Übergabeprotokoll",
-  handoverUnavailable: "Es gibt noch kein Übergabeprotokoll zum Herunterladen.",
 };
