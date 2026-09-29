@@ -93,7 +93,6 @@ export const farmer: Shape = {
   boardTabHistory: "Verlauf",
   boardFilterAll: "Alle",
   boardFilterPublic: "Pinnwand",
-  boardFilterField: "Feldweit",
   boardFilterPrivate: "Privat",
   noPostsYet: "Noch keine Beiträge — gesendete Mitteilungen erscheinen hier.",
   noPostsYetFiltered: "Keine Beiträge für diesen Filter.",
@@ -113,7 +112,7 @@ export const farmer: Shape = {
   announceChoosePlot: "Parzelle wählen",
   announceSending: "Wird gesendet…",
   announceSend: "Posten",
-  announceSuccess: "Gepostet — für {{recipients}} Empfänger in die Warteschlange gestellt.",
+  announceSuccess: "Gesendet — {{recipients}} Empfänger werden benachrichtigt.",
 
   ripenessSectionTitle: "Reifehinweis",
   ripenessSectionBody: "Sag den Pächtern, die eine Pflanze auf einem deiner Felder anbauen, dass sie erntereif ist.",
@@ -121,7 +120,7 @@ export const farmer: Shape = {
   ripenessChooseCrop: "Pflanze wählen",
   ripenessSending: "Wird gesendet…",
   ripenessSend: "Benachrichtigen",
-  ripenessSuccess: "Gesendet — für {{recipients}} Empfänger in die Warteschlange gestellt.",
+  ripenessSuccess: "Gesendet — {{recipients}} Empfänger werden benachrichtigt.",
   ripenessNoFieldsYet: "Lege zuerst ein Feld an — Reifehinweise werden pro Feld gepostet.",
   ripenessNoCropsForField: "Für dieses Feld werden auf keiner Parzelle Pflanzen angeboten.",
 

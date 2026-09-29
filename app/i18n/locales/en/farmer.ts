@@ -89,7 +89,6 @@ export const farmer = {
   boardTabHistory: "History",
   boardFilterAll: "All",
   boardFilterPublic: "Board",
-  boardFilterField: "Field",
   boardFilterPrivate: "Private",
   noPostsYet: "No posts yet — announcements you send will show up here.",
   noPostsYetFiltered: "No posts match this filter.",
@@ -109,7 +108,7 @@ export const farmer = {
   announceChoosePlot: "Choose a plot",
   announceSending: "Sending…",
   announceSend: "Post",
-  announceSuccess: "Posted — queued for {{recipients}} recipient(s).",
+  announceSuccess: "Sent — {{recipients}} recipient(s) will be notified.",
 
   ripenessSectionTitle: "Ready-to-harvest notice",
   ripenessSectionBody: "Tell the tenants growing a crop on one of your fields that it's ready to pick.",
@@ -117,7 +116,7 @@ export const farmer = {
   ripenessChooseCrop: "Choose a crop",
   ripenessSending: "Sending…",
   ripenessSend: "Notify",
-  ripenessSuccess: "Sent — queued for {{recipients}} recipient(s).",
+  ripenessSuccess: "Sent — {{recipients}} recipient(s) will be notified.",
   ripenessNoFieldsYet: "Add a field first — ripeness notices are posted per field.",
   ripenessNoCropsForField: "This field has no crops offered on any of its plots yet.",
 

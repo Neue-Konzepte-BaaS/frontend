@@ -34,7 +34,7 @@ function scopeLabel(announcement: Announcement, fields: FieldWithPlots[]): strin
 }
 
 type Tab = "send" | "history";
-type Filter = "all" | "public" | "field" | "private";
+type Filter = "all" | "public" | "private";
 type Destination = "board" | "inbox";
 
 function ComposeBox({
@@ -226,8 +226,7 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = announcements.filter((a) => {
-    if (filter === "public") return !a.fieldId && !a.plotId;
-    if (filter === "field") return !!a.fieldId;
+    if (filter === "public") return !a.plotId;
     if (filter === "private") return !!a.plotId;
     return true;
   });
@@ -270,9 +269,9 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
       {tab === "history" && (
         <div className="mt-6">
           <div className="flex gap-2">
-            {(["all", "public", "field", "private"] as Filter[]).map((f) => (
+            {(["all", "public", "private"] as Filter[]).map((f) => (
               <button key={f} type="button" className={chipClass(filter === f)} onClick={() => setFilter(f)}>
-                {t(f === "all" ? "boardFilterAll" : f === "public" ? "boardFilterPublic" : f === "field" ? "boardFilterField" : "boardFilterPrivate")}
+                {t(f === "all" ? "boardFilterAll" : f === "public" ? "boardFilterPublic" : "boardFilterPrivate")}
               </button>
             ))}
           </div>
