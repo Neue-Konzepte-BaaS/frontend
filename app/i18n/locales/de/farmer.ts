@@ -211,4 +211,8 @@ export const farmer: Shape = {
   savingCropRates: "Wird gespeichert…",
   saveCropRates: "Preise speichern",
   cropRatesSaved: "Pflanzenpreise gespeichert.",
+
+  seasonsMetaTitle: "Saisons · BaaS",
+  seasonsTitle: "Saisons",
+  seasonsBody: "Beschränke, wann eine Kultur mietbar ist, und lege eine eigene Saison für deinen Hof an, falls die Standardwerte nicht passen.",
 };

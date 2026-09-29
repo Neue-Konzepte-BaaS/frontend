@@ -7,6 +7,8 @@ import { formatPriceCents, formatRentalPeriod } from "~/components/plot-card";
 import { inputClass, submitClass, secondaryButtonClass } from "~/components/form";
 import { rememberCheckoutReturnTo } from "~/lib/payments";
 import type { CheckoutRequest } from "~/routes/customer/checkout";
+import { formatSeasonWindow, hasSeasonWindowInRange, seasonContainsPeriod } from "~/lib/seasons";
+import { InfoTooltip } from "~/components/info-tooltip";
 
 /** Isoformat (YYYY-MM-DD) date offset from today by the given number of days, for <input type="date"> min/max. */
 function isoDateOffset(days: number): string {
@@ -51,9 +53,6 @@ type PlotCropsAndRentProps = {
  * backend at all.
  */
 export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, returnTo }: PlotCropsAndRentProps) {
-  const [selectedCropId, setSelectedCropId] = useState(crops[0]?.id ?? "");
-  const [startAt, setStartAt] = useState("");
-  const [message, setMessage] = useState("");
   const { t, i18n } = useTranslation(["search", "common", "auth"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
   const navigate = useNavigate();
@@ -63,20 +62,46 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
   // rather than on every render, since "today" doesn't change mid-session.
   const minStartAt = useMemo(() => isoDateOffset(1), []);
   const maxStartAt = useMemo(() => isoDateOffset(60), []);
+  const minStartDate = useMemo(() => new Date(`${minStartAt}T00:00:00`), [minStartAt]);
+  const maxStartDate = useMemo(() => new Date(`${maxStartAt}T00:00:00`), [maxStartAt]);
+
+  // A crop with a season that can't fit a rental anywhere in the pickable
+  // 1-60-day-out range is never rentable right now — no date the customer
+  // could pick would work, so it's shown greyed out and can't be selected,
+  // rather than only failing once they pick a specific date.
+  const rentableCropIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const crop of crops) {
+      if (!crop.season || hasSeasonWindowInRange(crop.season, crop.durationMonths, minStartDate, maxStartDate)) {
+        ids.add(crop.id);
+      }
+    }
+    return ids;
+  }, [crops, minStartDate, maxStartDate]);
+
+  const [selectedCropId, setSelectedCropId] = useState(
+    () => crops.find((c) => rentableCropIds.has(c.id))?.id ?? crops[0]?.id ?? "",
+  );
+  const [startAt, setStartAt] = useState("");
+  const [message, setMessage] = useState("");
 
   const selectedCrop = crops.find((c) => c.id === selectedCropId) ?? crops[0];
 
   let periodPreview: string | null = null;
+  let outsideSeason = false;
   if (selectedCrop && startAt) {
     const start = new Date(`${startAt}T00:00:00`);
     const end = new Date(start);
     end.setMonth(end.getMonth() + selectedCrop.durationMonths);
     periodPreview = formatRentalPeriod(start.toISOString(), end.toISOString(), locale);
+    if (selectedCrop.season) {
+      outsideSeason = !seasonContainsPeriod(selectedCrop.season, start, end);
+    }
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selectedCrop || !startAt || !message.trim()) return;
+    if (!selectedCrop || !startAt || !message.trim() || outsideSeason) return;
 
     const startAtIso = new Date(`${startAt}T00:00:00`).toISOString();
     const state: CheckoutRequest = { plotId, cropId: selectedCrop.id, startAt: startAtIso, message: message.trim() };
@@ -126,11 +151,16 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
         <div className="mt-2 grid gap-2">
           {crops.map((crop) => {
             const checked = crop.id === selectedCrop?.id;
+            const rentable = rentableCropIds.has(crop.id);
             return (
               <label
                 key={crop.id}
-                className={`flex cursor-pointer items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                  checked ? "border-moss bg-moss/10 text-forest" : "border-beige bg-white text-wood hover:bg-cream"
+                className={`flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                  !rentable
+                    ? "cursor-not-allowed border-beige bg-cream/60 text-warm-olive opacity-60"
+                    : checked
+                      ? "cursor-pointer border-moss bg-moss/10 text-forest"
+                      : "cursor-pointer border-beige bg-white text-wood hover:bg-cream"
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -139,12 +169,19 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
                     name={`crop-${plotId}`}
                     value={crop.id}
                     checked={checked}
+                    disabled={!rentable}
                     onChange={() => setSelectedCropId(crop.id)}
-                    className="h-4 w-4 border-beige text-moss focus:ring-moss"
+                    className="h-4 w-4 border-beige text-moss focus:ring-moss disabled:cursor-not-allowed"
                   />
                   <span className="font-medium">{crop.name}</span>
+                  {crop.season && (
+                    <InfoTooltip label={t("search:seasonInfoAriaLabel", { name: crop.name })}>
+                      {t("search:seasonWindow", { window: formatSeasonWindow(crop.season, locale) })}
+                    </InfoTooltip>
+                  )}
+                  {!rentable && <span className="text-xs">({t("search:seasonUnavailableNow")})</span>}
                 </span>
-                <span className="text-warm-olive">
+                <span className={rentable ? "text-warm-olive" : ""}>
                   {t("search:cropMonths", { count: crop.durationMonths })} · {formatPriceCents(crop.priceCents, locale)}
                 </span>
               </label>
@@ -167,9 +204,15 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
           onChange={(e) => setStartAt(e.target.value)}
           className={`${inputClass} mt-1 block text-sm`}
         />
-        <p className="mt-1 text-xs text-warm-olive">
-          {periodPreview ? t("search:rentPeriodPreview", { period: periodPreview }) : t("search:rentStartDateHint")}
-        </p>
+        {outsideSeason ? (
+          <p role="alert" className="mt-1 text-xs text-error">
+            {t("search:seasonOutOfRangeWarning", { window: selectedCrop?.season ? formatSeasonWindow(selectedCrop.season, locale) : "" })}
+          </p>
+        ) : (
+          <p className="mt-1 text-xs text-warm-olive">
+            {periodPreview ? t("search:rentPeriodPreview", { period: periodPreview }) : t("search:rentStartDateHint")}
+          </p>
+        )}
       </div>
 
       <div>
@@ -187,7 +230,11 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
         />
       </div>
 
-      <button type="submit" disabled={!startAt || !message.trim()} className={`${submitClass} px-4 py-2 text-sm`}>
+      <button
+        type="submit"
+        disabled={!startAt || !message.trim() || outsideSeason || !selectedCrop || !rentableCropIds.has(selectedCrop.id)}
+        className={`${submitClass} px-4 py-2 text-sm`}
+      >
         {t("search:continueToPayment")}
       </button>
     </form>

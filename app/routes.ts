@@ -23,6 +23,7 @@ export default [
     route("admin/accounts", "routes/admin/accounts.tsx"),
     route("admin/rentals", "routes/admin/rentals.tsx"),
     route("admin/crops", "routes/admin/crops.tsx"),
+    route("admin/seasons", "routes/admin/seasons.tsx"),
     route("admin/broadcast", "routes/admin/broadcast.tsx"),
   ]),
   // Tenant section: nav is Home/Search/Board/Inbox/Me (issue #27). A layout
@@ -72,6 +73,7 @@ export default [
     route("farmer/requests", "routes/farmer/requests.tsx"),
     route("farmer/board", "routes/farmer/board.tsx"),
     route("farmer/care-guide", "routes/farmer/care-guide.tsx"),
+    route("farmer/seasons", "routes/farmer/seasons.tsx"),
     // The farmer's own numbers (issue #22): headline tiles from GET
     // /api/statistics, plus breakdowns computed client-side from rentals/fields.
     route("farmer/statistics", "routes/farmer/statistics.tsx"),

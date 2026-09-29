@@ -3,6 +3,7 @@ import {
   BarChart3,
   BookOpen,
   Building2,
+  CalendarRange,
   CircleUser,
   ClipboardList,
   Home,
@@ -57,6 +58,7 @@ export function useFarmerNavItems(): NavItem[] {
     { to: "/farmer/requests", label: t("navRequests"), icon: ListChecks },
     { to: "/farmer/board", label: t("navBoard"), icon: ClipboardList },
     { to: "/farmer/care-guide", label: t("navCareGuide"), icon: BookOpen },
+    { to: "/farmer/seasons", label: t("navSeasons"), icon: CalendarRange },
     { to: "/farmer/statistics", label: t("navStatistics"), icon: BarChart3 },
   ];
 }
@@ -107,6 +109,7 @@ export function useAdminSystemItems(): NavItem[] {
   const { t } = useTranslation("common");
   return [
     { to: "/admin/crops", label: t("navCrops"), icon: Sprout },
+    { to: "/admin/seasons", label: t("navSeasons"), icon: CalendarRange },
     { to: "/admin/broadcast", label: t("navBroadcast"), icon: Megaphone },
   ];
 }

@@ -1,6 +1,7 @@
 import { apiClient } from "~/lib/api-client";
 import type { Crop, Plot } from "~/lib/fields";
 import type { PolygonGeometry } from "~/lib/geo";
+import type { Season } from "~/lib/seasons";
 
 export type { Crop } from "~/lib/fields";
 
@@ -37,15 +38,20 @@ export type { Crop } from "~/lib/fields";
  */
 
 /**
- * A crop offering on a specific plot: the crop itself plus the total price
- * to rent this plot for that crop's fixed duration. `priceCents` is
- * computed server-side (from the plot's own base rate and the farm's
- * per-crop rate, both set by the farmer) — the frontend only ever displays
- * it, never computes or trusts a price of its own. A plot only offers a
- * crop here once the farmer has priced both halves; an offered-but-unpriced
- * crop simply doesn't appear in `crops` at all (see NearbyPlot below).
+ * A crop offering on a specific plot: the crop itself, the total price to
+ * rent this plot for that crop's fixed duration, and the season a rental of
+ * it here must fall within, if any. `priceCents` is computed server-side
+ * (from the plot's own base rate and the farm's per-crop rate, both set by
+ * the farmer) — the frontend only ever displays it, never computes or
+ * trusts a price of its own. A plot only offers a crop here once the farmer
+ * has priced both halves; an offered-but-unpriced crop simply doesn't
+ * appear in `crops` at all (see NearbyPlot below). `season` is the crop's
+ * effective season for this plot's farm — the farm's own rule if it has
+ * one, the default rule otherwise, or null if the crop is unrestricted
+ * here. Lets a customer see it before paying rather than finding out from a
+ * 409 on checkout.
  */
-export type PlotCropOffering = Crop & { priceCents: number };
+export type PlotCropOffering = Crop & { priceCents: number; season: Season | null };
 
 export type NearbyPlot = {
   id: string;

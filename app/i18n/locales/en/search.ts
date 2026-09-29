@@ -43,6 +43,11 @@ export const search = {
   cropMonths_other: "{{count}} months",
   rentStartDateHint: "Earliest tomorrow, at most 60 days from now.",
   rentPeriodPreview: "Rental period: {{period}}",
+  seasonInfoAriaLabel: "When {{name}} can be rented",
+  seasonWindow: "Available {{window}} each year.",
+  seasonOutOfRangeWarning: "This crop can only be rented {{window}} each year — pick a start date within that window.",
+  seasonCheckoutConflict: "This crop's season changed and your chosen date no longer fits — go back and pick a new start date.",
+  seasonUnavailableNow: "not available in the next 60 days",
   requestSentBody: "Request sent — the farm will get back to you. You can follow its status on your home page.",
 
   farmMetaTitle: "Farm · Farmland",

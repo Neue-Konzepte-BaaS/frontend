@@ -36,6 +36,7 @@ export const common: Shape = {
   navAccounts: "Konten",
   navRentals: "Mieten",
   navCrops: "Pflanzen",
+  navSeasons: "Saisons",
   navBroadcast: "Rundnachricht",
 
   comingSoonLead: "Demnächst verfügbar.",
