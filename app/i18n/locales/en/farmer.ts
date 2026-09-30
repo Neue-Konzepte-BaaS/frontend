@@ -37,8 +37,9 @@ export const farmer = {
   gridInstructions: "Pick rows and columns — the map shows you right away where each plot will land.",
   rowsLabel: "Rows",
   columnsLabel: "Columns",
-  gridPreviewCount: "Preview: {{rows}} rows × {{cols}} columns = {{count}} plots.",
-  gridPreviewTooLarge: "That's a lot of plots to preview — the grid will still generate, just without a live preview above {{max}}.",
+  gridPreviewCount: "Preview: {{rows}} rows × {{cols}} columns = {{count}} plots of {{area}} each.",
+  gridPreviewTooLarge:
+    "That's a lot of plots to preview — the grid will still generate, just without a live preview above {{max}}. Each plot would be about {{area}}.",
   creatingPlotProgress: "Creating plot {{done}} of {{total}}…",
   generatePlots: "Generate plots",
   noCropsForPlot: "No crops offered yet",

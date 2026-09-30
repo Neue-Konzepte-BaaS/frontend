@@ -294,6 +294,36 @@ const GRID_CELL_INSET_M = 0.001;
  * rectangle). Every cell is then inset by GRID_CELL_INSET_M — see its
  * comment for why that's load-bearing, not cosmetic.
  */
+/**
+ * Great-circle distance between two lon/lat points, in meters (haversine,
+ * WGS84 spherical approximation). NOT the same as measuring the Mercator-
+ * projected coordinate delta: Web Mercator's scale factor is 1/cos(lat), so
+ * treating projected-meter deltas as real-world meters overstates distances
+ * away from the equator (and overstates *area* by 1/cos(lat)^2, since the
+ * stretch applies in both directions — e.g. ~2.3x too large at 49°N, which
+ * is exactly the size of discrepancy this function was added to fix, found
+ * by comparing against the backend's PostGIS ST_Area(::geography) truth).
+ */
+function haversineDistanceMeters(p1: Position, p2: Position): number {
+  const [lon1, lat1] = p1;
+  const [lon2, lat2] = p2;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const havSin =
+    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * EARTH_RADIUS_M * Math.asin(Math.sqrt(havSin));
+}
+
+/** A field rectangle's two edge lengths in real-world meters (geodesic, not Mercator-projected). */
+export function rectangleEdgeLengthsMeters(fieldCorners: RectangleCorners): { widthM: number; heightM: number } {
+  const [a, b, , d] = fieldCorners;
+  return {
+    widthM: haversineDistanceMeters(a, b),
+    heightM: haversineDistanceMeters(a, d),
+  };
+}
+
 export function subdivideIntoGrid(fieldCorners: RectangleCorners, rows: number, cols: number): PolygonGeometry[] {
   if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows < 1 || cols < 1) {
     throw new Error(`subdivideIntoGrid: rows and cols must be positive integers, got ${rows}x${cols}`);
