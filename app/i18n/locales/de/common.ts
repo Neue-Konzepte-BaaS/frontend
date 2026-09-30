@@ -38,6 +38,7 @@ export const common: Shape = {
   navAccounts: "Konten",
   navRentals: "Mieten",
   navCrops: "Pflanzen",
+  navAdminCareGuide: "Pflegehinweise",
   navSeasons: "Saisons",
   navBroadcast: "Rundnachricht",
   navSubscriptionPlans: "Abo-Tarife",

@@ -110,6 +110,7 @@ export function useAdminSystemItems(): NavItem[] {
   const { t } = useTranslation("common");
   return [
     { to: "/admin/crops", label: t("navCrops"), icon: Sprout },
+    { to: "/admin/care-guide", label: t("navAdminCareGuide"), icon: BookOpen },
     { to: "/admin/seasons", label: t("navSeasons"), icon: CalendarRange },
     { to: "/admin/broadcast", label: t("navBroadcast"), icon: Megaphone },
     { to: "/admin/subscription-plans", label: t("navSubscriptionPlans"), icon: CreditCard },
