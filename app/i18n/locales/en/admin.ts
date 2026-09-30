@@ -91,7 +91,7 @@ export const admin = {
   careCropLabel: "Crop",
   careLoading: "Loading the guide…",
   careNoInstructions: "No instructions for this crop yet.",
-  careWeekLabel: "Rental week (1–104)",
+  careWeekLabel: "Rental week",
   careWeekLabelShort: "Week {{week}}",
   careWeekInvalid: "The week has to be a whole number between 1 and 104.",
   careTitleLabel: "Task",
