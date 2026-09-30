@@ -30,6 +30,7 @@ export const common = {
   navCareGuide: "Care guide",
   navStatistics: "Statistics",
   navFarmSettings: "Farm settings",
+  navSubscription: "Subscription",
   navPlatform: "Platform",
   navFarms: "Farms",
   navAccounts: "Accounts",
@@ -37,6 +38,7 @@ export const common = {
   navCrops: "Crops",
   navSeasons: "Seasons",
   navBroadcast: "Broadcast",
+  navSubscriptionPlans: "Subscription plans",
 
   comingSoonLead: "Coming soon.",
   comingSoonBody: "This screen isn't built yet — the navigation to reach it is.",

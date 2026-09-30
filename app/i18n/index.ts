@@ -10,6 +10,7 @@ import { farmer as enFarmer } from "~/i18n/locales/en/farmer";
 import { admin as enAdmin } from "~/i18n/locales/en/admin";
 import { customer as enCustomer } from "~/i18n/locales/en/customer";
 import { payment as enPayment } from "~/i18n/locales/en/payment";
+import { subscription as enSubscription } from "~/i18n/locales/en/subscription";
 
 import { common as deCommon } from "~/i18n/locales/de/common";
 import { home as deHome } from "~/i18n/locales/de/home";
@@ -19,6 +20,7 @@ import { farmer as deFarmer } from "~/i18n/locales/de/farmer";
 import { admin as deAdmin } from "~/i18n/locales/de/admin";
 import { customer as deCustomer } from "~/i18n/locales/de/customer";
 import { payment as dePayment } from "~/i18n/locales/de/payment";
+import { subscription as deSubscription } from "~/i18n/locales/de/subscription";
 
 export const defaultNS = "common";
 
@@ -32,6 +34,7 @@ export const resources = {
     admin: enAdmin,
     customer: enCustomer,
     payment: enPayment,
+    subscription: enSubscription,
   },
   de: {
     common: deCommon,
@@ -42,6 +45,7 @@ export const resources = {
     admin: deAdmin,
     customer: deCustomer,
     payment: dePayment,
+    subscription: deSubscription,
   },
 } as const;
 

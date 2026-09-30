@@ -25,6 +25,9 @@ export default [
     route("admin/crops", "routes/admin/crops.tsx"),
     route("admin/seasons", "routes/admin/seasons.tsx"),
     route("admin/broadcast", "routes/admin/broadcast.tsx"),
+    // Subscription tier pricing (issue #73) — pinned in the same "System
+    // tools" nav group as Crops/Seasons/Broadcast.
+    route("admin/subscription-plans", "routes/admin/subscription-plans.tsx"),
   ]),
   // Tenant section: nav is Home/Search/Board/Inbox/Me (issue #27). A layout
   // owns the requireRole("customer") guard + shared chrome for everything
@@ -54,11 +57,22 @@ export default [
     route("customer/request-sent", "routes/customer/request-sent.tsx"),
   ]),
   // Farmer section: nav is Home/Fields/Plot planner/Tenants/Requests/Board/
-  // Care guide/Statistics, plus Farm settings pinned separately (issue #27). A layout
-  // owns the requireRole("farmer") guard and shared chrome; children render
+  // Care guide/Statistics, plus Farm settings and Subscription pinned
+  // separately (issue #27, #73). A layout owns the requireRole("farmer") +
+  // requireActiveSubscription guard and shared chrome; children render
   // in its <Outlet />.
   layout("routes/farmer/layout.tsx", { id: "farmer-layout" }, [
     route("farmer", "routes/farmer/index.tsx"),
+    // Subscription selection/checkout (issue #73) — nested here (not a
+    // top-level sibling) so a farmer keeps the header/sidebar throughout,
+    // including one who already has a subscription and is just checking its
+    // status via the pinned nav item. requireActiveSubscription (the
+    // layout's own guard, above) exempts exactly these three paths from its
+    // redirect so an unsubscribed farmer visiting them doesn't loop back to
+    // themselves — see ~/lib/guards.ts.
+    route("farmer/subscribe", "routes/farmer/subscribe.tsx"),
+    route("farmer/subscribe/checkout", "routes/farmer/subscribe-checkout.tsx"),
+    route("farmer/subscribe/return", "routes/farmer/subscribe-return.tsx"),
     route("farmer/fields", "routes/farmer/fields.tsx"),
     // A field's "digital twin": view it, and (once, before any plots exist)
     // generate its plot grid.

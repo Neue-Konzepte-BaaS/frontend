@@ -4,6 +4,12 @@ import type { NavItem } from "~/lib/nav-items";
 /**
  * Desktop-only left sidebar (hidden below the `md` breakpoint — see
  * app-shell.tsx for why width, not orientation, decides which nav shows).
+ * `h-full` (of the flex row app-shell.tsx sizes to the viewport minus the
+ * page's own header) plus `overflow-y-auto` keep every item reachable and
+ * the sidebar itself always fully visible, instead of growing with (and
+ * scrolling away with) a tall page like Farm settings — a farmer no longer
+ * has to scroll the whole page just to reach a nav item, and the sidebar
+ * never runs off past the bottom of the screen.
  */
 export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem | NavItem[] }) {
   // One item (the farmer's "My farm") or a group (the admin's System
@@ -11,7 +17,7 @@ export function SideNav({ items, pinned }: { items: NavItem[]; pinned?: NavItem 
   const pinnedItems = pinned ? (Array.isArray(pinned) ? pinned : [pinned]) : [];
 
   return (
-    <nav className="hidden shrink-0 flex-col justify-between border-r border-beige/50 bg-beige p-4 md:flex md:w-64">
+    <nav className="hidden h-full shrink-0 flex-col justify-between overflow-y-auto border-r border-beige/50 bg-beige p-4 md:flex md:w-64">
       <ul className="space-y-1">
         {items.map((item) => (
           <SideNavLink key={item.to} item={item} />

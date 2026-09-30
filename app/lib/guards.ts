@@ -1,5 +1,6 @@
 import { redirect } from "react-router";
 import { me, dashboardPath, type Account, type Role } from "~/lib/auth";
+import { getSubscriptionStatusOrNull, hasActiveSubscription } from "~/lib/subscriptions";
 
 /**
  * dashboardPath(...) plus the query param AccountTypeNotice reads to explain
@@ -29,6 +30,42 @@ export async function requireRole(required: Role): Promise<Account> {
     throw redirect(dashboardPathWithNotice(account, required));
   }
   return account;
+}
+
+/**
+ * Paths under farmer-layout that must render even for a farmer with no
+ * Active/PastDue subscription — the plan picker itself and its Stripe
+ * checkout/return pages. requireActiveSubscription below never redirects
+ * away from one of these, since redirecting /farmer/subscribe to
+ * /farmer/subscribe would loop forever.
+ */
+const SUBSCRIPTION_FLOW_PATHS = ["/farmer/subscribe", "/farmer/subscribe/checkout", "/farmer/subscribe/return"];
+
+/**
+ * clientLoader guard for farmer/layout.tsx, run right after requireRole
+ * ("farmer"): redirects to the plan picker unless the caller holds an
+ * Active or PastDue subscription — mirrors the backend's own
+ * RequireActiveSubscription middleware, which otherwise 402s every one of
+ * these routes anyway. Returns whether the subscription is active so the
+ * layout can also use it to decide which nav items are safe to show — the
+ * full dashboard nav 402s for an unsubscribed farmer, which is exactly the
+ * case that lands them on the exempted subscribe-flow paths below.
+ *
+ * Takes the current pathname rather than assuming it can redirect
+ * unconditionally: the picker/checkout/return pages are nested inside
+ * farmer-layout too (so they get the same header/sidebar as every other
+ * farmer page), and this guard runs on every one of its children — without
+ * the exemption below, visiting /farmer/subscribe while unsubscribed would
+ * redirect to /farmer/subscribe, which re-runs this same guard, forever.
+ */
+export async function requireActiveSubscription(pathname: string): Promise<boolean> {
+  const sub = await getSubscriptionStatusOrNull();
+  const active = hasActiveSubscription(sub);
+
+  if (!active && !SUBSCRIPTION_FLOW_PATHS.includes(pathname)) {
+    throw redirect("/farmer/subscribe");
+  }
+  return active;
 }
 
 /**
