@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
 import type { Crop } from "~/lib/fields";
 import {
   createCareInstruction,
@@ -56,6 +57,9 @@ export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" 
   const [saving, setSaving] = useState(false);
   /** Which instruction's Delete button is armed and waiting for a second click. */
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const weekInputRef = useRef<HTMLInputElement>(null);
+
+  const selectedCrop = crops.find((crop) => crop.id === cropId);
 
   useEffect(() => {
     if (!cropId) return;
@@ -100,6 +104,8 @@ export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" 
     setBody(instruction.body);
     setError(null);
     setSuccess(null);
+    weekInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    weekInputRef.current?.focus();
   }
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -260,120 +266,189 @@ export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" 
         </div>
       )}
 
-      {loading ? (
-        <p className="mt-4 text-sm text-warm-olive">{t("careLoading")}</p>
-      ) : instructions.length === 0 ? (
-        <p className="mt-4 text-sm text-warm-olive">{t("careNoInstructions")}</p>
-      ) : (
-        <ul className="mt-4 divide-y divide-beige rounded-2xl border border-beige bg-cream shadow-sm">
-          {instructions.map((instruction) => (
-            <li key={instruction.id} className="flex items-start justify-between gap-4 px-5 py-3">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold tracking-widest text-moss uppercase">
-                  {t("careWeekLabelShort", { week: instruction.week })}
-                </p>
-                <p className="mt-1 font-medium text-forest">{instruction.title}</p>
-                <p className="mt-1 text-sm text-wood">{instruction.body}</p>
-              </div>
-              <span className="flex shrink-0 items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => startEditing(instruction)}
-                  className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
-                >
-                  {t("careEdit")}
-                </button>
-                {/* Two-click delete, matching the crop list: no window.confirm,
-                    which is unstyled and can't be translated. */}
-                {pendingDeleteId === instruction.id ? (
-                  <>
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div className="min-w-0">
+          {!loading && (
+            <WeekOverview crop={selectedCrop} instructions={instructions} t={t} onSelectWeek={startEditing} />
+          )}
+
+          {loading ? (
+            <p className="text-sm text-warm-olive">{t("careLoading")}</p>
+          ) : instructions.length === 0 ? (
+            <p className="text-sm text-warm-olive">{t("careNoInstructions")}</p>
+          ) : (
+            <ul className="divide-y divide-beige rounded-2xl border border-beige bg-cream shadow-sm">
+              {instructions.map((instruction) => (
+                <li key={instruction.id} className="flex items-start justify-between gap-4 px-5 py-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold tracking-widest text-moss uppercase">
+                      {t("careWeekLabelShort", { week: instruction.week })}
+                    </p>
+                    <p className="mt-1 font-medium text-forest">{instruction.title}</p>
+                    <p className="mt-1 text-sm text-wood">{instruction.body}</p>
+                  </div>
+                  <span className="flex shrink-0 items-center gap-1">
                     <button
                       type="button"
-                      onClick={() => handleDelete(instruction)}
-                      className="rounded bg-error px-2 py-1 text-xs font-medium text-ivory hover:opacity-90"
-                    >
-                      {t("cropDeleteConfirm")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setPendingDeleteId(null)}
+                      onClick={() => startEditing(instruction)}
                       className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
                     >
-                      {t("cropDeleteCancel")}
+                      {t("careEdit")}
                     </button>
-                  </>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setPendingDeleteId(instruction.id)}
-                    className="rounded px-2 py-1 text-xs font-medium text-error hover:bg-error/10"
-                  >
-                    {t("cropDelete")}
-                  </button>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <form onSubmit={handleSubmit} className="mt-4 max-w-sm space-y-4">
-        {error && <FormError message={error} />}
-        {success && <FormSuccess message={success} />}
-
-        <FormField label={t("careWeekLabel")} htmlFor="care-week">
-          <input
-            id="care-week"
-            type="number"
-            required
-            min={1}
-            max={104}
-            step={1}
-            inputMode="numeric"
-            value={week}
-            onChange={(e) => setWeek(e.target.value)}
-            className={inputClass}
-          />
-        </FormField>
-
-        <FormField label={t("careTitleLabel")} htmlFor="care-title">
-          <input
-            id="care-title"
-            type="text"
-            required
-            maxLength={200}
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t("careTitlePlaceholder")}
-            className={inputClass}
-          />
-        </FormField>
-
-        <FormField label={t("careBodyLabel")} htmlFor="care-body">
-          <textarea
-            id="care-body"
-            required
-            rows={3}
-            maxLength={5000}
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            placeholder={t("careBodyPlaceholder")}
-            className={inputClass}
-          />
-        </FormField>
-
-        <div className="flex gap-2">
-          <button type="submit" disabled={saving} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
-            {saving ? t("careSaving") : editingId ? t("careSaveEdit") : t("careAdd")}
-          </button>
-          {editingId && (
-            <button type="button" onClick={resetForm} className={`${secondaryButtonClass} px-6 py-2 text-sm`}>
-              {t("careCancelEdit")}
-            </button>
+                    {/* Two-click delete, matching the crop list: no window.confirm,
+                        which is unstyled and can't be translated. */}
+                    {pendingDeleteId === instruction.id ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(instruction)}
+                          className="rounded bg-error px-2 py-1 text-xs font-medium text-ivory hover:opacity-90"
+                        >
+                          {t("cropDeleteConfirm")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPendingDeleteId(null)}
+                          className="rounded px-2 py-1 text-xs font-medium text-wood hover:bg-beige/50"
+                        >
+                          {t("cropDeleteCancel")}
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setPendingDeleteId(instruction.id)}
+                        className="rounded px-2 py-1 text-xs font-medium text-error hover:bg-error/10"
+                      >
+                        {t("cropDelete")}
+                      </button>
+                    )}
+                  </span>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-      </form>
+
+        <div className="lg:sticky lg:top-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm"
+          >
+            <p className="text-xs font-semibold tracking-widest text-moss uppercase">
+              {editingId ? t("careSaveEdit") : t("careAdd")}
+            </p>
+
+            {error && <FormError message={error} />}
+            {success && <FormSuccess message={success} />}
+
+            <FormField label={t("careWeekLabel")} htmlFor="care-week">
+              <input
+                ref={weekInputRef}
+                id="care-week"
+                type="number"
+                required
+                min={1}
+                max={104}
+                step={1}
+                inputMode="numeric"
+                value={week}
+                onChange={(e) => setWeek(e.target.value)}
+                className={inputClass}
+              />
+            </FormField>
+
+            <FormField label={t("careTitleLabel")} htmlFor="care-title">
+              <input
+                id="care-title"
+                type="text"
+                required
+                maxLength={200}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder={t("careTitlePlaceholder")}
+                className={inputClass}
+              />
+            </FormField>
+
+            <FormField label={t("careBodyLabel")} htmlFor="care-body">
+              <textarea
+                id="care-body"
+                required
+                rows={3}
+                maxLength={5000}
+                value={body}
+                onChange={(e) => setBody(e.target.value)}
+                placeholder={t("careBodyPlaceholder")}
+                className={inputClass}
+              />
+            </FormField>
+
+            <div className="flex gap-2">
+              <button type="submit" disabled={saving} className={`${primaryButtonClass} px-6 py-2 text-sm`}>
+                {saving ? t("careSaving") : editingId ? t("careSaveEdit") : t("careAdd")}
+              </button>
+              {editingId && (
+                <button type="button" onClick={resetForm} className={`${secondaryButtonClass} px-6 py-2 text-sm`}>
+                  {t("careCancelEdit")}
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
+      </div>
     </section>
+  );
+}
+
+/** Approximate week count for a crop's own rental length, since the exact
+ * calendar-based totalWeeks needs a real start date this editor doesn't have.
+ * Matches the backend pricing convention's weeks-per-month multiplier
+ * (see backend/internal/services/pricing.go), rounded up to stay inclusive. */
+function approximateWeeks(durationMonths: number): number {
+  return Math.ceil(durationMonths * (52 / 12));
+}
+
+function WeekOverview({
+  crop,
+  instructions,
+  t,
+  onSelectWeek,
+}: {
+  crop: Crop | undefined;
+  instructions: CareInstruction[];
+  t: TFunction;
+  onSelectWeek: (instruction: CareInstruction) => void;
+}) {
+  if (!crop) return null;
+
+  const totalWeeks = approximateWeeks(crop.durationMonths);
+  if (totalWeeks <= 0) return null;
+
+  const byWeek = new Map(instructions.map((instruction) => [instruction.week, instruction]));
+  const weeks = Array.from({ length: totalWeeks }, (_, i) => i + 1);
+
+  return (
+    <div className="mb-4 rounded-2xl border border-beige bg-cream p-4 shadow-sm">
+      <div
+        className="grid gap-1"
+        style={{ gridTemplateColumns: `repeat(${Math.min(totalWeeks, 13)}, minmax(0, 1fr))` }}
+      >
+        {weeks.map((week) => {
+          const instruction = byWeek.get(week);
+          return (
+            <button
+              key={week}
+              type="button"
+              disabled={!instruction}
+              onClick={() => instruction && onSelectWeek(instruction)}
+              title={t("careWeekLabelShort", { week })}
+              className={`h-3 rounded-sm ${instruction ? "bg-moss hover:bg-moss/70" : "bg-beige/40"}`}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 }
 

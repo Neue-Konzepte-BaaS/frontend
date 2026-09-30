@@ -95,7 +95,7 @@ export const admin: Shape = {
   careCropLabel: "Kultur",
   careLoading: "Pflegeplan wird geladen…",
   careNoInstructions: "Für diese Kultur gibt es noch keine Anweisungen.",
-  careWeekLabel: "Mietwoche (1–104)",
+  careWeekLabel: "Mietwoche",
   careWeekLabelShort: "Woche {{week}}",
   careWeekInvalid: "Die Woche muss eine ganze Zahl zwischen 1 und 104 sein.",
   careTitleLabel: "Aufgabe",
