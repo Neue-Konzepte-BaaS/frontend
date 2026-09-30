@@ -32,6 +32,7 @@ export const common: Shape = {
   navCareGuide: "Pflegehinweise",
   navStatistics: "Statistiken",
   navFarmSettings: "Hofeinstellungen",
+  navSubscription: "Abonnement",
   navPlatform: "Plattform",
   navFarms: "Höfe",
   navAccounts: "Konten",
@@ -39,6 +40,7 @@ export const common: Shape = {
   navCrops: "Pflanzen",
   navSeasons: "Saisons",
   navBroadcast: "Rundnachricht",
+  navSubscriptionPlans: "Abo-Tarife",
 
   comingSoonLead: "Demnächst verfügbar.",
   comingSoonBody: "Dieser Bereich ist noch nicht gebaut — die Navigation dorthin schon.",

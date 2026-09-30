@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useTranslation } from "react-i18next";
-import { loadStripe, type Appearance } from "@stripe/stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutElementsProvider, useCheckoutElements, PaymentElement, ContactDetailsElement } from "@stripe/react-stripe-js/checkout";
 import { Loader2 } from "lucide-react";
 import { createCheckoutSession, classifyCheckoutSessionError, type CheckoutSession } from "~/lib/payments";
 import { STRIPE_PUBLISHABLE_KEY } from "~/lib/constants";
+import { stripeAppearance } from "~/lib/stripe-appearance";
 import { formatPriceCents } from "~/components/plot-card";
 import { FormError, primaryButtonClass } from "~/components/form";
 import i18n from "~/i18n";
@@ -26,38 +27,6 @@ export type CheckoutRequest = {
 // Loaded once at module scope, same as Stripe's own docs recommend — loadStripe
 // caches internally, but there's no reason to re-trigger that per render.
 const stripePromise = STRIPE_PUBLISHABLE_KEY ? loadStripe(STRIPE_PUBLISHABLE_KEY) : null;
-
-// Custom Checkout (ui_mode: "elements", see backend/internal/repositories/stripe_gateway.go)
-// only themes the Payment/Contact Details Elements it renders — everything
-// else on this page is plain HTML/Tailwind, so this is the one place that
-// has to hand Stripe our palette explicitly instead of inheriting it from
-// app.css. Values mirror app/app.css's --color-* tokens and the rounded-lg /
-// inputClass look used by every other form in the app.
-const stripeAppearance: Appearance = {
-  theme: "stripe",
-  variables: {
-    colorPrimary: "#524A26", // moss
-    colorBackground: "#F3E7C8", // ivory, matches inputClass's bg-ivory
-    colorText: "#31311B", // forest
-    colorTextSecondary: "#5F572E", // wood
-    colorTextPlaceholder: "#9B8D5B", // warm-olive
-    colorDanger: "#A96F4A", // error
-    fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-    fontSizeBase: "16px",
-    borderRadius: "8px", // rounded-lg
-    spacingUnit: "4px",
-  },
-  rules: {
-    ".Label": { color: "#5F572E", fontWeight: "500", marginBottom: "4px" },
-    ".Input": { border: "1px solid #B4AF8A", boxShadow: "none", padding: "12px 16px" }, // beige border
-    ".Input:focus": { border: "1px solid #524A26", boxShadow: "0 0 0 2px #797449" },
-    ".Tab": { border: "1px solid #B4AF8A", boxShadow: "none" },
-    ".Tab:hover": { color: "#31311B" },
-    ".Tab--selected": { border: "1px solid #524A26", backgroundColor: "#F3E7C8" },
-    ".TabLabel": { fontWeight: "500" },
-    ".Block": { border: "1px solid #B4AF8A", boxShadow: "none" },
-  },
-};
 
 type SessionState = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; session: CheckoutSession };
 

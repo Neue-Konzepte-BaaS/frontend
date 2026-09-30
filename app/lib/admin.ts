@@ -1,6 +1,7 @@
 import { apiClient } from "~/lib/api-client";
 import type { Role } from "~/lib/auth";
 import type { Crop } from "~/lib/fields";
+import type { SubscriptionPlan } from "~/lib/subscriptions";
 
 /**
  * Admin-only API wrappers. See backend/openapi.yml for the contract:
@@ -74,6 +75,31 @@ export function createCrop(name: string, durationMonths: number): Promise<Crop> 
 
 export function deleteCrop(id: string): Promise<void> {
   return apiClient.delete(`/crops/${id}`);
+}
+
+/**
+ * Every subscription plan, active or retired — unlike GET /subscriptions/plans
+ * (public, active only), this is the admin back-office view. See
+ * backend/internal/handlers/subscription_handler.go's ListPlansAdmin.
+ */
+export function listSubscriptionPlansAdmin(): Promise<SubscriptionPlan[]> {
+  return apiClient.get<SubscriptionPlan[]>("/admin/subscription-plans");
+}
+
+/**
+ * Repoints a plan at a newly created Stripe Price for `priceCents` — Stripe
+ * Prices are immutable, so this creates a new one rather than editing the
+ * old, and only affects farmers who subscribe from now on (see
+ * UpdateSubscriptionPlanPrice in subscription_plan.sql for why existing
+ * subscribers are unaffected).
+ */
+export function updateSubscriptionPlanPrice(planId: string, priceCents: number): Promise<SubscriptionPlan> {
+  return apiClient.put<SubscriptionPlan>(`/admin/subscription-plans/${planId}/price`, { priceCents });
+}
+
+/** Retires or reactivates a tier without deleting it — existing subscriptions still reference it. */
+export function setSubscriptionPlanActive(planId: string, active: boolean): Promise<void> {
+  return apiClient.put(`/admin/subscription-plans/${planId}/active`, { active });
 }
 
 /**

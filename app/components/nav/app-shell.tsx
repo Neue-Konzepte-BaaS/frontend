@@ -14,6 +14,16 @@ import type { NavItem } from "~/lib/nav-items";
  *
  * `mobileItems` lets the bottom bar show a different (usually shorter) set
  * than the sidebar — see useFarmerMobileNavItems for why.
+ *
+ * The caller's own header sits above this component and is expected to be
+ * `shrink-0` inside an `h-screen flex flex-col` page wrapper, with this
+ * component taking `flex-1 overflow-hidden` (via its own `md:flex md:flex-1
+ * md:min-h-0`) so the sidebar can be `h-full` of exactly the *remaining*
+ * height rather than the whole viewport — sizing it against 100vh directly
+ * would run its bottom edge off-screen by however tall the header is. Only
+ * `main` scrolls internally on desktop; the sidebar stays fully visible and
+ * unscrolled unless its own content (nav items + pinned group) is taller
+ * than the remaining space, in which case it scrolls independently.
  */
 export function AppShell({
   items,
@@ -29,9 +39,9 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="md:flex md:flex-1">
+    <div className="md:flex md:min-h-0 md:flex-1">
       <SideNav items={items} pinned={pinned} />
-      <main className="flex-1 pb-16 pt-8 md:pb-0">{children}</main>
+      <main className="pb-16 pt-8 md:min-h-0 md:flex-1 md:overflow-y-auto md:pb-8">{children}</main>
       <BottomNav items={mobileItems ?? items} />
     </div>
   );

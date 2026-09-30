@@ -1,0 +1,46 @@
+export const subscription = {
+  // Plan picker (routes/farmer/subscribe.tsx)
+  pickerMetaTitle: "Choose a plan · Farmland",
+  pickerTitle: "Choose a subscription plan",
+  pickerBody: "Every farmer needs an active subscription to list plots. Pick the tier that fits how many plots you plan to offer — you can switch later.",
+  loadingPlans: "Loading plans…",
+  perMonth: "/ month",
+  unlimitedPlots: "Unlimited plots",
+  maxPlots: "Up to {{count}} plot",
+  maxPlots_other: "Up to {{count}} plots",
+  choosePlan: "Choose this plan",
+  mostPopular: "Most popular",
+  planName_cheap: "Cheap",
+  planName_modest: "Modest",
+  planName_expensive: "Expensive",
+
+  currentPlanTitle: "Your subscription",
+  statusActive: "Active",
+  statusPastDue: "Payment past due — we're retrying automatically",
+  renewsOn: "Renews on {{date}}",
+
+  // Checkout (routes/farmer/subscribe-checkout.tsx)
+  checkoutMetaTitle: "Subscribe · Farmland",
+  checkoutTitle: "Confirm and subscribe",
+  missingRequest: "We lost track of your plan choice — please pick a plan again.",
+  backToPicker: "Back to plans",
+  startingCheckout: "Preparing checkout…",
+  billingNotice: "You'll be charged now, then automatically every month until you cancel.",
+  stripeNotConfigured: "Payments aren't configured yet — please try again later.",
+  subscribeNow: "Subscribe now",
+  processingPayment: "Processing…",
+  alreadySubscribed: "You already have a subscription.",
+  planNotFound: "That plan is no longer available — please pick another.",
+
+  // Return / activation poll (routes/farmer/subscribe-return.tsx)
+  returnMetaTitle: "Confirming subscription · Farmland",
+  returnTitle: "Confirming your subscription",
+  missingSession: "We couldn't find that checkout session.",
+  goToDashboard: "Go to dashboard",
+  confirmingSubscription: "Activating your subscription…",
+  stillProcessing: "This is taking longer than usual. Your subscription may still be activating.",
+  checkAgain: "Check again",
+  subscribeSuccess: "Subscription active — welcome aboard!",
+  continueNow: "Continue now",
+  sessionFailed: "This subscription couldn't be started. Please try again.",
+} as const;

@@ -6,6 +6,7 @@ import {
   CalendarRange,
   CircleUser,
   ClipboardList,
+  CreditCard,
   Home,
   Inbox,
   LandPlot,
@@ -111,6 +112,7 @@ export function useAdminSystemItems(): NavItem[] {
     { to: "/admin/crops", label: t("navCrops"), icon: Sprout },
     { to: "/admin/seasons", label: t("navSeasons"), icon: CalendarRange },
     { to: "/admin/broadcast", label: t("navBroadcast"), icon: Megaphone },
+    { to: "/admin/subscription-plans", label: t("navSubscriptionPlans"), icon: CreditCard },
   ];
 }
 
@@ -135,4 +137,15 @@ export function useAdminMobileNavItems(): NavItem[] {
 export function useFarmerSettingsItem(): NavItem {
   const { t } = useTranslation("common");
   return { to: "/farmer/settings", label: t("navFarmSettings"), icon: Settings };
+}
+
+/**
+ * Pinned alongside useFarmerSettingsItem. Points at the same plan-picker
+ * page the subscription gate redirects a never-subscribed farmer to (see
+ * routes/farmer/subscribe.tsx) — visiting it again once already subscribed
+ * shows the current plan/status instead of offering to double-subscribe.
+ */
+export function useFarmerSubscriptionItem(): NavItem {
+  const { t } = useTranslation("common");
+  return { to: "/farmer/subscribe", label: t("navSubscription"), icon: CreditCard };
 }

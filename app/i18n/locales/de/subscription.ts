@@ -1,0 +1,46 @@
+export const subscription = {
+  // Tarifauswahl (routes/farmer/subscribe.tsx)
+  pickerMetaTitle: "Tarif wählen · Farmland",
+  pickerTitle: "Abo-Tarif wählen",
+  pickerBody: "Jeder Landwirt braucht ein aktives Abo, um Parzellen anzubieten. Wähle den Tarif passend zur Anzahl deiner Parzellen — ein Wechsel ist später möglich.",
+  loadingPlans: "Tarife werden geladen…",
+  perMonth: "/ Monat",
+  unlimitedPlots: "Unbegrenzt viele Parzellen",
+  maxPlots: "Bis zu {{count}} Parzelle",
+  maxPlots_other: "Bis zu {{count}} Parzellen",
+  choosePlan: "Diesen Tarif wählen",
+  mostPopular: "Am beliebtesten",
+  planName_cheap: "Günstig",
+  planName_modest: "Mittel",
+  planName_expensive: "Premium",
+
+  currentPlanTitle: "Dein Abo",
+  statusActive: "Aktiv",
+  statusPastDue: "Zahlung überfällig — wir versuchen es automatisch erneut",
+  renewsOn: "Verlängert sich am {{date}}",
+
+  // Checkout (routes/farmer/subscribe-checkout.tsx)
+  checkoutMetaTitle: "Abonnieren · Farmland",
+  checkoutTitle: "Bestätigen und abonnieren",
+  missingRequest: "Deine Tarifauswahl ist verloren gegangen — bitte wähle erneut.",
+  backToPicker: "Zurück zur Tarifauswahl",
+  startingCheckout: "Checkout wird vorbereitet…",
+  billingNotice: "Du wirst jetzt belastet, danach automatisch jeden Monat bis zur Kündigung.",
+  stripeNotConfigured: "Zahlungen sind noch nicht eingerichtet — bitte versuche es später erneut.",
+  subscribeNow: "Jetzt abonnieren",
+  processingPayment: "Wird verarbeitet…",
+  alreadySubscribed: "Du hast bereits ein Abo.",
+  planNotFound: "Dieser Tarif ist nicht mehr verfügbar — bitte wähle einen anderen.",
+
+  // Rückkehr / Aktivierung (routes/farmer/subscribe-return.tsx)
+  returnMetaTitle: "Abo wird bestätigt · Farmland",
+  returnTitle: "Dein Abo wird bestätigt",
+  missingSession: "Diese Checkout-Sitzung konnte nicht gefunden werden.",
+  goToDashboard: "Zum Dashboard",
+  confirmingSubscription: "Abo wird aktiviert…",
+  stillProcessing: "Das dauert länger als gewöhnlich. Dein Abo wird möglicherweise noch aktiviert.",
+  checkAgain: "Erneut prüfen",
+  subscribeSuccess: "Abo aktiv — willkommen an Bord!",
+  continueNow: "Weiter",
+  sessionFailed: "Dieses Abo konnte nicht gestartet werden. Bitte versuche es erneut.",
+} as const;
