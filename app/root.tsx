@@ -10,12 +10,20 @@ import {
 } from "react-router";
 import { useTranslation } from "react-i18next";
 
+import { registerSW } from "virtual:pwa-register";
+
 import type { Route } from "./+types/root";
 import "./app.css";
 import "~/i18n";
 
+if (typeof window !== "undefined") {
+  registerSW({ immediate: true });
+}
+
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/farmlandlogo.png", type: "image/png" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/manifest.webmanifest" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
@@ -47,6 +55,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="theme-color" content="#31311B" />
         <Meta />
         <Links />
       </head>
