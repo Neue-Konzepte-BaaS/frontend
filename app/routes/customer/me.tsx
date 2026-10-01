@@ -8,6 +8,7 @@ import { roleLabel } from "~/lib/auth";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { Switch } from "~/components/switch";
 import { LogoutButton } from "~/components/logout-button";
+import { useSimpleMode } from "~/lib/simple-mode";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -46,11 +47,11 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const currentLanguage = i18nInstance.language.startsWith("de") ? "de" : "en";
 
-  // Simple mode and the notification toggles below are visual-only for now —
-  // there is no backend preference storage or push-notification/email-opt-out
-  // support yet (see issue #34 summary). They persist nothing and have no
-  // effect beyond their own on/off state; wiring them up needs backend work.
-  const [simpleMode, setSimpleMode] = useState(false);
+  const [simpleMode, setSimpleMode] = useSimpleMode();
+  // The notification toggles below are visual-only for now — there is no
+  // backend preference storage or push-notification/email-opt-out support yet
+  // (see issue #34 summary). They persist nothing and have no effect beyond
+  // their own on/off state; wiring them up needs backend work.
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(true);
   const [weeklyDigestEnabled, setWeeklyDigestEnabled] = useState(false);

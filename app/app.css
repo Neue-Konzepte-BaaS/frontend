@@ -41,6 +41,86 @@ body {
   @apply bg-paper;
 }
 
+/* Roter Pfeil-Cursor für bessere Sichtbarkeit */
+html.simple-mode,
+html.simple-mode *:not(a):not(button):not([role="button"]):not([role="switch"]) {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M5 2 L5 29 L10 24 L16 34 L19 33 L13 23 L22 23 Z' fill='%23cc0000' stroke='%23000000' stroke-width='2'/%3E%3C/svg%3E") 5 2, auto !important;
+}
+
+/* Klickbare Elemente: Pfeil mit Punkt als Pointer-Indikator */
+html.simple-mode a,
+html.simple-mode button,
+html.simple-mode [role="button"],
+html.simple-mode [role="switch"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36'%3E%3Cpath d='M5 2 L5 29 L10 24 L16 34 L19 33 L13 23 L22 23 Z' fill='%23cc0000' stroke='%23000000' stroke-width='2'/%3E%3Ccircle cx='28' cy='28' r='5' fill='%23cc0000' stroke='%23000000' stroke-width='1.5'/%3E%3C/svg%3E") 5 2, pointer !important;
+}
+
+html.simple-mode {
+  --color-forest: #1c1c0a;
+  --color-deep-olive: #1c1c0a;
+  --color-moss: #2e2a10;
+  --color-olive: #2e2a10;
+  --color-sage: #2e2a10;
+  --color-warm-olive: #1c1c0a;
+  --color-wood: #1c1c0a;
+  --color-paper: #faf6ec;
+  --color-paper-contrast: #f0e8d0;
+  --color-ivory: #fdf9f0;
+  --color-cream: #f0e8d0;
+  /* Dunkleres Beige für stärkere Rahmen und Divider */
+  --color-beige: #7a7050;
+  --color-error: #8b1a00;
+  font-size: 125%;
+}
+
+/* main erbt die Root-Größe; header/nav werden auf Originalgröße zurückgesetzt,
+   da rem-Werte sonst von der 125%-Basis skalieren würden */
+html.simple-mode main { font-size: inherit; }
+html.simple-mode header,
+html.simple-mode nav { font-size: 0.8rem; }
+
+html.simple-mode * { font-weight: 500; }
+html.simple-mode .font-semibold { font-weight: 600; }
+html.simple-mode .font-bold { font-weight: 700; }
+
+/* Sidebar-Hintergrund ist dunkel (bg-beige) — Text muss hell sein */
+html.simple-mode nav.bg-beige { color: #f5f0e0; }
+html.simple-mode nav.bg-beige a,
+html.simple-mode nav.bg-beige button,
+html.simple-mode nav.bg-beige span { color: #f5f0e0; }
+
+/* Aktiver Nav-Link bekommt sichtbare Umrandung */
+html.simple-mode nav.bg-beige [aria-current="page"] { outline: 2px solid #f5f0e0; outline-offset: -2px; }
+
+html.simple-mode nav.bg-beige { border-right: 3px solid #3a3520 !important; }
+html.simple-mode header { border-bottom: 3px solid #3a3520 !important; }
+
+html.simple-mode a { color: #6600cc !important; font-weight: 700 !important; text-decoration: underline; }
+html.simple-mode a:has(img) { text-decoration: none !important; }
+html.simple-mode button:not([role="switch"]),
+html.simple-mode [role="button"]:not([role="switch"]) { font-weight: 700 !important; }
+
+html.simple-mode nav.bg-beige a { color: #f5f0e0 !important; }
+
+html.simple-mode .bg-moss { background-color: #1a6600 !important; color: #ffffff !important; }
+html.simple-mode .border-error\/50 { border-color: #cc0000 !important; border-width: 2px !important; color: #cc0000 !important; font-weight: 700 !important; }
+
+/* Links auf dunklem Hintergrund (z.B. Hero-Bereich mit Foto) bleiben weiß */
+html.simple-mode .bg-forest a,
+html.simple-mode .bg-deep-olive a,
+html.simple-mode .text-ivory { color: #ffffff !important; }
+
+/* Halbtransparenter CTA-Button im Hero wird besser sichtbar */
+html.simple-mode .bg-white\/10 { background-color: rgba(255,255,255,0.35) !important; border-color: rgba(255,255,255,0.8) !important; }
+
+/* Browser-Autofill überschreibt sonst die Hintergrundfarbe von Inputs */
+html.simple-mode input:-webkit-autofill,
+html.simple-mode input:-webkit-autofill:hover,
+html.simple-mode input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #fdf9f0 inset !important;
+  -webkit-text-fill-color: #1c1c0a !important;
+}
+
 @layer base {
   button, [role="button"] { cursor: pointer; }
 }

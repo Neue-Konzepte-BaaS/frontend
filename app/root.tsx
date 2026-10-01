@@ -51,6 +51,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
+        <script dangerouslySetInnerHTML={{ __html:
+          `(function(){try{if(localStorage.getItem("baas_simple_mode")==="true")` +
+          `document.documentElement.classList.add("simple-mode")}catch(e){}})()`
+        }} />
         {children}
         <ScrollRestoration />
         <Scripts />
