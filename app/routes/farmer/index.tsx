@@ -11,9 +11,9 @@ export default function FarmerDashboard() {
   const { t } = useTranslation("farmer");
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
+    <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
-      <h1 className="text-2xl font-bold text-forest">{t("dashboardTitle")}</h1>
+      <h1 className="text-3xl font-bold text-forest">{t("dashboardTitle")}</h1>
       <p className="mt-2 text-wood">{t("dashboardBody")}</p>
 
       <Link

@@ -57,7 +57,7 @@ export default function RequestsQueue({ loaderData }: Route.ComponentProps) {
       <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
         {t("requestsOpenSummary", { count: requests.length })}
       </p>
-      <h1 className="mt-1 text-2xl font-bold text-forest">{t("requestsTitle")}</h1>
+      <h1 className="mt-1 text-3xl font-bold text-forest">{t("requestsTitle")}</h1>
 
       {requests.length === 0 ? (
         <p className="mt-8 text-wood">{t("noRequestsYet")}</p>

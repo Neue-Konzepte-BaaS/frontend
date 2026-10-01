@@ -158,8 +158,8 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
   if (!account) return null;
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("farmer:settingsTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("farmer:settingsTitle")}</h1>
       <p className="mt-1 text-wood">
         {account.firstName} {account.lastName} · {roleLabel(t, account.role)}
         {account.postalCode > 0 ? ` · ${account.postalCode}` : ""}

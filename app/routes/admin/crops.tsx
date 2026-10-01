@@ -19,8 +19,8 @@ export default function AdminCrops({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation("admin");
 
   return (
-    <main className="mx-auto max-w-6xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("cropsTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("cropsTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("cropsBody")}</p>
       <CropSection initialCrops={loaderData.crops} />
       {/* The default care guide hangs off a crop, so an admin authors it here

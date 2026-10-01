@@ -57,7 +57,7 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
   return (
     <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
-      <h1 className="text-2xl font-bold text-forest">{t("search:customerTitle")}</h1>
+      <h1 className="text-3xl font-bold text-forest">{t("search:customerTitle")}</h1>
 
       <section className="mt-6">
         <h2 className="text-lg font-semibold text-forest">{t("search:myRentals")}</h2>

@@ -291,7 +291,7 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
 
   if (customer) {
     return (
-      <div className="flex min-h-screen flex-col">
+      <div className="flex h-screen flex-col">
         <header className="border-b border-beige bg-cream">
           <div className="flex items-center justify-between px-6 py-4">
             <Link to="/" className="flex items-center gap-2">

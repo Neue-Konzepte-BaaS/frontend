@@ -25,8 +25,8 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const tenantNavItems = useTenantNavItems();
 
   const content = (
-    <main className="mx-auto w-full max-w-5xl p-6">
-      <h1 className="font-serif text-3xl font-bold text-forest">{t("search:searchTitle")}</h1>
+    <main className="mx-auto max-w-5xl px-4 py-8">
+      <h1 className="text-3xl font-bold text-forest">{t("search:searchTitle")}</h1>
       <p className="mt-2 text-wood">{t("search:searchSubtitle")}</p>
       <PlotSearch />
     </main>
@@ -78,7 +78,9 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
           </div>
         </div>
       </header>
-      {content}
+      <div className="flex flex-1 items-start justify-center pt-16">
+        {content}
+      </div>
     </div>
   );
 }

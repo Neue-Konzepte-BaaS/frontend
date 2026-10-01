@@ -24,8 +24,8 @@ export default function FarmerCareGuide({ loaderData }: Route.ComponentProps) {
   const { t } = useTranslation("farmer");
 
   return (
-    <main className="mx-auto max-w-6xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("careGuideTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("careGuideTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("careGuideIntro")}</p>
       <CareGuideEditor crops={loaderData.crops} role="farmer" />
     </main>

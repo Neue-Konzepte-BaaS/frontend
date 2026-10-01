@@ -20,7 +20,7 @@ export default function RequestSent() {
   ];
 
   return (
-    <main className="mx-auto max-w-2xl px-6 py-12">
+    <main className="mx-auto max-w-5xl p-4">
       <div className="flex h-20 w-20 items-center justify-center rounded-full bg-moss/15">
         <Check className="h-9 w-9 text-moss" strokeWidth={2.5} />
       </div>
