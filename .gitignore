@@ -5,3 +5,6 @@
 # React Router
 /.react-router/
 /build/
+
+# vite-plugin-pwa (dev-mode service worker output)
+/dev-dist/
