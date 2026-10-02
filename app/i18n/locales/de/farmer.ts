@@ -41,8 +41,9 @@ export const farmer: Shape = {
   gridInstructions: "Wähle Zeilen und Spalten — die Karte zeigt dir sofort, wo jede Parzelle landet.",
   rowsLabel: "Zeilen",
   columnsLabel: "Spalten",
-  gridPreviewCount: "Vorschau: {{rows}} Zeilen × {{cols}} Spalten = {{count}} Parzellen.",
-  gridPreviewTooLarge: "Das sind zu viele Parzellen für eine Vorschau — das Raster wird trotzdem erstellt, nur ohne Live-Vorschau oberhalb von {{max}}.",
+  gridPreviewCount: "Vorschau: {{rows}} Zeilen × {{cols}} Spalten = {{count}} Parzellen von je {{area}}.",
+  gridPreviewTooLarge:
+    "Das sind zu viele Parzellen für eine Vorschau — das Raster wird trotzdem erstellt, nur ohne Live-Vorschau oberhalb von {{max}}. Jede Parzelle wäre etwa {{area}} groß.",
   creatingPlotProgress: "Parzelle {{done}} von {{total}} wird erstellt…",
   generatePlots: "Parzellen erstellen",
   noCropsForPlot: "Noch keine Pflanzen angeboten",

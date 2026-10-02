@@ -11,8 +11,9 @@ import { FieldMap, fitToPolygon, type MapShape } from "~/components/map/field-ma
 import { Field as FormField, FormError, FormSuccess, inputClass, submitClass } from "~/components/form";
 import { PlotGrid } from "~/components/plot-grid";
 import { PlotDetailPanel, type SelectedPlot } from "~/components/farmer/plot-detail-panel";
-import { ringToCorners, subdivideIntoGrid, toBbox, type PolygonGeometry } from "~/lib/geo";
+import { ringToCorners, subdivideIntoGrid, rectangleEdgeLengthsMeters, toBbox, type PolygonGeometry } from "~/lib/geo";
 import type { LatLon } from "~/lib/geocode";
+import { formatArea } from "~/components/plot-card";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -60,6 +61,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const [cropsSaved, setCropsSaved] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const { t } = useTranslation(["farmer", "common"]);
+  const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
   const hasPlots = field.plots.length > 0;
   const plots = sortPlotsNaturally(field.plots);
@@ -120,6 +122,11 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const hasValidGridInput =
     Number.isInteger(parsedRows) && Number.isInteger(parsedCols) && parsedRows >= 1 && parsedCols >= 1;
   const gridTooLargeToPreview = hasValidGridInput && parsedRows * parsedCols > MAX_PREVIEW_CELLS;
+
+  // Cheap (no polygon generation), so computed even when gridTooLargeToPreview
+  // suppresses the map tiles — the area number is most useful exactly then.
+  const { widthM, heightM } = rectangleEdgeLengthsMeters(ringToCorners(field.coordinates));
+  const plotAreaSquareMeters = hasValidGridInput ? (widthM / parsedCols) * (heightM / parsedRows) : null;
 
   let previewCells: PolygonGeometry[] = [];
   if (!hasPlots && hasValidGridInput && !gridTooLargeToPreview) {
@@ -467,8 +474,16 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
           {hasValidGridInput && (
             <p className="text-sm text-warm-olive">
               {gridTooLargeToPreview
-                ? t("farmer:gridPreviewTooLarge", { max: MAX_PREVIEW_CELLS })
-                : t("farmer:gridPreviewCount", { rows: parsedRows, cols: parsedCols, count: parsedRows * parsedCols })}
+                ? t("farmer:gridPreviewTooLarge", {
+                    max: MAX_PREVIEW_CELLS,
+                    area: formatArea(plotAreaSquareMeters!, locale),
+                  })
+                : t("farmer:gridPreviewCount", {
+                    rows: parsedRows,
+                    cols: parsedCols,
+                    count: parsedRows * parsedCols,
+                    area: formatArea(plotAreaSquareMeters!, locale),
+                  })}
             </p>
           )}
 
