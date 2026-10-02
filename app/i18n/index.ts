@@ -4,6 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import { common as enCommon } from "~/i18n/locales/en/common";
 import { home as enHome } from "~/i18n/locales/en/home";
+import { farmInfo as enFarmInfo } from "~/i18n/locales/en/for-farmers";
 import { auth as enAuth } from "~/i18n/locales/en/auth";
 import { search as enSearch } from "~/i18n/locales/en/search";
 import { farmer as enFarmer } from "~/i18n/locales/en/farmer";
@@ -15,6 +16,7 @@ import { legal as enLegal } from "~/i18n/locales/en/legal";
 
 import { common as deCommon } from "~/i18n/locales/de/common";
 import { home as deHome } from "~/i18n/locales/de/home";
+import { farmInfo as deFarmInfo } from "~/i18n/locales/de/for-farmers";
 import { auth as deAuth } from "~/i18n/locales/de/auth";
 import { search as deSearch } from "~/i18n/locales/de/search";
 import { farmer as deFarmer } from "~/i18n/locales/de/farmer";
@@ -30,6 +32,7 @@ export const resources = {
   en: {
     common: enCommon,
     home: enHome,
+    farmInfo: enFarmInfo,
     auth: enAuth,
     search: enSearch,
     farmer: enFarmer,
@@ -42,6 +45,7 @@ export const resources = {
   de: {
     common: deCommon,
     home: deHome,
+    farmInfo: deFarmInfo,
     auth: deAuth,
     search: deSearch,
     farmer: deFarmer,

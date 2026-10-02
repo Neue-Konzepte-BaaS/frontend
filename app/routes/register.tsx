@@ -30,7 +30,9 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 
 export default function Register() {
   const [searchParams] = useSearchParams();
-  const [role, setRole] = useState<RegisterableRole>("customer");
+  const [role, setRole] = useState<RegisterableRole>(
+    searchParams.get("role") === "farmer" ? "farmer" : "customer"
+  );
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
