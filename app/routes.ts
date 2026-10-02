@@ -5,6 +5,10 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("verify-email", "routes/verify-email.tsx"),
+  // Allgemeine Geschäftsbedingungen (ToS) — public, linked from the rental
+  // request form's acceptance checkbox (plot-crops-and-rent.tsx) before a
+  // customer ever signs in to pay, so it must stay reachable logged out.
+  route("agb", "routes/terms.tsx"),
   // Explains the farmer business model (subscription + 10% transaction cut)
   // before a prospective farmer commits to signing up. Linked from the
   // landing page's farmer-directed CTAs instead of going straight to
