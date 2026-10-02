@@ -122,7 +122,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
                   {t("home:findPlotCta")} →
                 </Link>
                 <Link
-                  to="/register"
+                  to="/for-farmers"
                   className="inline-flex items-center gap-2 rounded-full border border-ivory/40 bg-white/10 px-8 py-3.5 text-base font-semibold text-ivory backdrop-blur-sm hover:bg-white/20"
                 >
                   {t("home:runFarmCta")} →
@@ -204,7 +204,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               <h2 className="font-serif text-4xl font-bold text-forest">{t("home:harvestTitle")}</h2>
               <p className="body-lg mt-5 max-w-sm">{t("home:harvestBody")}</p>
               <Link
-                to="/register"
+                to="/for-farmers"
                 className="mt-8 inline-flex items-center gap-2 rounded-full bg-deep-olive px-8 py-3.5 text-base font-semibold text-ivory hover:bg-moss"
               >
                 {t("home:howItWorks")} →
@@ -243,13 +243,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </button>
           </form>
         </div>
-        <p className="text-muted mx-auto mt-5 max-w-7xl px-8">{t("home:searchTagline")}</p>
+        <p className="mx-auto mt-5 max-w-7xl px-8 text-sm text-cream/70">{t("home:searchTagline")}</p>
       </section>
 
       {/* ── Footer ── */}
       <footer className="border-t border-white/5 bg-forest py-8">
         <div className="mx-auto max-w-7xl px-8">
-          <p className="text-xs text-beige/40">{t("common:brand")}</p>
+          <p className="text-xs text-cream/70">{t("common:brand")}</p>
         </div>
       </footer>
     </div>
