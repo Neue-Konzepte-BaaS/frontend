@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { PlotCropOffering } from "~/lib/rentals";
+import { getCropName } from "~/lib/fields";
 import { roleLabel, type Account } from "~/lib/auth";
 import { formatPriceCents, formatRentalPeriod } from "~/components/plot-card";
 import { inputClass, submitClass, secondaryButtonClass } from "~/components/form";
@@ -122,7 +123,7 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
           {crops.map((crop) => (
             <li key={crop.id}>
               {t("search:cropWithDurationAndPrice", {
-                name: crop.name,
+                name: getCropName(crop, i18n.language),
                 months: crop.durationMonths,
                 price: formatPriceCents(crop.priceCents, locale),
               })}
@@ -174,9 +175,9 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
                     onChange={() => setSelectedCropId(crop.id)}
                     className="h-4 w-4 border-beige text-moss focus:ring-moss disabled:cursor-not-allowed"
                   />
-                  <span className="font-medium">{crop.name}</span>
+                  <span className="font-medium">{getCropName(crop, i18n.language)}</span>
                   {crop.season && (
-                    <InfoTooltip label={t("search:seasonInfoAriaLabel", { name: crop.name })}>
+                    <InfoTooltip label={t("search:seasonInfoAriaLabel", { name: getCropName(crop, i18n.language) })}>
                       {t("search:seasonWindow", { window: formatSeasonWindow(crop.season, locale) })}
                     </InfoTooltip>
                   )}

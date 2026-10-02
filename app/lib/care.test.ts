@@ -28,7 +28,7 @@ function guide(overrides: Partial<PlotCareGuide> = {}): PlotCareGuide {
     plotId: "plot-1",
     plotName: "Plot 1",
     fieldName: "North field",
-    crop: { id: "crop-1", name: "Tomatoes", durationMonths: 3 },
+    crop: { id: "crop-1", nameDe: "Tomaten", nameEn: "Tomatoes", durationMonths: 3 },
     startAt: "2026-04-01T00:00:00Z",
     endAt: "2026-07-01T00:00:00Z",
     currentWeek: 3,

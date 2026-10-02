@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { Crop } from "~/lib/fields";
+import { getCropName, type Crop } from "~/lib/fields";
 import { assignCropSeason, removeCropSeasonRule, type Season } from "~/lib/seasons";
 import { ApiError } from "~/lib/api-client";
 import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonClass } from "~/components/form";
@@ -21,7 +21,7 @@ const NO_RESTRICTION = "";
  * upserts it, matching PUT /api/crops/{cropId}/season's own upsert semantics.
  */
 export function SeasonAssignment({ crops, seasons }: { crops: Crop[]; seasons: Season[] }) {
-  const { t } = useTranslation("admin");
+  const { t, i18n } = useTranslation("admin");
   const [cropId, setCropId] = useState(crops[0]?.id ?? "");
   const [seasonId, setSeasonId] = useState<string>(NO_RESTRICTION);
   const [saving, setSaving] = useState(false);
@@ -82,7 +82,7 @@ export function SeasonAssignment({ crops, seasons }: { crops: Crop[]; seasons: S
             <select id="season-assign-crop" value={cropId} onChange={(e) => setCropId(e.target.value)} className={inputClass}>
               {crops.map((crop) => (
                 <option key={crop.id} value={crop.id}>
-                  {crop.name}
+                  {getCropName(crop, i18n.language)}
                 </option>
               ))}
             </select>

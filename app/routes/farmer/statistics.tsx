@@ -36,7 +36,7 @@ export default function FarmerStatistics({ loaderData }: Route.ComponentProps) {
   );
 
   const funnel = requestFunnel(farmRentals);
-  const byCrop = rentalsByCrop(farmRentals, fields);
+  const byCrop = rentalsByCrop(farmRentals, fields, i18nInstance.language);
   const byField = occupancyByField(fields, farmRentals);
   const upcoming = upcomingStarts(farmRentals);
 

@@ -1,5 +1,5 @@
 import type { FarmRental } from "~/lib/rentals";
-import type { FieldWithPlots } from "~/lib/fields";
+import { getCropName, type FieldWithPlots } from "~/lib/fields";
 
 /**
  * Client-side breakdowns for the farmer's statistics page (issue #22).
@@ -23,12 +23,12 @@ export function requestFunnel(rentals: FarmRental[]): RequestFunnel {
 export type CropCount = { cropName: string; count: number };
 
 /** cropId -> name, from the crops each plot offers — FarmRental only carries cropId, not the crop itself. */
-function cropNamesById(fields: FieldWithPlots[]): Map<string, string> {
+function cropNamesById(fields: FieldWithPlots[], language: string): Map<string, string> {
   const names = new Map<string, string>();
   for (const field of fields) {
     for (const plot of field.plots) {
       for (const crop of plot.crops) {
-        names.set(crop.id, crop.name);
+        names.set(crop.id, getCropName(crop, language));
       }
     }
   }
@@ -41,8 +41,8 @@ function cropNamesById(fields: FieldWithPlots[]): Map<string, string> {
  * plot. A cropId with no matching plot today (e.g. the crop was later
  * dropped from every plot) falls back to the raw id rather than disappearing.
  */
-export function rentalsByCrop(rentals: FarmRental[], fields: FieldWithPlots[]): CropCount[] {
-  const names = cropNamesById(fields);
+export function rentalsByCrop(rentals: FarmRental[], fields: FieldWithPlots[], language: string): CropCount[] {
+  const names = cropNamesById(fields, language);
   const counts = new Map<string, number>();
   for (const rental of rentals) {
     if (rental.status === "declined") continue;

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
-import type { PlotWithCrops } from "~/lib/fields";
+import { getCropName, type PlotWithCrops } from "~/lib/fields";
 import type { FarmRental } from "~/lib/rentals";
 import type { PlotStatus } from "~/lib/plots";
 import { createRipenessNotice } from "~/lib/ripeness";
@@ -86,7 +86,7 @@ export function PlotDetailPanel({ fieldId, selection, cropNames, cropEditor }: P
         {rental && <Row label={t("farmer:plantedLabel")} value={plantedName!} />}
         <Row
           label={t("farmer:offeredLabel")}
-          value={plot.crops.length > 0 ? plot.crops.map((c) => c.name).join(", ") : t("farmer:noCropsForPlot")}
+          value={plot.crops.length > 0 ? plot.crops.map((c) => getCropName(c, i18n.language)).join(", ") : t("farmer:noCropsForPlot")}
         />
       </dl>
 

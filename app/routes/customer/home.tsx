@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/home";
 import { listMyRentals, type RentalStatus } from "~/lib/rentals";
+import { getCropName } from "~/lib/fields";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
@@ -74,7 +75,7 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
               <PlotCard
                 key={rental.id}
                 name={rental.plot.name}
-                meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
+                meta={`${getCropName(rental.crop, i18nInstance.language)} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                 action={
                   /* Badge and link together: the status is what Home says
                      about the rental, the link is where the tenant acts on it.

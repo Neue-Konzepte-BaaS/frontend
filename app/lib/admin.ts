@@ -9,6 +9,7 @@ import type { SubscriptionPlan } from "~/lib/subscriptions";
  *   GET  /api/statistics     -> Statistics   (farmer or admin; scope derived from role)
  *   POST /api/notifications  -> BroadcastAccepted  (admin only)
  *   POST /api/crops          -> Crop                (admin only)
+ *   PUT  /api/crops/{cropID} -> Crop                (admin only)
  *   GET  /api/crops          -> Crop[]              (public; re-exported for convenience)
  *   GET  /api/admin/farms    -> Page<FarmListing>    (admin only)
  *   GET  /api/admin/accounts -> Page<AccountListing> (admin only)
@@ -69,8 +70,12 @@ export function broadcastNotification(subject: string, body: string): Promise<Br
   return apiClient.post<BroadcastAccepted>("/notifications", { subject, body });
 }
 
-export function createCrop(name: string, durationMonths: number): Promise<Crop> {
-  return apiClient.post<Crop>("/crops", { name, durationMonths });
+export function createCrop(nameDe: string, nameEn: string, durationMonths: number): Promise<Crop> {
+  return apiClient.post<Crop>("/crops", { nameDe, nameEn, durationMonths });
+}
+
+export function updateCrop(id: string, nameDe: string, nameEn: string, durationMonths: number): Promise<Crop> {
+  return apiClient.put<Crop>(`/crops/${id}`, { nameDe, nameEn, durationMonths });
 }
 
 export function deleteCrop(id: string): Promise<void> {

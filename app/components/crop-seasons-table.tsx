@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { formatSeasonWindow, type CropSeason } from "~/lib/seasons";
+import { getCropName } from "~/lib/fields";
 
 /**
  * Read-only: every crop in the catalog with the season it's effectively
@@ -33,7 +34,7 @@ export function CropSeasonsTable({ cropSeasons }: { cropSeasons: CropSeason[] })
         <tbody className="divide-y divide-beige">
           {cropSeasons.map((cropSeason) => (
             <tr key={cropSeason.id}>
-              <td className="px-4 py-3 text-wood">{cropSeason.name}</td>
+              <td className="px-4 py-3 text-wood">{getCropName(cropSeason, i18n.language)}</td>
               <td className="px-4 py-3 text-wood">{cropSeason.season ? cropSeason.season.name : t("seasonAssignNoRestriction")}</td>
               <td className="px-4 py-3 text-wood">{cropSeason.season ? formatSeasonWindow(cropSeason.season, locale) : "—"}</td>
             </tr>
