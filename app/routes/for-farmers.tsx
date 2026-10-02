@@ -135,6 +135,25 @@ export default function ForFarmers({ loaderData }: Route.ComponentProps) {
         </div>
       </section>
 
+      {/* ── Plot & crop pricing ── */}
+      <section className="bg-paper py-24">
+        <div className="mx-auto max-w-3xl px-8 text-center">
+          <h2 className="font-serif text-4xl font-bold text-forest">{t("farmInfo:plotPricingTitle")}</h2>
+          <p className="body-lg mt-5">{t("farmInfo:plotPricingBody")}</p>
+        </div>
+
+        <div className="mx-auto mt-12 grid max-w-3xl gap-6 px-8 sm:grid-cols-2">
+          <div className="rounded-2xl border border-beige/40 bg-sage/30 p-8">
+            <h3 className="font-serif text-xl font-semibold text-deep-olive">{t("farmInfo:plotPriceLabel")}</h3>
+            <p className="body-md mt-3">{t("farmInfo:plotPriceBody")}</p>
+          </div>
+          <div className="rounded-2xl border border-beige/40 bg-sage/30 p-8">
+            <h3 className="font-serif text-xl font-semibold text-deep-olive">{t("farmInfo:cropPriceLabel")}</h3>
+            <p className="body-md mt-3">{t("farmInfo:cropPriceBody")}</p>
+          </div>
+        </div>
+      </section>
+
       {/* ── Keep your brand ── */}
       <section className="bg-paper py-24">
         <div className="mx-auto max-w-3xl px-8 text-center">

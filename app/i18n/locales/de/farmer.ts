@@ -209,6 +209,8 @@ export const farmer: Shape = {
   statNoFieldsYet: "Noch keine Felder.",
   statFieldOccupancy: "{{rented}} / {{total}} vermietet",
   cropRatesHeading: "Preisgestaltung",
+  cropRatesRequiredNotice:
+    "Du hast noch für keine Pflanze einen Preis festgelegt — keine deiner Parzellen kann vermietet werden, bis mindestens eine Pflanze hier einen Preis hat.",
   cropRatesInstructions:
     "Lege fest, was der Anbau jeder Pflanze pro Quadratmeter pro Woche kostet — kombiniert mit dem eigenen Grundpreis jeder Parzelle (auf der Seite ihres Feldes festgelegt) ergibt das den Preis für den Kunden. Eine Pflanze ohne Preis hier ist auf keiner deiner Parzellen mietbar.",
   cropRatePlaceholder: "z. B. 0,02",

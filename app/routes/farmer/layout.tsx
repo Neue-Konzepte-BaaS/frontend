@@ -1,6 +1,6 @@
 import { Link, Outlet } from "react-router";
 import type { Route } from "./+types/layout";
-import { requireRole, requireActiveSubscription } from "~/lib/guards";
+import { requireRole, requireActiveSubscription, requireFarmCropRatesSet } from "~/lib/guards";
 import { LogoutButton } from "~/components/logout-button";
 import { AppShell } from "~/components/nav/app-shell";
 import { useFarmerNavItems, useFarmerMobileNavItems, useFarmerSettingsItem, useFarmerSubscriptionItem } from "~/lib/nav-items";
@@ -18,11 +18,20 @@ import { LanguageSwitcher } from "~/components/language-switcher";
  * the backend's own RequireActiveSubscription middleware (see
  * ~/lib/guards.ts) — it exempts the subscription flow's own pages from that
  * redirect so visiting them doesn't loop.
+ *
+ * requireFarmCropRatesSet runs only once a subscription is confirmed active
+ * — an unsubscribed farmer is already being bounced to /farmer/subscribe,
+ * so there's no point also forcing them through crop pricing first. It
+ * redirects to /farmer/settings until the farmer has priced at least one
+ * crop farm-wide, closing the gap where a farmer could otherwise list plots
+ * and crops that never actually become rentable (see ~/lib/guards.ts).
  */
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   const account = await requireRole("farmer");
-  const hasActiveSubscription = await requireActiveSubscription(new URL(request.url).pathname);
-  return { account, hasActiveSubscription };
+  const pathname = new URL(request.url).pathname;
+  const hasActiveSubscription = await requireActiveSubscription(pathname);
+  const hasFarmCropRatesSet = hasActiveSubscription ? await requireFarmCropRatesSet(pathname) : true;
+  return { account, hasActiveSubscription, hasFarmCropRatesSet };
 }
 
 export default function FarmerLayout({ loaderData }: Route.ComponentProps) {

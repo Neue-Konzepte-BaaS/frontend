@@ -1,6 +1,7 @@
 import { redirect } from "react-router";
 import { me, dashboardPath, type Account, type Role } from "~/lib/auth";
 import { getSubscriptionStatusOrNull, hasActiveSubscription } from "~/lib/subscriptions";
+import { getFarmCropRates } from "~/lib/fields";
 
 /**
  * dashboardPath(...) plus the query param AccountTypeNotice reads to explain
@@ -66,6 +67,33 @@ export async function requireActiveSubscription(pathname: string): Promise<boole
     throw redirect("/farmer/subscribe");
   }
   return active;
+}
+
+/**
+ * Paths under farmer-layout that must render even for a farmer with no farm
+ * crop rates set yet — the farm settings page itself, where those rates are
+ * set. requireFarmCropRatesSet below never redirects away from this path,
+ * since redirecting /farmer/settings to /farmer/settings would loop forever.
+ */
+const CROP_RATES_FLOW_PATHS = ["/farmer/settings"];
+
+/**
+ * clientLoader guard for farmer/layout.tsx, run right after
+ * requireActiveSubscription: redirects to the farm settings page unless the
+ * farmer has set at least one farm-wide crop rate. A crop with no rate there
+ * never appears as rentable on any plot (see FarmCropRate in ~/lib/fields),
+ * so a farmer who skips this would otherwise list plots and crops that
+ * silently never show up for customers. Returns whether at least one rate is
+ * set, mirroring requireActiveSubscription's return shape.
+ */
+export async function requireFarmCropRatesSet(pathname: string): Promise<boolean> {
+  const rates = await getFarmCropRates();
+  const hasRates = rates.length > 0;
+
+  if (!hasRates && !CROP_RATES_FLOW_PATHS.includes(pathname)) {
+    throw redirect("/farmer/settings#crop-rates");
+  }
+  return hasRates;
 }
 
 /**

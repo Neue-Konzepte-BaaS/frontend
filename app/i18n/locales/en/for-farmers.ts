@@ -16,6 +16,13 @@ export const farmInfo = {
   commissionTitle: "10% per transaction",
   commissionBody:
     "We only make money when you do: Farmland keeps 10% of every rental payment made through the platform. No hidden costs on top.",
+  plotPricingTitle: "You set the price — in two parts",
+  plotPricingBody:
+    "What a customer pays is your own base rate for a plot (by size or location, however you like) combined with your rate for the crop grown there. Set a plot's base rate per plot, and set each crop's rate once for your whole farm — both together price every rental.",
+  plotPriceLabel: "Price per plot",
+  plotPriceBody: "A base rate per m² per week, set for each plot — reflects things like size or location.",
+  cropPriceLabel: "Price per crop",
+  cropPriceBody: "A rate per m² per week for each crop, set once for your whole farm and reused on every plot that grows it.",
   brandTitle: "Your farm, your brand",
   brandBody: "Your farm keeps its own name and its own customers. We just provide the tooling behind the scenes.",
   ctaTitle: "Ready to run your farm on Farmland?",

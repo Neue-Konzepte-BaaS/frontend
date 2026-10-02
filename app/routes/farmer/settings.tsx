@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link, useRouteLoaderData } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useRouteLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/settings";
 import type { clientLoader as farmerLayoutLoader } from "./layout";
@@ -66,9 +66,18 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
   const { t, i18n: i18nInstance } = useTranslation(["farmer", "auth", "common"]);
   const currentLanguage = i18nInstance.language.startsWith("de") ? "de" : "en";
   const numberLocale = currentLanguage === "de" ? "de-DE" : "en-GB";
+  const { hash } = useLocation();
 
   const { catalog } = loaderData;
   const existingRates = loaderData.rates;
+
+  // A client-side navigation (e.g. the requireFarmCropRatesSet guard's
+  // redirect to #crop-rates) doesn't get the browser's own hash-scroll —
+  // that only fires on a full page load — so it's done by hand here.
+  useEffect(() => {
+    if (hash !== "#crop-rates") return;
+    document.getElementById("crop-rates")?.scrollIntoView({ behavior: "smooth" });
+  }, [hash]);
 
   const [farm, setFarm] = useState<Farm>(loaderData.farm);
   const [name, setName] = useState(farm.name);
@@ -240,9 +249,15 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
         </form>
       </section>
 
-      <section className="mt-8">
+      <section id="crop-rates" className="mt-8 scroll-mt-6">
         <h2 className="text-sm font-semibold tracking-wide text-warm-olive uppercase">{t("farmer:cropRatesHeading")}</h2>
         <p className="mt-1 text-sm text-warm-olive">{t("farmer:cropRatesInstructions")}</p>
+
+        {existingRates.length === 0 && (
+          <p role="alert" className="mt-4 rounded-lg border border-wood/40 bg-wood/10 px-4 py-3 text-sm text-wood">
+            {t("farmer:cropRatesRequiredNotice")}
+          </p>
+        )}
 
         {catalog.length === 0 ? (
           <p className="mt-6 text-sm text-wood">{t("farmer:noCropsInCatalog")}</p>
