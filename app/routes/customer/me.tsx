@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/me";
 import type { clientLoader as customerLayoutLoader } from "./layout";
 import { listMyRentals } from "~/lib/rentals";
+import { getCropName } from "~/lib/fields";
 import { roleLabel } from "~/lib/auth";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { Switch } from "~/components/switch";
@@ -85,7 +86,7 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
               <PlotCard
                 key={rental.id}
                 name={rental.plot.name}
-                meta={`${rental.crop.name} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
+                meta={`${getCropName(rental.crop, i18nInstance.language)} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                 action={null}
               />
             ))}

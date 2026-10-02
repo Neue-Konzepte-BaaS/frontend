@@ -2,22 +2,22 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createRipenessNotice } from "~/lib/ripeness";
 import { ApiError } from "~/lib/api-client";
-import type { Crop, FieldWithPlots } from "~/lib/fields";
+import { getCropName, type Crop, type FieldWithPlots } from "~/lib/fields";
 import { FormError, FormSuccess, inputClass, submitClass } from "~/components/form";
 
 type RipenessSectionProps = {
   fields: FieldWithPlots[];
 };
 
-/** Every crop offered by at least one of the field's plots, deduped, sorted by name. */
-function cropsOfferedByField(field: FieldWithPlots): Crop[] {
+/** Every crop offered by at least one of the field's plots, deduped, sorted by name in the given language. */
+function cropsOfferedByField(field: FieldWithPlots, language: string): Crop[] {
   const byId = new Map<string, Crop>();
   for (const plot of field.plots) {
     for (const crop of plot.crops) {
       byId.set(crop.id, crop);
     }
   }
-  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return [...byId.values()].sort((a, b) => getCropName(a, language).localeCompare(getCropName(b, language)));
 }
 
 /**
@@ -27,7 +27,7 @@ function cropsOfferedByField(field: FieldWithPlots): Crop[] {
  * ripeness notice has no read-back endpoint of its own (see lib/ripeness.ts).
  */
 export function RipenessSection({ fields }: RipenessSectionProps) {
-  const { t } = useTranslation("farmer");
+  const { t, i18n } = useTranslation("farmer");
   const [fieldId, setFieldId] = useState(fields[0]?.id ?? "");
   const [cropId, setCropId] = useState("");
   const [sending, setSending] = useState(false);
@@ -35,7 +35,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
   const [success, setSuccess] = useState<string | null>(null);
 
   const field = fields.find((f) => f.id === fieldId);
-  const crops = useMemo(() => (field ? cropsOfferedByField(field) : []), [field]);
+  const crops = useMemo(() => (field ? cropsOfferedByField(field, i18n.language) : []), [field, i18n.language]);
   const selectedCropId = crops.some((c) => c.id === cropId) ? cropId : (crops[0]?.id ?? "");
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
@@ -98,7 +98,7 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
                 >
                   {crops.map((crop) => (
                     <option key={crop.id} value={crop.id}>
-                      {crop.name}
+                      {getCropName(crop, i18n.language)}
                     </option>
                   ))}
                 </select>

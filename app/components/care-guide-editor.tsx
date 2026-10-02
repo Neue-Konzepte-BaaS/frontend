@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
-import type { Crop } from "~/lib/fields";
+import { getCropName, type Crop } from "~/lib/fields";
 import {
   createCareInstruction,
   deleteCareInstruction,
@@ -36,7 +36,7 @@ import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonCl
  * the farmer-only ones (version badge, reset) in `farmer`.
  */
 export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" | "farmer" }) {
-  const { t } = useTranslation("admin");
+  const { t, i18n } = useTranslation("admin");
   const { t: tFarmer } = useTranslation("farmer");
   const [cropId, setCropId] = useState(crops[0]?.id ?? "");
   const [instructions, setInstructions] = useState<CareInstruction[]>([]);
@@ -216,7 +216,7 @@ export function CareGuideEditor({ crops, role }: { crops: Crop[]; role: "admin" 
           >
             {crops.map((crop) => (
               <option key={crop.id} value={crop.id}>
-                {crop.name}
+                {getCropName(crop, i18n.language)}
               </option>
             ))}
           </select>

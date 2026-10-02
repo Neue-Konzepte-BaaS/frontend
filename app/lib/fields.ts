@@ -52,9 +52,15 @@ export type Plot = {
  */
 export type Crop = {
   id: string;
-  name: string;
+  nameDe: string;
+  nameEn: string;
   durationMonths: number;
 };
+
+/** Picks the crop's name for the given i18next language (e.g. `i18n.language`). */
+export function getCropName(crop: Pick<Crop, "nameDe" | "nameEn">, language: string): string {
+  return language.startsWith("de") ? crop.nameDe : crop.nameEn;
+}
 
 export type PlotWithCrops = Plot & { crops: Crop[] };
 

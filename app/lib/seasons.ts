@@ -76,7 +76,8 @@ export type CropSeasonRule = {
  */
 export type CropSeason = {
   id: string;
-  name: string;
+  nameDe: string;
+  nameEn: string;
   durationMonths: number;
   season: Season | null;
 };

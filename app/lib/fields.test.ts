@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolveCropRatesToSave, type Crop, type FarmCropRate } from "./fields";
 
 function crop(overrides: Partial<Crop>): Crop {
-  return { id: "crop-1", name: "Wheat", durationMonths: 3, ...overrides };
+  return { id: "crop-1", nameDe: "Weizen", nameEn: "Wheat", durationMonths: 3, ...overrides };
 }
 
 describe("resolveCropRatesToSave", () => {
@@ -10,7 +10,7 @@ describe("resolveCropRatesToSave", () => {
     // The bug this guards against: settings.tsx submits a full-replace PUT,
     // so naively dropping blank inputs would silently delete this crop's
     // rate just because the farmer didn't retype it.
-    const catalog = [crop({ id: "wheat", name: "Wheat" })];
+    const catalog = [crop({ id: "wheat", nameEn: "Wheat" })];
     const existing: FarmCropRate[] = [{ cropId: "wheat", priceCentsPerSqmPerWeek: 5 }];
     const rateInputs = new Map<string, string>(); // never touched -- still blank
 
@@ -20,7 +20,7 @@ describe("resolveCropRatesToSave", () => {
   });
 
   it("omits a crop that was never priced and is still blank", () => {
-    const catalog = [crop({ id: "carrot", name: "Carrot" })];
+    const catalog = [crop({ id: "carrot", nameEn: "Carrot" })];
     const result = resolveCropRatesToSave(catalog, new Map(), []);
 
     expect(result).toEqual({ ok: true, rates: [] });
@@ -37,7 +37,7 @@ describe("resolveCropRatesToSave", () => {
   });
 
   it("only touches the edited crop, leaving every other crop's existing rate intact", () => {
-    const catalog = [crop({ id: "wheat", name: "Wheat" }), crop({ id: "carrot", name: "Carrot" }), crop({ id: "potato", name: "Potato" })];
+    const catalog = [crop({ id: "wheat", nameEn: "Wheat" }), crop({ id: "carrot", nameEn: "Carrot" }), crop({ id: "potato", nameEn: "Potato" })];
     const existing: FarmCropRate[] = [
       { cropId: "wheat", priceCentsPerSqmPerWeek: 5 },
       { cropId: "carrot", priceCentsPerSqmPerWeek: 3 },
@@ -62,11 +62,11 @@ describe("resolveCropRatesToSave", () => {
   });
 
   it("rejects a zero or negative rate, naming the offending crop", () => {
-    const catalog = [crop({ id: "wheat", name: "Wheat" })];
+    const catalog = [crop({ id: "wheat", nameEn: "Wheat" })];
     const result = resolveCropRatesToSave(catalog, new Map([["wheat", "0"]]), []);
 
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(result.invalidCrop.name).toBe("Wheat");
+    if (!result.ok) expect(result.invalidCrop.nameEn).toBe("Wheat");
   });
 
   it("rejects a non-numeric rate", () => {

@@ -3,7 +3,16 @@ import { redirect } from "react-router";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/field-detail";
 import { requireRole } from "~/lib/guards";
-import { listFields, listCrops, createPlot, setPlotCrops, type Crop, type FieldWithPlots, type PlotWithCrops } from "~/lib/fields";
+import {
+  listFields,
+  listCrops,
+  createPlot,
+  setPlotCrops,
+  getCropName,
+  type Crop,
+  type FieldWithPlots,
+  type PlotWithCrops,
+} from "~/lib/fields";
 import { listFarmRentals } from "~/lib/rentals";
 import { plotStatusesByPlot, sortPlotsNaturally } from "~/lib/plots";
 import { ApiError } from "~/lib/api-client";
@@ -287,7 +296,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   const selection: SelectedPlot[] = plots.flatMap((plot, i) =>
     selectedPlotIds.has(plot.id) ? [{ plot, number: i + 1, ...statuses.get(plot.id)! }] : [],
   );
-  const cropNames = new Map<string, string>(catalog.map((c: Crop) => [c.id, c.name]));
+  const cropNames = new Map<string, string>(catalog.map((c: Crop) => [c.id, getCropName(c, i18n.language)]));
 
   // FieldMap requires an initial `center` before it can fitTo the field's
   // real bounds on the next tick — the bbox midpoint is good enough since
@@ -378,7 +387,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
                     }}
                     className="h-4 w-4 rounded border-beige text-moss focus:ring-moss"
                   />
-                  {t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })}
+                  {t("farmer:cropDuration", { name: getCropName(crop, i18n.language), months: crop.durationMonths })}
                 </label>
               </li>
             ))}

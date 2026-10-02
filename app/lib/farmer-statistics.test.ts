@@ -51,7 +51,7 @@ describe("rentalsByCrop", () => {
   const fields = [
     field({
       plots: [
-        { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [{ id: "crop-1", name: "Tomatoes", durationMonths: 3 }] },
+        { id: "plot-1", name: "Plot 1", field: "field-1", coordinates: { type: "Polygon", coordinates: [] }, areaSquareMeters: 100, basePriceCentsPerSqmPerWeek: 10, crops: [{ id: "crop-1", nameDe: "Tomaten", nameEn: "Tomatoes", durationMonths: 3 }] },
       ],
     }),
   ];
@@ -63,7 +63,7 @@ describe("rentalsByCrop", () => {
       rental({ cropId: "crop-2" }),
     ];
     // crop-2 has no matching plot, so it falls back to the raw id.
-    expect(rentalsByCrop(rentals, fields)).toEqual([
+    expect(rentalsByCrop(rentals, fields, "en")).toEqual([
       { cropName: "Tomatoes", count: 2 },
       { cropName: "crop-2", count: 1 },
     ]);
@@ -71,12 +71,12 @@ describe("rentalsByCrop", () => {
 
   it("excludes declined rentals — they never occupied a plot", () => {
     const rentals = [rental({ cropId: "crop-1", status: "declined" })];
-    expect(rentalsByCrop(rentals, fields)).toEqual([]);
+    expect(rentalsByCrop(rentals, fields, "en")).toEqual([]);
   });
 
   it("counts still-requested rentals alongside approved ones", () => {
     const rentals = [rental({ cropId: "crop-1", status: "requested" })];
-    expect(rentalsByCrop(rentals, fields)).toEqual([{ cropName: "Tomatoes", count: 1 }]);
+    expect(rentalsByCrop(rentals, fields, "en")).toEqual([{ cropName: "Tomatoes", count: 1 }]);
   });
 });
 

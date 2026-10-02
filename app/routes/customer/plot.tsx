@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import type { Route } from "./+types/plot";
 import { listMyRentals, type RentalWithPlot } from "~/lib/rentals";
+import { getCropName } from "~/lib/fields";
 import {
   careGuideForPlot,
   cropStage,
@@ -82,7 +83,7 @@ export default function CustomerPlot({ loaderData }: Route.ComponentProps) {
           not carry it — so the subtitle drops it rather than substituting
           something else for a rental that has ended. */}
       <p className="mt-1 text-wood">
-        {[guide?.fieldName, rental.crop.name, formatArea(rental.plot.areaSquareMeters, locale)]
+        {[guide?.fieldName, getCropName(rental.crop, i18nInstance.language), formatArea(rental.plot.areaSquareMeters, locale)]
           .filter(Boolean)
           .join(" · ")}
       </p>
@@ -227,7 +228,7 @@ function CropsTab({
     <div className="space-y-4">
       <div className="rounded-2xl border border-beige bg-cream px-5 py-4 shadow-sm">
         <div className="flex items-start justify-between gap-4">
-          <p className="text-lg font-medium text-forest">{rental.crop.name}</p>
+          <p className="text-lg font-medium text-forest">{getCropName(rental.crop, locale)}</p>
           <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${stageClass[stage]}`}>
             {t(`customer:cropStage_${stage}`)}
           </span>

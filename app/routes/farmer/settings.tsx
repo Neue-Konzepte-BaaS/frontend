@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import type { Route } from "./+types/settings";
 import type { clientLoader as farmerLayoutLoader } from "./layout";
 import { requireRole } from "~/lib/guards";
-import { listCrops, getFarmCropRates, setFarmCropRates, resolveCropRatesToSave, type Crop } from "~/lib/fields";
+import { listCrops, getFarmCropRates, setFarmCropRates, resolveCropRatesToSave, getCropName, type Crop } from "~/lib/fields";
 import { ApiError } from "~/lib/api-client";
 import { roleLabel } from "~/lib/auth";
 import {
@@ -140,7 +140,7 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
     // rate — see resolveCropRatesToSave's own docs for why.
     const result = resolveCropRatesToSave(catalog, rateInputs, existingRates);
     if (!result.ok) {
-      setRatesError(t("farmer:invalidCropRate", { name: result.invalidCrop.name }));
+      setRatesError(t("farmer:invalidCropRate", { name: getCropName(result.invalidCrop, i18nInstance.language) }));
       return;
     }
 
@@ -254,7 +254,10 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
             <ul className="space-y-3">
               {catalog.map((crop: Crop) => (
                 <li key={crop.id}>
-                  <FormField label={t("farmer:cropDuration", { name: crop.name, months: crop.durationMonths })} htmlFor={`rate-${crop.id}`}>
+                  <FormField
+                    label={t("farmer:cropDuration", { name: getCropName(crop, i18nInstance.language), months: crop.durationMonths })}
+                    htmlFor={`rate-${crop.id}`}
+                  >
                     <input
                       id={`rate-${crop.id}`}
                       type="number"
