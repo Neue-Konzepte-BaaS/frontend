@@ -40,11 +40,8 @@ export default function AdminOverview({ loaderData }: Route.ComponentProps) {
     <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
 
-      <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
-        {stats.scope === "platform" ? t("scopePlatform") : t("scopeFarm")}
-      </p>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold text-forest">{t("overviewTitle")}</h1>
+        <h1 className="text-3xl font-bold text-forest">{t("overviewTitle")}</h1>
         <p className="text-xs text-warm-olive">{t("generatedAt", { time: generatedAt })}</p>
       </div>
 

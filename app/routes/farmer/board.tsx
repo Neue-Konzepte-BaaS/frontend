@@ -242,8 +242,8 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
     }`;
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("boardTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("boardTitle")}</h1>
 
       {/* Tabs */}
       <div className="mt-4 flex border-b border-beige">

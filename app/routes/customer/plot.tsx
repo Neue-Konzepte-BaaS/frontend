@@ -72,7 +72,7 @@ export default function CustomerPlot({ loaderData }: Route.ComponentProps) {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8">
+    <main className="mx-auto max-w-5xl p-4">
       <Link to="/customer" className="text-sm font-medium text-moss hover:underline">
         ← {t("customer:backToHome")}
       </Link>

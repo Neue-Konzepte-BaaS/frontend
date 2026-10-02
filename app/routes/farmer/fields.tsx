@@ -87,8 +87,8 @@ export default function FieldsList({ loaderData }: Route.ComponentProps) {
   const fitTo = unionBbox(fields.map((f) => toBbox(f.coordinates)));
 
   return (
-    <main className="mx-auto max-w-6xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("farmer:yourFieldsTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("farmer:yourFieldsTitle")}</h1>
 
       {fields.length === 0 ? (
         <p className="mt-6 text-wood">{t("farmer:noFieldsYet")}</p>

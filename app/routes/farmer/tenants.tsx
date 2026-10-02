@@ -99,7 +99,7 @@ export default function TenantsList({ loaderData }: Route.ComponentProps) {
           <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
             {t("tenantsActiveSummary", { count: activeCount })} · {t("field", { count: fields.length })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-forest">{t("tenantsTitle")}</h1>
+          <h1 className="mt-1 text-3xl font-bold text-forest">{t("tenantsTitle")}</h1>
         </div>
         <input
           type="search"

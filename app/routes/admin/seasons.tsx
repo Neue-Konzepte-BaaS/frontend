@@ -22,8 +22,8 @@ export default function AdminSeasons({ loaderData }: Route.ComponentProps) {
   const [seasons, setSeasons] = useState<Season[]>(loaderData.seasons);
 
   return (
-    <main className="mx-auto max-w-6xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("seasonsTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("seasonsTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("seasonsBody")}</p>
 
       <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-2">

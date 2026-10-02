@@ -127,7 +127,7 @@ export default function NewField({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("farmer:newFieldTitle")}</h1>
+      <h1 className="text-3xl font-bold text-forest">{t("farmer:newFieldTitle")}</h1>
 
       <StepInstructions step={step} />
 

@@ -19,7 +19,7 @@ export default function AdminBroadcast() {
       <Link to="/admin" className="text-sm text-warm-olive hover:underline md:hidden">
         ← {t("overviewTitle")}
       </Link>
-      <h1 className="mt-2 text-2xl font-bold text-forest md:mt-0">{t("notificationsTitle")}</h1>
+      <h1 className="mt-2 text-3xl font-bold text-forest md:mt-0">{t("notificationsTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("notificationsBody")}</p>
       <BroadcastSection />
     </main>

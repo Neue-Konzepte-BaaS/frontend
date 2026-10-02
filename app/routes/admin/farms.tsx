@@ -42,7 +42,7 @@ export default function AdminFarms({ loaderData }: Route.ComponentProps) {
 
   return (
     <main className="mx-auto max-w-5xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("farmsTitle")}</h1>
+      <h1 className="text-3xl font-bold text-forest">{t("farmsTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("farmsBody")}</p>
 
       {/* A GET form: submitting navigates with the filters in the URL, which

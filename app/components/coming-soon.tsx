@@ -10,8 +10,8 @@ export function ComingSoon({ title }: { title: string }) {
   const { t } = useTranslation("common");
 
   return (
-    <main className="mx-auto max-w-3xl p-8">
-      <h1 className="text-2xl font-bold text-forest">{title}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{title}</h1>
       <div
         role="note"
         className="mt-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900"

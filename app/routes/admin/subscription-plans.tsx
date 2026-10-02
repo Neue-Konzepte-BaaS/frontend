@@ -17,8 +17,8 @@ export default function AdminSubscriptionPlans({ loaderData }: Route.ComponentPr
   const { t } = useTranslation("admin");
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{t("subscriptionPlansTitle")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("subscriptionPlansTitle")}</h1>
       <p className="mt-1 text-sm text-warm-olive">{t("subscriptionPlansBody")}</p>
       <SubscriptionPlanSection initialPlans={loaderData.plans} />
     </main>

@@ -85,8 +85,8 @@ export default function CustomerInbox({ loaderData }: Route.ComponentProps) {
   const groups = groupNotifications(filtered);
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8">
-      <h1 className="font-serif text-3xl font-bold text-forest">{t("inboxHeading")}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{t("inboxHeading")}</h1>
 
       <div className="mt-5 flex flex-wrap gap-2">
         {FILTERS.map((key) => (

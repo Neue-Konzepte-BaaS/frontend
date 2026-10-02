@@ -397,8 +397,8 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
   );
 
   return (
-    <main className="mx-auto max-w-6xl p-4">
-      <h1 className="text-2xl font-bold text-forest">{field.name}</h1>
+    <main className="mx-auto max-w-5xl p-4">
+      <h1 className="text-3xl font-bold text-forest">{field.name}</h1>
       <p className="mt-1 text-wood">
         {hasPlots ? t("farmer:plot", { count: field.plots.length }) : t("farmer:fieldHasNoPlotsYet")}
       </p>

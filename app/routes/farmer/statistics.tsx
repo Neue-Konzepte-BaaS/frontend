@@ -45,7 +45,7 @@ export default function FarmerStatistics({ loaderData }: Route.ComponentProps) {
       <AccountTypeNotice />
 
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h1 className="text-2xl font-bold text-forest">{t("statisticsTitle")}</h1>
+        <h1 className="text-3xl font-bold text-forest">{t("statisticsTitle")}</h1>
         <p className="text-xs text-warm-olive">{t("statGeneratedAt", { time: generatedAt })}</p>
       </div>
 

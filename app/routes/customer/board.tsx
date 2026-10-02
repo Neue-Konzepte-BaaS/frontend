@@ -79,7 +79,7 @@ export default function CustomerBoard({ loaderData }: Route.ComponentProps) {
   });
 
   return (
-    <main className="mx-auto max-w-3xl p-4">
+    <main className="mx-auto max-w-5xl p-4">
       {/* No per-farm photo exists yet — same themed-banner stand-in as search/farm.tsx. */}
       <div className="relative overflow-hidden rounded-2xl bg-linear-to-br from-moss to-forest">
         <Wheat className="absolute -top-8 -right-8 h-44 w-44 text-white/10" aria-hidden />
