@@ -5,6 +5,13 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("verify-email", "routes/verify-email.tsx"),
+  // Explains the farmer business model (subscription + 10% transaction cut)
+  // before a prospective farmer commits to signing up. Linked from the
+  // landing page's farmer-directed CTAs instead of going straight to
+  // /register. Public, no guard — "/for-farmers" is also listed in
+  // PUBLIC_PATHS (see ~/lib/constants.ts) so a logged-out visitor's failed
+  // /me check doesn't bounce them to /login.
+  route("for-farmers", "routes/for-farmers.tsx"),
   // Public plot search. Open to everyone (no guard) — also the tenant nav's
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).
