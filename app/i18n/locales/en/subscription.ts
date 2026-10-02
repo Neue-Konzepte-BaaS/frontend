@@ -10,9 +10,9 @@ export const subscription = {
   maxPlots_other: "Up to {{count}} plots",
   choosePlan: "Choose this plan",
   mostPopular: "Most popular",
-  planName_cheap: "Cheap",
-  planName_modest: "Modest",
-  planName_expensive: "Expensive",
+  planName_cheap: "Beginner",
+  planName_modest: "Medium",
+  planName_expensive: "Premium",
 
   currentPlanTitle: "Your subscription",
   statusActive: "Active",
