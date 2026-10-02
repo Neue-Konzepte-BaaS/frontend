@@ -2,9 +2,17 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Check, Loader2 } from "lucide-react";
-import { getSubscriptionPlans, getSubscriptionStatusOrNull, hasActiveSubscription, type SubscriptionPlan } from "~/lib/subscriptions";
+import {
+  getSubscriptionPlans,
+  getSubscriptionStatusOrNull,
+  hasActiveSubscription,
+  upgradeSubscription,
+  type FarmerSubscription,
+  type SubscriptionPlan,
+} from "~/lib/subscriptions";
 import { formatPriceCents } from "~/components/plot-card";
-import { FormError, primaryButtonClass } from "~/components/form";
+import { ApiError } from "~/lib/api-client";
+import { FormError, FormSuccess, primaryButtonClass, secondaryButtonClass } from "~/components/form";
 import type { Route } from "./+types/subscribe";
 import i18n from "~/i18n";
 
@@ -32,35 +40,154 @@ export async function clientLoader() {
 }
 
 export default function FarmerSubscribe({ loaderData }: Route.ComponentProps) {
-  const { plans, subscription } = loaderData;
+  const { plans } = loaderData;
+  const [subscription, setSubscription] = useState(loaderData.subscription);
+
+  if (subscription && hasActiveSubscription(subscription)) {
+    return <FarmerSubscriptionStatus subscription={subscription} plans={plans} onUpgraded={setSubscription} />;
+  }
+
+  return <FarmerPlanPicker plans={plans} />;
+}
+
+/**
+ * The "already subscribed" view: current plan + renewal date, plus an
+ * upgrade picker for any active tier priced higher than the farmer's
+ * current one. Split out of FarmerSubscribe so the plan-picker-for-a-new-
+ * farmer path below stays simple.
+ */
+function FarmerSubscriptionStatus({
+  subscription,
+  plans,
+  onUpgraded,
+}: {
+  subscription: FarmerSubscription;
+  plans: SubscriptionPlan[];
+  onUpgraded: (sub: FarmerSubscription) => void;
+}) {
+  const { t, i18n: i18nInstance } = useTranslation(["subscription", "common"]);
+  const priceLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
+  const [confirmingPlanId, setConfirmingPlanId] = useState<string | null>(null);
+  const [upgradingId, setUpgradingId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const upgradeOptions = plans.filter((plan) => plan.isActive && plan.priceCents > subscription.priceCents);
+
+  async function confirmUpgrade(plan: SubscriptionPlan) {
+    setError(null);
+    setSuccess(null);
+    setUpgradingId(plan.id);
+    try {
+      const updated = await upgradeSubscription(plan.id);
+      onUpgraded(updated);
+      setSuccess(t("subscription:upgradeSuccess", { name: t(`subscription:planName_${plan.code}`, { defaultValue: plan.displayName }) }));
+      setConfirmingPlanId(null);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 409) {
+        setError(t("subscription:upgradeNotAnUpgrade"));
+      } else {
+        setError(err instanceof ApiError ? err.message : String(err));
+      }
+    } finally {
+      setUpgradingId(null);
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-lg p-4">
+      <h1 className="text-2xl font-bold text-forest">{t("subscription:currentPlanTitle")}</h1>
+      <div className="mt-6 flex items-center gap-3 rounded-lg border border-moss/40 bg-moss/10 p-4">
+        <Check className="h-6 w-6 shrink-0 text-moss" strokeWidth={2.5} />
+        <div>
+          <p className="font-semibold text-forest">
+            {t(`subscription:planName_${subscription.planCode}`, { defaultValue: subscription.planDisplayName })} ·{" "}
+            {formatPriceCents(subscription.priceCents, priceLocale)} {t("subscription:perMonth")}
+          </p>
+          <p className="text-sm text-wood">{subscription.status === "past_due" ? t("subscription:statusPastDue") : t("subscription:statusActive")}</p>
+          {subscription.currentPeriodEnd && (
+            <p className="text-sm text-wood">
+              {t("subscription:renewsOn", { date: new Date(subscription.currentPeriodEnd).toLocaleDateString(priceLocale) })}
+            </p>
+          )}
+        </div>
+      </div>
+
+      {upgradeOptions.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold text-forest">{t("subscription:upgradeSectionTitle")}</h2>
+          <p className="mt-1 text-sm text-wood">{t("subscription:upgradeSectionBody")}</p>
+
+          {error && <div className="mt-4"><FormError message={error} /></div>}
+          {success && <div className="mt-4"><FormSuccess message={success} /></div>}
+
+          <ul className="mt-4 divide-y divide-beige rounded-lg border border-beige">
+            {upgradeOptions.map((plan) => (
+              <li key={plan.id} className="flex flex-col gap-3 px-4 py-3">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-forest">{t(`subscription:planName_${plan.code}`, { defaultValue: plan.displayName })}</p>
+                    <p className="text-sm text-wood">
+                      {formatPriceCents(plan.priceCents, priceLocale)} {t("subscription:perMonth")} ·{" "}
+                      {plan.maxPlots === null ? t("subscription:unlimitedPlots") : t("subscription:maxPlots", { count: plan.maxPlots })}
+                    </p>
+                  </div>
+
+                  {confirmingPlanId !== plan.id && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError(null);
+                        setSuccess(null);
+                        setConfirmingPlanId(plan.id);
+                      }}
+                      className={`${secondaryButtonClass} w-auto shrink-0 px-3 py-2 text-sm`}
+                    >
+                      {t("subscription:upgradeButton")}
+                    </button>
+                  )}
+                </div>
+
+                {confirmingPlanId === plan.id && (
+                  <div className="flex flex-col gap-2 rounded-lg border border-amber-300 bg-amber-50 p-3 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-sm text-amber-900">{t("subscription:upgradeConfirmPrompt")}</p>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={upgradingId === plan.id}
+                        onClick={() => confirmUpgrade(plan)}
+                        className={`${primaryButtonClass} w-auto px-3 py-2 text-sm`}
+                      >
+                        {upgradingId === plan.id ? t("subscription:upgradeProcessing") : t("subscription:upgradeConfirmButton")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmingPlanId(null)}
+                        className={`${secondaryButtonClass} w-auto px-3 py-2 text-sm`}
+                      >
+                        {t("subscription:upgradeCancelButton")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <Link to="/farmer" className="mt-6 inline-block text-sm font-medium text-moss hover:underline">
+        {t("subscription:goToDashboard")}
+      </Link>
+    </main>
+  );
+}
+
+function FarmerPlanPicker({ plans }: { plans: SubscriptionPlan[] }) {
   const { t, i18n: i18nInstance } = useTranslation(["subscription", "common"]);
   const priceLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-
-  if (subscription && hasActiveSubscription(subscription)) {
-    return (
-      <main className="mx-auto max-w-lg p-4">
-        <h1 className="text-2xl font-bold text-forest">{t("subscription:currentPlanTitle")}</h1>
-        <div className="mt-6 flex items-center gap-3 rounded-lg border border-moss/40 bg-moss/10 p-4">
-          <Check className="h-6 w-6 shrink-0 text-moss" strokeWidth={2.5} />
-          <div>
-            <p className="font-semibold text-forest">
-              {subscription.status === "past_due" ? t("subscription:statusPastDue") : t("subscription:statusActive")}
-            </p>
-            {subscription.currentPeriodEnd && (
-              <p className="text-sm text-wood">
-                {t("subscription:renewsOn", { date: new Date(subscription.currentPeriodEnd).toLocaleDateString(priceLocale) })}
-              </p>
-            )}
-          </div>
-        </div>
-        <Link to="/farmer" className="mt-6 inline-block text-sm font-medium text-moss hover:underline">
-          {t("subscription:goToDashboard")}
-        </Link>
-      </main>
-    );
-  }
 
   function choosePlan(plan: SubscriptionPlan) {
     setError(null);

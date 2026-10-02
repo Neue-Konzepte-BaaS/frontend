@@ -8,6 +8,7 @@ import { apiClient, ApiError } from "~/lib/api-client";
  *   GET  /api/subscriptions/plans              -> SubscriptionPlan[] (public)
  *   POST /api/subscriptions/checkout-sessions   -> SubscriptionCheckoutSession (farmer only)
  *   GET  /api/subscriptions/me                  -> FarmerSubscription (farmer only) or 404 if never subscribed
+ *   PUT  /api/subscriptions/upgrade             -> FarmerSubscription (farmer only)
  *
  * Every farmer must hold an Active or PastDue subscription to use anything
  * under /farmer beyond this flow itself — see farmer/layout.tsx's
@@ -56,6 +57,10 @@ export type SubscriptionStatus = "pending" | "active" | "past_due" | "canceled";
 export type FarmerSubscription = {
   status: SubscriptionStatus;
   currentPeriodEnd?: string;
+  planId: string;
+  planCode: SubscriptionPlanCode;
+  planDisplayName: string;
+  priceCents: number;
 };
 
 /**
@@ -81,6 +86,17 @@ export async function getSubscriptionStatusOrNull(): Promise<FarmerSubscription 
 /** Active or PastDue both count as "may use the farmer dashboard" — see RequireActiveSubscription on the backend. */
 export function hasActiveSubscription(sub: FarmerSubscription | null): boolean {
   return sub?.status === "active" || sub?.status === "past_due";
+}
+
+/**
+ * Moves the caller's subscription to a higher-priced plan, prorating the
+ * difference immediately. Throws ApiError(404) if the caller has no
+ * active/past_due subscription or planId doesn't exist/is retired, or
+ * ApiError(409) if planId isn't priced higher than the caller's current
+ * plan.
+ */
+export function upgradeSubscription(planId: string): Promise<FarmerSubscription> {
+  return apiClient.put<FarmerSubscription>("/subscriptions/upgrade", { planId });
 }
 
 export type SubscriptionPollOutcome = { kind: "polling" } | { kind: "timedOut" } | { kind: "settled"; status: SubscriptionStatus };
