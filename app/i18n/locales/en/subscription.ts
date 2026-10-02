@@ -19,6 +19,17 @@ export const subscription = {
   statusPastDue: "Payment past due — we're retrying automatically",
   renewsOn: "Renews on {{date}}",
 
+  // Upgrade picker (routes/farmer/subscribe.tsx, already-subscribed view)
+  upgradeSectionTitle: "Upgrade your plan",
+  upgradeSectionBody: "Switch to a higher tier now — you'll be charged a prorated amount immediately, and billed the new price from your next renewal.",
+  upgradeButton: "Switch to this plan",
+  upgradeConfirmPrompt: "Switch now? You'll be charged a prorated amount right away.",
+  upgradeConfirmButton: "Confirm switch",
+  upgradeCancelButton: "Cancel",
+  upgradeProcessing: "Switching…",
+  upgradeSuccess: "Switched to {{name}}.",
+  upgradeNotAnUpgrade: "That plan is no longer a valid upgrade — please refresh and try again.",
+
   // Checkout (routes/farmer/subscribe-checkout.tsx)
   checkoutMetaTitle: "Subscribe · Farmland",
   checkoutTitle: "Confirm and subscribe",

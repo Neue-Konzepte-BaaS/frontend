@@ -19,6 +19,17 @@ export const subscription = {
   statusPastDue: "Zahlung überfällig — wir versuchen es automatisch erneut",
   renewsOn: "Verlängert sich am {{date}}",
 
+  // Upgrade-Auswahl (routes/farmer/subscribe.tsx, Ansicht für bestehendes Abo)
+  upgradeSectionTitle: "Tarif upgraden",
+  upgradeSectionBody: "Wechsle jetzt zu einem höheren Tarif — ein anteiliger Betrag wird sofort berechnet, ab der nächsten Verlängerung gilt dann der neue Preis.",
+  upgradeButton: "Zu diesem Tarif wechseln",
+  upgradeConfirmPrompt: "Jetzt wechseln? Ein anteiliger Betrag wird sofort berechnet.",
+  upgradeConfirmButton: "Wechsel bestätigen",
+  upgradeCancelButton: "Abbrechen",
+  upgradeProcessing: "Wird gewechselt…",
+  upgradeSuccess: "Zu {{name}} gewechselt.",
+  upgradeNotAnUpgrade: "Dieser Tarif ist kein gültiges Upgrade mehr — bitte aktualisiere die Seite und versuche es erneut.",
+
   // Checkout (routes/farmer/subscribe-checkout.tsx)
   checkoutMetaTitle: "Abonnieren · Farmland",
   checkoutTitle: "Bestätigen und abonnieren",
