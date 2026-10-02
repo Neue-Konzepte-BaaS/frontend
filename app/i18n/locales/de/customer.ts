@@ -10,7 +10,7 @@ export const customer: Shape = {
   findAPlot: "Parzelle finden",
 
   simpleModeHeading: "Einfacher Modus",
-  simpleModeDescription: "Große Schrift, hoher Kontrast, weniger Schritte",
+  simpleModeDescription: "Große Schrift, hoher Kontrast",
 
   notificationsHeading: "Wie der Hof mich erreicht",
   pushNotification: "Push-Benachrichtigung",
