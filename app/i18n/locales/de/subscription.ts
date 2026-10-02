@@ -10,7 +10,7 @@ export const subscription = {
   maxPlots_other: "Bis zu {{count}} Parzellen",
   choosePlan: "Diesen Tarif wählen",
   mostPopular: "Am beliebtesten",
-  planName_cheap: "Günstig",
+  planName_cheap: "Einsteiger",
   planName_modest: "Mittel",
   planName_expensive: "Premium",
 

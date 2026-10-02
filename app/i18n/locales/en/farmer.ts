@@ -205,6 +205,8 @@ export const farmer = {
   statNoFieldsYet: "No fields yet.",
   statFieldOccupancy: "{{rented}} / {{total}} rented",
   cropRatesHeading: "Crop pricing",
+  cropRatesRequiredNotice:
+    "You haven't set a price for any crop yet — none of your plots can be rented until at least one crop has a rate here.",
   cropRatesInstructions:
     "Set what each crop costs to grow, per square meter per week — combined with each plot's own base rate (set on its field's page) to price what a customer pays. A crop with no rate here won't be rentable on any of your plots yet.",
   cropRatePlaceholder: "e.g. 0.02",

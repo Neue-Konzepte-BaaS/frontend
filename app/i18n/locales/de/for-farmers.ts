@@ -20,6 +20,13 @@ export const farmInfo: Shape = {
   commissionTitle: "10% pro Transaktion",
   commissionBody:
     "Wir verdienen nur, wenn du verdienst: Farmland behält 10% jeder Mietzahlung, die über die Plattform läuft. Keine versteckten Zusatzkosten.",
+  plotPricingTitle: "Du bestimmst den Preis — in zwei Teilen",
+  plotPricingBody:
+    "Was ein Kunde zahlt, ergibt sich aus deinem eigenen Grundpreis für eine Parzelle (z. B. nach Größe oder Lage) kombiniert mit deinem Preis für die dort angebaute Pflanze. Lege den Grundpreis pro Parzelle fest und den Preis jeder Pflanze einmal für deinen ganzen Hof — zusammen ergeben beide den Mietpreis.",
+  plotPriceLabel: "Preis pro Parzelle",
+  plotPriceBody: "Ein Grundpreis pro m² pro Woche, für jede Parzelle einzeln festgelegt — richtet sich z. B. nach Größe oder Lage.",
+  cropPriceLabel: "Preis pro Pflanze",
+  cropPriceBody: "Ein Preis pro m² pro Woche für jede Pflanze, einmal für deinen ganzen Hof festgelegt und auf jeder Parzelle genutzt, die sie anbaut.",
   brandTitle: "Dein Hof, deine Marke",
   brandBody: "Dein Hof behält seinen eigenen Namen und seine eigenen Kunden. Wir stellen nur die Werkzeuge im Hintergrund bereit.",
   ctaTitle: "Bereit, deinen Hof mit Farmland zu betreiben?",
