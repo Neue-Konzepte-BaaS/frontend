@@ -11,7 +11,8 @@ export const farmInfo = {
   subscriptionTitle: "A simple monthly subscription",
   subscriptionBody:
     "Pick a plan that fits the size of your farm. No setup fees, no long-term contract — just one monthly price for full access to the platform.",
-  subscriptionCta: "See subscription plans",
+  subscriptionCta: "Sign up as a farmer",
+  subscriptionCtaLoggedIn: "Go to dashboard",
   commissionTitle: "10% per transaction",
   commissionBody:
     "We only make money when you do: Farmland keeps 10% of every rental payment made through the platform. No hidden costs on top.",

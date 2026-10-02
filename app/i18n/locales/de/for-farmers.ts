@@ -15,7 +15,8 @@ export const farmInfo: Shape = {
   subscriptionTitle: "Ein einfaches Monatsabo",
   subscriptionBody:
     "Wähle ein Paket passend zur Größe deines Hofs. Keine Einrichtungsgebühr, keine lange Vertragsbindung — nur ein monatlicher Preis für vollen Zugang zur Plattform.",
-  subscriptionCta: "Abo-Pakete ansehen",
+  subscriptionCta: "Als Hof registrieren",
+  subscriptionCtaLoggedIn: "Zum Dashboard",
   commissionTitle: "10% pro Transaktion",
   commissionBody:
     "Wir verdienen nur, wenn du verdienst: Farmland behält 10% jeder Mietzahlung, die über die Plattform läuft. Keine versteckten Zusatzkosten.",
