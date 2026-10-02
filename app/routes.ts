@@ -5,6 +5,10 @@ export default [
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("verify-email", "routes/verify-email.tsx"),
+  // Allgemeine Geschäftsbedingungen (ToS) — public, linked from the rental
+  // request form's acceptance checkbox (plot-crops-and-rent.tsx) before a
+  // customer ever signs in to pay, so it must stay reachable logged out.
+  route("agb", "routes/terms.tsx"),
   // Public plot search. Open to everyone (no guard) — also the tenant nav's
   // "Search" destination, so it stays outside customer-layout below (that
   // layout requires a customer session; this route must not).

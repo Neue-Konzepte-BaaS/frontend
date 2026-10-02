@@ -53,7 +53,7 @@ type PlotCropsAndRentProps = {
  * backend at all.
  */
 export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, returnTo }: PlotCropsAndRentProps) {
-  const { t, i18n } = useTranslation(["search", "common", "auth"]);
+  const { t, i18n } = useTranslation(["search", "common", "auth", "legal"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
   const navigate = useNavigate();
   const isCustomer = account?.role === "customer";
@@ -84,6 +84,7 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
   );
   const [startAt, setStartAt] = useState("");
   const [message, setMessage] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const selectedCrop = crops.find((c) => c.id === selectedCropId) ?? crops[0];
 
@@ -101,7 +102,7 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!selectedCrop || !startAt || !message.trim() || outsideSeason) return;
+    if (!selectedCrop || !startAt || !message.trim() || outsideSeason || !acceptedTerms) return;
 
     const startAtIso = new Date(`${startAt}T00:00:00`).toISOString();
     const state: CheckoutRequest = { plotId, cropId: selectedCrop.id, startAt: startAtIso, message: message.trim() };
@@ -230,9 +231,26 @@ export function PlotCropsAndRent({ plotId, crops, account, loginRedirectTo, retu
         />
       </div>
 
+      <label className="flex items-start gap-2 text-sm text-wood">
+        <input
+          type="checkbox"
+          required
+          checked={acceptedTerms}
+          onChange={(e) => setAcceptedTerms(e.target.checked)}
+          className="mt-0.5 h-4 w-4 border-beige text-moss focus:ring-moss"
+        />
+        <span>
+          {t("legal:acceptTermsLabel")}{" "}
+          <Link to="/agb" target="_blank" rel="noopener noreferrer" className="text-moss underline hover:text-olive">
+            {t("legal:termsLinkText")}
+          </Link>{" "}
+          {t("legal:acceptTermsSuffix")}
+        </span>
+      </label>
+
       <button
         type="submit"
-        disabled={!startAt || !message.trim() || outsideSeason || !selectedCrop || !rentableCropIds.has(selectedCrop.id)}
+        disabled={!startAt || !message.trim() || outsideSeason || !selectedCrop || !rentableCropIds.has(selectedCrop.id) || !acceptedTerms}
         className={`${submitClass} px-4 py-2 text-sm`}
       >
         {t("search:continueToPayment")}
