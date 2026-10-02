@@ -18,8 +18,8 @@ import { Field as FormField, FormError, FormSuccess, inputClass, primaryButtonCl
  * Authoring for the weekly care guide (backend #44, #68): the instructions a
  * tenant reads on their plot page, one crop at a time.
  *
- * - As an **admin** (on `/admin/crops`) it edits the crop's **default guide**,
- *   the one every farm starts from.
+ * - As an **admin** (on `/admin/care-guide`) it edits the crop's **default
+ *   guide**, the one every farm starts from.
  * - As a **farmer** (on `/farmer/care-guide`) it edits the version the
  *   farmer's own tenants read. Until the farmer changes anything that is the
  *   default; the first write copies it into a version of their own, which

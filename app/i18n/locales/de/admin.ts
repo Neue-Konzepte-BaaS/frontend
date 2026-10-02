@@ -74,6 +74,12 @@ export const admin: Shape = {
   cropsMetaTitle: "Pflanzenkatalog · Farmland",
   cropsTitle: "Pflanzenkatalog",
   cropsBody: "Diese Pflanzen stehen Landwirten zur Zuweisung an ihre Parzellen zur Verfügung.",
+
+  // Standard-Pflegeplan-Seite
+  careGuidePageMetaTitle: "Standard-Pflegeplan · Farmland",
+  careGuidePageTitle: "Standard-Pflegeplan",
+  careGuidePageIntro:
+    "Der Ausgangspunkt, mit dem der Pflegeplan jedes Hofs startet. Ein Betrieb kann davon abweichen und Teile für seine eigenen Mietenden überschreiben — Änderungen hier betreffen nur den gemeinsamen Standard, nicht bereits überschriebene Höfe.",
   cropNameLabel: "Pflanzenname",
   cropDurationLabel: "Mietdauer (Monate)",
   cropNamePlaceholder: "Tomaten",

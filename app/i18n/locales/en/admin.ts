@@ -70,6 +70,12 @@ export const admin = {
   cropsMetaTitle: "Crop catalog · Farmland",
   cropsTitle: "Crop catalog",
   cropsBody: "These crops are available for farmers to assign to their plots.",
+
+  // Default care guide page
+  careGuidePageMetaTitle: "Default care guide · Farmland",
+  careGuidePageTitle: "Default care guide",
+  careGuidePageIntro:
+    "The starting point every farm's care guide begins from. A farmer can override any of it for their own tenants — editing it here only changes the shared default, not what already-overridden farms show.",
   cropNameLabel: "Crop name",
   cropDurationLabel: "Rental duration (months)",
   cropNamePlaceholder: "Tomatoes",

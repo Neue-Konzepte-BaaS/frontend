@@ -13,20 +13,23 @@ export default [
   // Same public reach as /search — no guard, no customer-layout.
   route("search/farms/:farmId", "routes/search/farm.tsx"),
   // Admin section: nav is Platform/Farms/Accounts/Rentals, plus the System
-  // tools (Crop catalog, Broadcast) pinned separately (issue #25). A layout
-  // owns the requireRole("admin") guard and shared chrome; children render in
-  // its <Outlet />. /admin/rentals is still a ComingSoon stub — the backend
-  // has no admin rentals endpoint yet.
+  // tools (Crop catalog, Care guide, Broadcast) pinned separately (issue
+  // #25). A layout owns the requireRole("admin") guard and shared chrome;
+  // children render in its <Outlet />. /admin/rentals is still a ComingSoon
+  // stub — the backend has no admin rentals endpoint yet.
   layout("routes/admin/layout.tsx", { id: "admin-layout" }, [
     route("admin", "routes/admin/index.tsx"),
     route("admin/farms", "routes/admin/farms.tsx"),
     route("admin/accounts", "routes/admin/accounts.tsx"),
     route("admin/rentals", "routes/admin/rentals.tsx"),
     route("admin/crops", "routes/admin/crops.tsx"),
+    // The platform's default care guide — every farm starts from this
+    // (backend #44/#68). Its own page/nav entry, mirroring farmer/care-guide.
+    route("admin/care-guide", "routes/admin/care-guide.tsx"),
     route("admin/seasons", "routes/admin/seasons.tsx"),
     route("admin/broadcast", "routes/admin/broadcast.tsx"),
     // Subscription tier pricing (issue #73) — pinned in the same "System
-    // tools" nav group as Crops/Seasons/Broadcast.
+    // tools" nav group as Crops/Care guide/Seasons/Broadcast.
     route("admin/subscription-plans", "routes/admin/subscription-plans.tsx"),
   ]),
   // Tenant section: nav is Home/Search/Board/Inbox/Me (issue #27). A layout
