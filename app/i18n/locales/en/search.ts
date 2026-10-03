@@ -21,6 +21,8 @@ export const search = {
   postalCodeOrCityNotFound: "We couldn't find that postal code or city — try another.",
   searchAboveHint: "Search above to see farms with plots available near you.",
   noPlotsFoundNearby: "No available plots found near there right now.",
+  hideMap: "Hide map",
+  showMap: "Show map",
   browseHint: "Click a farm below to see its available plots.",
   farmDistance: "{{distance}} away",
   nearbyPlotCount_one: "{{count}} plot available",

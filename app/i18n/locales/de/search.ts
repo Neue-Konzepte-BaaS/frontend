@@ -23,6 +23,8 @@ export const search: Shape = {
   postalCodeOrCityNotFound: "Wir konnten diese Postleitzahl oder Stadt nicht finden — versuche eine andere.",
   searchAboveHint: "Suche oben, um Höfe mit verfügbaren Parzellen in deiner Nähe zu sehen.",
   noPlotsFoundNearby: "Momentan wurden keine verfügbaren Parzellen in der Nähe gefunden.",
+  hideMap: "Karte ausblenden",
+  showMap: "Karte anzeigen",
   browseHint: "Klicke auf einen Hof, um seine verfügbaren Parzellen zu sehen.",
   farmDistance: "{{distance}} entfernt",
   nearbyPlotCount_one: "{{count}} Parzelle verfügbar",

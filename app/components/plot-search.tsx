@@ -52,6 +52,7 @@ export function PlotSearch({ homePostalCode }: PlotSearchProps) {
   // The geocoded search location, used to make sure the map always moves
   // toward where the visitor searched, not just toward the result plots.
   const [searchCenter, setSearchCenter] = useState<LatLon | null>(null);
+  const [showMap, setShowMap] = useState(true);
   const { t, i18n } = useTranslation(["search", "common"]);
   const numberLocale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
@@ -176,16 +177,26 @@ export function PlotSearch({ homePostalCode }: PlotSearchProps) {
         </div>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-        <div className="overflow-hidden rounded-lg border border-beige lg:sticky lg:top-4">
-          <FieldMap
-            center={searchCenter ?? initialCenter}
-            shapes={shapes}
-            drawMode={null}
-            onShapeClick={handleShapeClick}
-            fitTo={hasSearched ? fitTo : null}
-          />
-        </div>
+      <button
+        type="button"
+        onClick={() => setShowMap((v) => !v)}
+        className="mt-4 text-sm font-semibold text-deep-olive hover:text-moss"
+      >
+        {showMap ? t("search:hideMap") : t("search:showMap")}
+      </button>
+
+      <div className={`mt-3 grid gap-6 ${showMap ? "lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start" : ""}`}>
+        {showMap && (
+          <div className="overflow-hidden rounded-lg border border-beige lg:sticky lg:top-4">
+            <FieldMap
+              center={searchCenter ?? initialCenter}
+              shapes={shapes}
+              drawMode={null}
+              onShapeClick={handleShapeClick}
+              fitTo={hasSearched ? fitTo : null}
+            />
+          </div>
+        )}
 
         {!hasSearched ? (
           <p className="text-wood">{t("search:searchAboveHint")}</p>
