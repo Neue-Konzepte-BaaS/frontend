@@ -10,6 +10,8 @@ export const customer = {
   ripeFrom: "from {{sender}} · {{time}}",
   boardNewFromFarm_one: "{{count}} new post from the farm this week",
   boardNewFromFarm_other: "{{count}} new posts from the farm this week",
+  plotMapExpand: "Show larger map",
+  plotMapCollapse: "Show smaller map",
   boardNoNewPosts: "Nothing new from the farm this week",
 
   simpleModeHeading: "Simple mode",

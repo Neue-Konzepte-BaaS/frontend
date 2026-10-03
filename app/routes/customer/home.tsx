@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useRouteLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowRight } from "lucide-react";
@@ -66,22 +67,57 @@ export async function clientLoader() {
   return { rentals, guides, notifications, announcements };
 }
 
-/** A read-only map of one rented plot, framed on its own boundary. */
+/**
+ * One rented plot on a map. Collapsed it is a small, non-interactive overview
+ * (the whole thumbnail is one button); a tap opens the full-size map. The map
+ * is remounted on toggle (`key`) rather than resized: FieldMap only fits its
+ * bounds on mount and when `fitTo` changes, not when its container changes size.
+ */
 function PlotMap({ rental }: { rental: RentalWithPlot }) {
-  const { t } = useTranslation("farmer");
+  const { t } = useTranslation("customer");
+  const [expanded, setExpanded] = useState(false);
   const bbox = toBbox(rental.plot.coordinates);
   const shapes: MapShape[] = [
     { id: rental.plot.id, polygon: rental.plot.coordinates, variant: "plot", selected: true },
   ];
+  const center = { lat: (bbox.minLat + bbox.maxLat) / 2, lon: (bbox.minLon + bbox.maxLon) / 2 };
+
+  if (expanded) {
+    return (
+      <div className="mt-4">
+        <div className="overflow-hidden rounded-lg border border-beige">
+          <FieldMap key="large" center={center} shapes={shapes} drawMode={null} fitTo={bbox} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="mt-2 text-sm font-medium text-moss hover:underline"
+        >
+          {t("plotMapCollapse")}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-4 overflow-hidden rounded-lg border border-beige" role="img" aria-label={t("mapAriaLabel")}>
-      <FieldMap
-        center={{ lat: (bbox.minLat + bbox.maxLat) / 2, lon: (bbox.minLon + bbox.maxLon) / 2 }}
-        shapes={shapes}
-        drawMode={null}
-        fitTo={bbox}
-      />
-    </div>
+    <button
+      type="button"
+      onClick={() => setExpanded(true)}
+      aria-label={t("plotMapExpand")}
+      className="mt-4 block w-full cursor-pointer overflow-hidden rounded-lg border border-beige focus:outline-none focus:ring-2 focus:ring-olive"
+    >
+      <div className="pointer-events-none">
+        <FieldMap
+          key="small"
+          center={center}
+          shapes={shapes}
+          drawMode={null}
+          fitTo={bbox}
+          fitPadding={8}
+          className="h-28 w-full"
+        />
+      </div>
+    </button>
   );
 }
 

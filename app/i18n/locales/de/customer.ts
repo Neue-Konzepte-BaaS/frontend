@@ -14,6 +14,8 @@ export const customer: Shape = {
   ripeFrom: "von {{sender}} · {{time}}",
   boardNewFromFarm_one: "{{count}} neuer Beitrag vom Hof diese Woche",
   boardNewFromFarm_other: "{{count}} neue Beiträge vom Hof diese Woche",
+  plotMapExpand: "Größere Karte anzeigen",
+  plotMapCollapse: "Kleinere Karte anzeigen",
   boardNoNewPosts: "Diese Woche nichts Neues vom Hof",
 
   simpleModeHeading: "Einfacher Modus",
