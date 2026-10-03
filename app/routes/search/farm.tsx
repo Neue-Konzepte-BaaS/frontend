@@ -7,6 +7,7 @@ import { me, dashboardPath } from "~/lib/auth";
 import { getFarm, getFarmFields } from "~/lib/farms";
 import { findNearestPlots, listMyRentals, groupPlotsByField, MAX_NEAREST_PLOTS, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
+import { PlotStatusLegend } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
 import { sortPlotsNaturally, plotStatusesByPlot } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
@@ -259,8 +260,14 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
             <p className="mt-2 text-wood">{t("search:fieldHasNoPlotsNearby")}</p>
           ) : (
             <div className="mt-3 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-              <div className="overflow-hidden rounded-lg border border-beige">
-                <FieldMap center={initialCenter} shapes={shapes} drawMode={null} onShapeClick={handleMapShapeClick} fitTo={fitTo} />
+              <div>
+                <div className="overflow-hidden rounded-lg border border-beige">
+                  <FieldMap center={initialCenter} shapes={shapes} drawMode={null} onShapeClick={handleMapShapeClick} fitTo={fitTo} />
+                </div>
+                <PlotStatusLegend
+                  plots={fieldPlots.map((p) => ({ status: plotStatusByPlot.get(p.id)?.status ?? "free" }))}
+                  legendStatuses={["free", "requested", "rented"]}
+                />
               </div>
               <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
                 <PlotRentPanel
