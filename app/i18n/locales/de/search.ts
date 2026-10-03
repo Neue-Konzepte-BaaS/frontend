@@ -42,7 +42,7 @@ export const search: Shape = {
   noCropsOffered: "Noch nicht verfügbar — keine Pflanzen angeboten.",
   loginToRent: "Zum Anfragen anmelden",
   cannotRentWrongRole: "Du bist als {{role}} angemeldet — nur Kunden-Konten können mieten.",
-  rentPanelHint: "Klicke auf eine Parzelle in der Karte oder im Raster, um sie anzufragen.",
+  rentPanelHint: "Klicke auf eine Parzelle in der Karte, um sie anzufragen.",
   cropMonths_one: "{{count}} Monat",
   cropMonths_other: "{{count}} Monate",
   rentStartDateHint: "Frühestens morgen, spätestens in 60 Tagen.",

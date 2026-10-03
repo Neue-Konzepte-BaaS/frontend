@@ -40,7 +40,7 @@ export const search = {
   noCropsOffered: "Not available yet — no crops offered.",
   loginToRent: "Log in to request",
   cannotRentWrongRole: "You're signed in as a {{role}} — only customer accounts can rent.",
-  rentPanelHint: "Click a plot on the map or in the grid to request it.",
+  rentPanelHint: "Click a plot on the map to request it.",
   cropMonths_one: "{{count}} month",
   cropMonths_other: "{{count}} months",
   rentStartDateHint: "Earliest tomorrow, at most 60 days from now.",
