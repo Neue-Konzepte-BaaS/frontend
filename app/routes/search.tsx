@@ -23,12 +23,15 @@ export default function SearchPage({ loaderData }: Route.ComponentProps) {
   const customer = account?.role === "customer" ? account : null;
   const { t } = useTranslation(["search", "common", "home"]);
   const tenantNavItems = useTenantNavItems();
+  // 0 means "unknown" (see Account.postalCode) — only a real postal code is
+  // worth auto-centering/auto-searching the map on.
+  const homePostalCode = customer && customer.postalCode > 0 ? customer.postalCode : undefined;
 
   const content = (
     <main className="mx-auto max-w-5xl px-4 py-8">
       <h1 className="text-3xl font-bold text-forest">{t("search:searchTitle")}</h1>
       <p className="mt-2 text-wood">{t("search:searchSubtitle")}</p>
-      <PlotSearch />
+      <PlotSearch homePostalCode={homePostalCode} />
     </main>
   );
 

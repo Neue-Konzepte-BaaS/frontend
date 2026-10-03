@@ -6,7 +6,7 @@ import { getFarm } from "~/lib/farms";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox, pointBbox } from "~/lib/geo";
-import { geocodeLocation, FALLBACK_CENTER, type LatLon } from "~/lib/geocode";
+import { geocodeLocation, geocodePostalCode, FALLBACK_CENTER, type LatLon } from "~/lib/geocode";
 import { formatDistance } from "~/components/plot-card";
 import { Field as FormField, FormError, inputClass, submitClass } from "~/components/form";
 
@@ -30,7 +30,14 @@ function toFarmLink(farmId: string, locationQuery: URLSearchParams) {
   return `/search/farms/${farmId}?${locationQuery.toString()}`;
 }
 
-export function PlotSearch() {
+type PlotSearchProps = {
+  /** The signed-in customer's postal code, if any — used to centre the map
+   * and auto-run a search on first load so the map isn't empty before the
+   * visitor has typed anything. */
+  homePostalCode?: number;
+};
+
+export function PlotSearch({ homePostalCode }: PlotSearchProps) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("postalCode") ?? searchParams.get("city") ?? "");
@@ -99,11 +106,26 @@ export function PlotSearch() {
 
   // Re-run automatically if the page was reached with a query already in the
   // URL (a fresh /search?postalCode=... link, or landing back here from a
-  // farm's page) instead of showing a blank search box the visitor already filled in.
+  // farm's page) instead of showing a blank search box the visitor already
+  // filled in. Otherwise, if the visitor is a signed-in customer, search
+  // their home postal code so the map isn't empty before they've typed
+  // anything — but leave the search box itself blank, since they didn't
+  // actually type this.
   useEffect(() => {
     if (query) runSearch(query);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount only, using the URL's initial value.
+    else if (homePostalCode) runSearch(String(homePostalCode));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once on mount only, using the URL's/account's initial value.
   }, []);
+
+  // Before any search has resolved, still give the map somewhere sensible to
+  // sit — the visitor's own postal code if we know it (geocoded once below,
+  // cached, and then reused — see geocode.ts — so this doesn't double the
+  // Nominatim traffic the auto-search above already causes), else the fallback.
+  const [initialCenter, setInitialCenter] = useState<LatLon>(FALLBACK_CENTER);
+  useEffect(() => {
+    if (!homePostalCode) return;
+    geocodePostalCode(homePostalCode).then(setInitialCenter);
+  }, [homePostalCode]);
 
   // Every plot's real outline, same as before the farm-grouped list —
   // labelled with its farm's position in the list below (so a farm with
@@ -154,22 +176,22 @@ export function PlotSearch() {
         </div>
       )}
 
-      {!hasSearched ? (
-        <p className="mt-8 text-wood">{t("search:searchAboveHint")}</p>
-      ) : results.length === 0 ? (
-        <p className="mt-8 text-wood">{t("search:noPlotsFoundNearby")}</p>
-      ) : (
-        <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
-          <div className="overflow-hidden rounded-lg border border-beige lg:sticky lg:top-4">
-            <FieldMap
-              center={searchCenter ?? FALLBACK_CENTER}
-              shapes={shapes}
-              drawMode={null}
-              onShapeClick={handleShapeClick}
-              fitTo={fitTo}
-            />
-          </div>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
+        <div className="overflow-hidden rounded-lg border border-beige lg:sticky lg:top-4">
+          <FieldMap
+            center={searchCenter ?? initialCenter}
+            shapes={shapes}
+            drawMode={null}
+            onShapeClick={handleShapeClick}
+            fitTo={hasSearched ? fitTo : null}
+          />
+        </div>
 
+        {!hasSearched ? (
+          <p className="text-wood">{t("search:searchAboveHint")}</p>
+        ) : results.length === 0 ? (
+          <p className="text-wood">{t("search:noPlotsFoundNearby")}</p>
+        ) : (
           <div>
             <p className="text-sm text-warm-olive">{t("search:browseHint")}</p>
 
@@ -199,8 +221,8 @@ export function PlotSearch() {
               ))}
             </ul>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }
