@@ -18,9 +18,7 @@ export const customer = {
   simpleModeDescription: "Large type, high contrast, fewer steps",
 
   notificationsHeading: "How the farm reaches me",
-  pushNotification: "Push notification",
   emailNotification: "Email",
-  weeklyDigest: "Weekly care digest",
 
   inboxMetaTitle: "Inbox · Farmland",
   inboxHeading: "Notifications",

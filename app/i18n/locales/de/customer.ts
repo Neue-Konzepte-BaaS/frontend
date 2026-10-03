@@ -22,9 +22,7 @@ export const customer: Shape = {
   simpleModeDescription: "Große Schrift, hoher Kontrast",
 
   notificationsHeading: "Wie der Hof mich erreicht",
-  pushNotification: "Push-Benachrichtigung",
   emailNotification: "E-Mail",
-  weeklyDigest: "Wöchentliche Pflege-Übersicht",
 
   inboxMetaTitle: "Posteingang · Farmland",
   inboxHeading: "Benachrichtigungen",

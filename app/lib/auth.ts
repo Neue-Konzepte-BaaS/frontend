@@ -197,3 +197,26 @@ export async function deleteAccount(): Promise<void> {
     // ignore
   }
 }
+
+export type NotificationPreferences = {
+  emailEnabled: boolean;
+};
+
+/** Wire shape for GET/PATCH /accounts/me/notification-preferences (snake_case). */
+type NotificationPreferencesResponse = {
+  email_enabled: boolean;
+};
+
+/** Customer-only: the caller's current notification preferences. */
+export async function getNotificationPreferences(): Promise<NotificationPreferences> {
+  const res = await apiClient.get<NotificationPreferencesResponse>("/accounts/me/notification-preferences");
+  return { emailEnabled: res.email_enabled };
+}
+
+/** Customer-only: updates the caller's notification preferences. */
+export async function updateNotificationPreferences(input: NotificationPreferences): Promise<NotificationPreferences> {
+  const res = await apiClient.patch<NotificationPreferencesResponse>("/accounts/me/notification-preferences", {
+    email_enabled: input.emailEnabled,
+  });
+  return { emailEnabled: res.email_enabled };
+}

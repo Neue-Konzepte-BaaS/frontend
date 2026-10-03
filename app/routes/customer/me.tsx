@@ -5,7 +5,7 @@ import type { Route } from "./+types/me";
 import type { clientLoader as customerLayoutLoader } from "./layout";
 import { listMyRentals } from "~/lib/rentals";
 import { getCropName } from "~/lib/fields";
-import { roleLabel } from "~/lib/auth";
+import { roleLabel, getNotificationPreferences, updateNotificationPreferences } from "~/lib/auth";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { Switch } from "~/components/switch";
 import { LogoutButton } from "~/components/logout-button";
@@ -23,8 +23,11 @@ export function meta() {
  * (`requireRole("customer")`), read via useRouteLoaderData rather than
  * fetching it again here. */
 export async function clientLoader() {
-  const rentals = await listMyRentals();
-  return { rentals };
+  const [rentals, notificationPreferences] = await Promise.all([
+    listMyRentals(),
+    getNotificationPreferences(),
+  ]);
+  return { rentals, notificationPreferences };
 }
 
 const LANGUAGES = [
@@ -43,20 +46,23 @@ const logoutButtonClass =
   "hover:bg-cream";
 
 export default function CustomerMe({ loaderData }: Route.ComponentProps) {
-  const { rentals } = loaderData;
+  const { rentals, notificationPreferences } = loaderData;
   const account = useRouteLoaderData<typeof customerLayoutLoader>("customer-layout")?.account;
   const { t, i18n: i18nInstance } = useTranslation(["customer", "auth", "common"]);
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const currentLanguage = i18nInstance.language.startsWith("de") ? "de" : "en";
 
   const [simpleMode, setSimpleMode] = useSimpleMode();
-  // The notification toggles below are visual-only for now — there is no
-  // backend preference storage or push-notification/email-opt-out support yet
-  // (see issue #34 summary). They persist nothing and have no effect beyond
-  // their own on/off state; wiring them up needs backend work.
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [emailEnabled, setEmailEnabled] = useState(true);
-  const [weeklyDigestEnabled, setWeeklyDigestEnabled] = useState(false);
+  const [emailEnabled, setEmailEnabled] = useState(notificationPreferences.emailEnabled);
+
+  async function handleEmailEnabledChange(next: boolean) {
+    setEmailEnabled(next);
+    try {
+      await updateNotificationPreferences({ emailEnabled: next });
+    } catch {
+      setEmailEnabled(!next);
+    }
+  }
 
   if (!account) return null;
 
@@ -130,22 +136,10 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
         </h2>
         <div className="mt-2 divide-y divide-beige rounded-lg border border-beige px-4">
           <Switch
-            id="push-notifications"
-            checked={pushEnabled}
-            onChange={setPushEnabled}
-            label={t("customer:pushNotification")}
-          />
-          <Switch
             id="email-notifications"
             checked={emailEnabled}
-            onChange={setEmailEnabled}
+            onChange={handleEmailEnabledChange}
             label={t("customer:emailNotification")}
-          />
-          <Switch
-            id="weekly-digest"
-            checked={weeklyDigestEnabled}
-            onChange={setWeeklyDigestEnabled}
-            label={t("customer:weeklyDigest")}
           />
         </div>
       </section>
