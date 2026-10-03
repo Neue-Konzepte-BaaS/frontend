@@ -7,7 +7,7 @@ import { me, dashboardPath } from "~/lib/auth";
 import { getFarm, getFarmFields } from "~/lib/farms";
 import { findNearestPlots, listMyRentals, groupPlotsByField, MAX_NEAREST_PLOTS, type NearbyPlot } from "~/lib/rentals";
 import { formatArea } from "~/components/plot-card";
-import { PlotGrid } from "~/components/plot-grid";
+import { PlotStatusLegend } from "~/components/plot-grid";
 import { PlotRentPanel } from "~/components/plot-rent-panel";
 import { sortPlotsNaturally, plotStatusesByPlot } from "~/lib/plots";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
@@ -137,7 +137,10 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         requested: plotStatusByPlot.get(plot.id)?.status === "requested",
         rented: plotStatusByPlot.get(plot.id)?.status === "rented",
       }))
-    : fields.map((field) => ({ id: field.id, polygon: field.coordinates, variant: "field" }));
+    : // Colored as "plot" (not "field") so the field picker matches the color
+      // a visitor sees once they're inside a field looking at its plots,
+      // and the same color already used for fields on the /search page.
+      fields.map((field) => ({ id: field.id, polygon: field.coordinates, variant: "plot" }));
 
   const selectedPlot = fieldPlots.find((p) => p.id === selectedPlotId) ?? null;
 
@@ -264,14 +267,10 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
                 <div className="overflow-hidden rounded-lg border border-beige">
                   <FieldMap center={initialCenter} shapes={shapes} drawMode={null} onShapeClick={handleMapShapeClick} fitTo={fitTo} />
                 </div>
-                <div className="mt-4">
-                  <PlotGrid
-                    plots={fieldPlots.map((p) => ({ id: p.id, status: plotStatusByPlot.get(p.id)?.status ?? "free", label: p.name }))}
-                    selectedIds={new Set(selectedPlotId ? [selectedPlotId] : [])}
-                    onSelect={toggleSelectPlot}
-                    legendStatuses={["free", "requested", "rented"]}
-                  />
-                </div>
+                <PlotStatusLegend
+                  plots={fieldPlots.map((p) => ({ status: plotStatusByPlot.get(p.id)?.status ?? "free" }))}
+                  legendStatuses={["free", "requested", "rented"]}
+                />
               </div>
               <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
                 <PlotRentPanel
