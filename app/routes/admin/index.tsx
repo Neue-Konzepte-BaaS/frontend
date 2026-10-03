@@ -4,6 +4,7 @@ import type { Route } from "./+types/index";
 import { getStatistics } from "~/lib/admin";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import { StatTile } from "~/components/stat-tile";
+import { formatPriceCents } from "~/components/plot-card";
 import { useAdminSystemItems } from "~/lib/nav-items";
 import i18n from "~/i18n";
 
@@ -87,6 +88,14 @@ export default function AdminOverview({ loaderData }: Route.ComponentProps) {
             })}
           />
         )}
+        <StatTile
+          label={t("statRevenue")}
+          value={formatPriceCents(stats.revenue.totalCents, locale)}
+          detail={t("statRevenueDetail", {
+            last30: formatPriceCents(stats.revenue.last30DaysCents, locale),
+            perFarm: formatPriceCents(stats.revenue.averageCentsPerUnit, locale),
+          })}
+        />
       </div>
 
       {/* The System tools also live in the sidebar, but the mobile bottom bar

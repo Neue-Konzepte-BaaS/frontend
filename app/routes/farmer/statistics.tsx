@@ -6,6 +6,7 @@ import { listFarmRentals } from "~/lib/rentals";
 import { listFields } from "~/lib/fields";
 import { occupancyByField, rentalsByCrop, requestFunnel, upcomingStarts } from "~/lib/farmer-statistics";
 import { StatTile } from "~/components/stat-tile";
+import { formatPriceCents } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
 
@@ -69,6 +70,14 @@ export default function FarmerStatistics({ loaderData }: Route.ComponentProps) {
           detail={t("statRentalsDetail", { active: num(stats.rentals.active), last30: num(stats.rentals.last30Days) })}
         />
         <StatTile label={t("statUpcomingStarts")} value={num(upcoming)} />
+        <StatTile
+          label={t("statRevenue")}
+          value={formatPriceCents(stats.revenue.totalCents, locale)}
+          detail={t("statRevenueDetail", {
+            last30: formatPriceCents(stats.revenue.last30DaysCents, locale),
+            perPlot: formatPriceCents(stats.revenue.averageCentsPerUnit, locale),
+          })}
+        />
       </div>
 
       <section className="mt-10">

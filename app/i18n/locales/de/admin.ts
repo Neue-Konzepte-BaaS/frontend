@@ -22,6 +22,8 @@ export const admin: Shape = {
   statRentalsDetail: "{{active}} aktiv · {{last30}} in 30 T.",
   statAccounts: "Konten",
   statAccountsDetail: "{{farmers}} Landwirte · {{customers}} Pächter · +{{registered}} in 30 T.",
+  statRevenue: "Umsatz",
+  statRevenueDetail: "{{last30}} in 30 T. · {{perFarm}} pro Hof",
   systemTitle: "System",
 
   // Platzhalterseite — die Navigation steht, der Backend-Endpunkt dahinter noch nicht

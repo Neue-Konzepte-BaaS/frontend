@@ -195,6 +195,8 @@ export const farmer = {
   statRentals: "Rentals",
   statRentalsDetail: "{{active}} active · {{last30}} in 30 d",
   statUpcomingStarts: "Upcoming starts",
+  statRevenue: "Revenue",
+  statRevenueDetail: "{{last30}} in 30 d · {{perPlot}} per plot",
   statRequestFunnel: "Requests",
   statRequestsRequested: "Requested",
   statRequestsApproved: "Approved",

@@ -42,6 +42,13 @@ export type RentalStatistics = {
   last30Days: number;
 };
 
+export type RevenueStatistics = {
+  totalCents: number;
+  last30DaysCents: number;
+  averageCentsPerRental: number;
+  averageCentsPerUnit: number;
+};
+
 export type AccountStatistics = {
   total: number;
   farmers: number;
@@ -55,6 +62,7 @@ export type Statistics = {
   fields: FieldStatistics;
   plots: PlotStatistics;
   rentals: RentalStatistics;
+  revenue: RevenueStatistics;
   accounts?: AccountStatistics;
 };
 

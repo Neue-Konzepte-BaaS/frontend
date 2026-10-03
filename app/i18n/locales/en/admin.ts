@@ -18,6 +18,8 @@ export const admin = {
   statRentalsDetail: "{{active}} active · {{last30}} in 30 d",
   statAccounts: "Accounts",
   statAccountsDetail: "{{farmers}} farmer · {{customers}} renter · +{{registered}} in 30 d",
+  statRevenue: "Revenue",
+  statRevenueDetail: "{{last30}} in 30 d · {{perFarm}} per farm",
   systemTitle: "System",
 
   // Stub page — nav exists, the backend endpoint behind it doesn't yet
