@@ -180,3 +180,20 @@ export async function logout(): Promise<void> {
 export function dashboardPath(role: Role): string {
   return `/${role}`;
 }
+
+/**
+ * Soft-deletes the caller's own account (farmer or customer — see backend
+ * issue #67): personal data is scrubbed and login stops working. Throws
+ * ApiError(409) if the account still has a currently-active rental, which
+ * the caller must resolve first. Does not clear local state or redirect —
+ * callers do that only once this has actually succeeded, unlike `logout`,
+ * which is best-effort.
+ */
+export async function deleteAccount(): Promise<void> {
+  await apiClient.delete<void>("/accounts/me");
+  try {
+    localStorage.removeItem(AUTH_USER_KEY);
+  } catch {
+    // ignore
+  }
+}

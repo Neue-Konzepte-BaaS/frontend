@@ -18,6 +18,7 @@ import {
 } from "~/lib/farms";
 import { Field as FormField, FormError, FormSuccess, inputClass, submitClass, primaryButtonClass } from "~/components/form";
 import { LogoutButton } from "~/components/logout-button";
+import { DeleteAccountSection } from "~/components/delete-account-section";
 import i18n from "~/i18n";
 
 export function meta() {
@@ -301,6 +302,8 @@ export default function FarmerMyFarm({ loaderData }: Route.ComponentProps) {
       <div className="mt-8">
         <LogoutButton className={logoutButtonClass} />
       </div>
+
+      <DeleteAccountSection role={account.role} />
     </main>
   );
 }
