@@ -7,9 +7,6 @@ export const farmer = {
   requestsWaiting_other: "{{count}} plot requests waiting",
   dashboardNextRequestStart: "Next starts {{date}}",
   fieldRentedCount: "{{rented}} rented",
-  dashboardSeasonLabel: "Season",
-  seasonProgress: "{{name}} · day {{day}} of {{total}}",
-  nextHandover: "next handover {{date}}",
   yourFieldsTitle: "Your fields",
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
 

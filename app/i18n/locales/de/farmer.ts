@@ -11,9 +11,6 @@ export const farmer: Shape = {
   requestsWaiting_other: "{{count}} Parzellenanfragen warten",
   dashboardNextRequestStart: "Nächster Start am {{date}}",
   fieldRentedCount: "{{rented}} vermietet",
-  dashboardSeasonLabel: "Saison",
-  seasonProgress: "{{name}} · Tag {{day}} von {{total}}",
-  nextHandover: "nächste Übergabe am {{date}}",
   yourFieldsTitle: "Deine Felder",
   yourFieldsBody: "Sieh dir deine Felder und Flurstücke an oder zeichne ein neues Feld auf der Karte.",
 

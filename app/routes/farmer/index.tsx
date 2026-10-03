@@ -5,8 +5,7 @@ import type { Route } from "./+types/index";
 import { requireRole } from "~/lib/guards";
 import { getMyFarm } from "~/lib/farms";
 import { listFields } from "~/lib/fields";
-import { activeRentalsByPlot, earliestPendingRequest, listFarmRentals, nextHandover } from "~/lib/rentals";
-import { currentSeason, listSeasons } from "~/lib/seasons";
+import { activeRentalsByPlot, earliestPendingRequest, listFarmRentals } from "~/lib/rentals";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import { StatTile } from "~/components/stat-tile";
 import { primaryButtonClass } from "~/components/form";
@@ -18,24 +17,20 @@ export function meta() {
 
 export async function clientLoader() {
   await requireRole("farmer");
-  const [farm, fields, farmRentals, seasons] = await Promise.all([
+  const [farm, fields, farmRentals] = await Promise.all([
     getMyFarm(),
     listFields(),
     listFarmRentals(),
-    listSeasons(),
   ]);
-  return { farm, fields, farmRentals, seasons };
+  return { farm, fields, farmRentals };
 }
 
 /**
  * The farmer's "Today" landing page (issue #18): the primary action (mark a
- * crop ripe), what needs a decision (open requests), occupancy at a glance,
- * and where the farm is in its season. The season card is derived, not
- * stored: the running season from `listSeasons` (the farm's own beat the
- * platform defaults) and the next handover from the farm's approved rentals.
+ * crop ripe), what needs a decision (open requests), and occupancy at a glance.
  */
 export default function FarmerDashboard({ loaderData }: Route.ComponentProps) {
-  const { farm, fields, farmRentals, seasons } = loaderData;
+  const { farm, fields, farmRentals } = loaderData;
   const { t, i18n: i18nInstance } = useTranslation(["farmer", "common"]);
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
   const dateFormatter = new Intl.DateTimeFormat(dateLocale, { day: "numeric", month: "short" });
@@ -51,8 +46,6 @@ export default function FarmerDashboard({ loaderData }: Route.ComponentProps) {
   );
   const totalPlots = fields.reduce((sum, field) => sum + field.plots.length, 0);
   const rentedPlots = [...rentedByField.values()].reduce((sum, count) => sum + count, 0);
-  const season = currentSeason(seasons);
-  const handover = nextHandover(farmRentals);
 
   return (
     <main className="mx-auto max-w-5xl p-4">
@@ -131,27 +124,6 @@ export default function FarmerDashboard({ loaderData }: Route.ComponentProps) {
           </ul>
         )}
       </section>
-
-      {(season || handover) && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold text-forest">
-            {t("farmer:dashboardSeasonLabel")}
-          </h2>
-          <p className="mt-2 text-forest">
-            {[
-              season &&
-                t("farmer:seasonProgress", {
-                  name: season.season.name,
-                  day: season.day,
-                  total: season.totalDays,
-                }),
-              handover && t("farmer:nextHandover", { date: dateFormatter.format(handover) }),
-            ]
-              .filter(Boolean)
-              .join(" · ")}
-          </p>
-        </section>
-      )}
     </main>
   );
 }
