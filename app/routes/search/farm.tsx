@@ -137,7 +137,10 @@ export default function FarmDetail({ loaderData }: Route.ComponentProps) {
         requested: plotStatusByPlot.get(plot.id)?.status === "requested",
         rented: plotStatusByPlot.get(plot.id)?.status === "rented",
       }))
-    : fields.map((field) => ({ id: field.id, polygon: field.coordinates, variant: "field" }));
+    : // Colored as "plot" (not "field") so the field picker matches the color
+      // a visitor sees once they're inside a field looking at its plots,
+      // and the same color already used for fields on the /search page.
+      fields.map((field) => ({ id: field.id, polygon: field.coordinates, variant: "plot" }));
 
   const selectedPlot = fieldPlots.find((p) => p.id === selectedPlotId) ?? null;
 

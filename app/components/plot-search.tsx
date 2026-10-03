@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { findNearestPlots, groupPlotsByFarm, MAX_NEAREST_PLOTS, type NearbyFarm, type NearbyPlot } from "~/lib/rentals";
-import { getFarm } from "~/lib/farms";
+import { getFarm, getFarmFields, type FieldWithPlotStats } from "~/lib/farms";
 import { ApiError } from "~/lib/api-client";
 import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { toBbox, unionBbox, pointBbox } from "~/lib/geo";
@@ -46,6 +46,10 @@ export function PlotSearch({ homePostalCode }: PlotSearchProps) {
   const [hasSearched, setHasSearched] = useState(false);
   const [results, setResults] = useState<NearbyPlot[]>([]);
   const [farms, setFarms] = useState<FarmResult[]>([]);
+  // The undivided fields behind the current results — what the map actually
+  // draws (see `shapes` below), since the map shows whole fields here, not
+  // individual plots (plots are only subdivided once inside a farm's page).
+  const [fields, setFields] = useState<FieldWithPlotStats[]>([]);
   // The query that produced the current results, reused to link into each
   // farm's own page (see toFarmLink) — that page re-runs this same search.
   const [locationQuery, setLocationQuery] = useState<URLSearchParams>(new URLSearchParams());
@@ -73,10 +77,17 @@ export function PlotSearch({ homePostalCode }: PlotSearchProps) {
       // The nearest-plots endpoint only carries each plot's farm id, not its
       // name — one lookup per distinct nearby farm to fill that in.
       const farmDetails = await Promise.all(farmSummaries.map((f) => getFarm(f.farmId)));
+      // Likewise it only carries each plot's field id, not the field's own
+      // boundary — fetch each nearby farm's fields and keep only the ones
+      // that actually have an available plot here, for the map's shapes.
+      const farmFieldLists = await Promise.all(farmSummaries.map((f) => getFarmFields(f.farmId)));
+      const fieldIdsWithPlots = new Set(plots.map((p) => p.field));
+      const nearbyFields = farmFieldLists.flat().filter((field) => fieldIdsWithPlots.has(field.id));
 
       const newLocationQuery = new URLSearchParams(isPostalCode ? { postalCode: trimmed } : { city: trimmed });
       setResults(plots);
       setFarms(farmSummaries.map((f, i) => ({ ...f, name: farmDetails[i].name })));
+      setFields(nearbyFields);
       setLocationQuery(newLocationQuery);
       setSearchCenter(geocoded);
       setHasSearched(true);
@@ -128,26 +139,31 @@ export function PlotSearch({ homePostalCode }: PlotSearchProps) {
     geocodePostalCode(homePostalCode).then(setInitialCenter);
   }, [homePostalCode]);
 
-  // Every plot's real outline, same as before the farm-grouped list —
-  // labelled with its farm's position in the list below (so a farm with
-  // several plots shows the same number on each one) rather than the
-  // plot's own index, since the list no longer has a row per plot.
-  const shapes: MapShape[] = results.map((plot) => {
-    const farmIndex = farms.findIndex((f) => f.farmId === plot.farm);
-    return { id: plot.id, polygon: plot.coordinates, variant: "plot", label: farmIndex >= 0 ? String(farmIndex + 1) : "" };
+  // Each nearby field's own undivided outline — not its individual plots,
+  // which only show once inside a farm's own page — labelled with its
+  // farm's position in the list below (so a farm with several fields shows
+  // the same number on each one). Colored as "plot" (not "field") so these
+  // shapes match the color a visitor sees once they're inside a field and
+  // looking at its actual plots, rather than the field-picker's own color.
+  const shapes: MapShape[] = fields.map((field) => {
+    const farmIndex = farms.findIndex((f) => f.farmId === field.farm);
+    return { id: field.id, polygon: field.coordinates, variant: "plot", label: farmIndex >= 0 ? String(farmIndex + 1) : "" };
   });
-  // Frame the nearest few plots rather than all 30. Results are
+  // Frame the nearest few fields rather than all of them. Results are
   // nearest-first, and the tail can sit tens of kilometres out — fitting to
-  // every one of them zooms so far out that the plots the searcher actually
+  // every one of them zooms so far out that the fields the searcher actually
   // cares about become specks. The closest handful keeps the view tight.
   // The geocoded search point is unioned in too, so the map always visibly
   // moves toward where the visitor searched, not just toward the results.
-  const resultBoxes = results.slice(0, MAP_FIT_RESULT_COUNT).map((p) => toBbox(p.coordinates));
+  const resultBoxes = fields.slice(0, MAP_FIT_RESULT_COUNT).map((f) => toBbox(f.coordinates));
   const fitTo = unionBbox(searchCenter ? [pointBbox(searchCenter.lon, searchCenter.lat), ...resultBoxes] : resultBoxes);
 
-  function handleShapeClick(plotId: string) {
-    const plot = results.find((p) => p.id === plotId);
-    if (plot) navigate(toFarmLink(plot.farm, locationQuery));
+  // Clicking a field goes to that farm's page, same as clicking it in the
+  // list below — not straight into the field, since this map only shows
+  // fields whole, never their plots.
+  function handleShapeClick(fieldId: string) {
+    const field = fields.find((f) => f.id === fieldId);
+    if (field) navigate(toFarmLink(field.farm, locationQuery));
   }
 
   return (
