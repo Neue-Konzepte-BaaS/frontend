@@ -226,6 +226,19 @@ export function declineRental(rentalId: string): Promise<Rental> {
 }
 
 /**
+ * The approved rentals covering right now — same "running" test as
+ * activeRentalsByPlot, for lists that aren't keyed by plot (the tenant's
+ * Home). A requested, declined, future or ended rental is not running.
+ */
+export function runningRentals<R extends Rental>(rentals: R[], now: Date = new Date()): R[] {
+  const at = now.getTime();
+  return rentals.filter(
+    (rental) =>
+      rental.status === "approved" && new Date(rental.startAt).getTime() <= at && at < new Date(rental.endAt).getTime(),
+  );
+}
+
+/**
  * The still-requested rental starting soonest, or null if there are none.
  * Used by the farmer's dashboard to point at the one request most worth
  * looking at first among several pending ones (a Rental has no creation

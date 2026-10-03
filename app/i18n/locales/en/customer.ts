@@ -5,6 +5,13 @@ export const customer = {
   noRentedPlots: "You're not renting a plot yet.",
   findAPlot: "Find a plot",
 
+  dashboardGreeting: "Hello, {{name}}",
+  ripeTodayLabel: "Ripe today",
+  ripeFrom: "from {{sender}} · {{time}}",
+  boardNewFromFarm_one: "{{count}} new post from the farm this week",
+  boardNewFromFarm_other: "{{count}} new posts from the farm this week",
+  boardNoNewPosts: "Nothing new from the farm this week",
+
   simpleModeHeading: "Simple mode",
   simpleModeDescription: "Large type, high contrast, fewer steps",
 

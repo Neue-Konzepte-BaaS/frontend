@@ -4,7 +4,6 @@ export const search = {
   searchSubtitle: "Search a German postal code or city to see available self-harvest plots nearby.",
 
   customerMetaTitle: "Home · Farmland",
-  customerTitle: "Home",
   myRentals: "My rentals",
   // Plot search moved to its own /search tab (issue #27) — this page no
   // longer has a search box "above" it, hence no mention of one here.

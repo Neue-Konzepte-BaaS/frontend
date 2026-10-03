@@ -9,6 +9,13 @@ export const customer: Shape = {
   noRentedPlots: "Du hast noch keine Parzelle gemietet.",
   findAPlot: "Parzelle finden",
 
+  dashboardGreeting: "Hallo, {{name}}",
+  ripeTodayLabel: "Heute reif",
+  ripeFrom: "von {{sender}} · {{time}}",
+  boardNewFromFarm_one: "{{count}} neuer Beitrag vom Hof diese Woche",
+  boardNewFromFarm_other: "{{count}} neue Beiträge vom Hof diese Woche",
+  boardNoNewPosts: "Diese Woche nichts Neues vom Hof",
+
   simpleModeHeading: "Einfacher Modus",
   simpleModeDescription: "Große Schrift, hoher Kontrast",
 

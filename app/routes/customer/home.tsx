@@ -1,8 +1,15 @@
-import { Link } from "react-router";
+import { Link, useRouteLoaderData } from "react-router";
 import { useTranslation } from "react-i18next";
+import { ArrowRight } from "lucide-react";
 import type { Route } from "./+types/home";
-import { listMyRentals, type RentalStatus } from "~/lib/rentals";
+import type { clientLoader as customerLayoutLoader } from "./layout";
+import { listMyRentals, runningRentals, type RentalStatus, type RentalWithPlot } from "~/lib/rentals";
 import { getCropName } from "~/lib/fields";
+import { careGuideForPlot, listCareGuide, splitInstructionsByWeek } from "~/lib/care";
+import { listNotifications, ripeToday } from "~/lib/notifications";
+import { listAnnouncements, recentAnnouncementCount } from "~/lib/announcements";
+import { toBbox } from "~/lib/geo";
+import { FieldMap, type MapShape } from "~/components/map/field-map";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { AccountTypeNotice } from "~/components/account-type-notice";
 import i18n from "~/i18n";
@@ -41,67 +48,174 @@ export function meta() {
 }
 
 /**
- * The tenant's "Home" — their own rentals. Plot search moved to its own tab
- * (/search, shared with the public page) once the nav grew a dedicated
- * Search destination — see issue #27.
+ * The tenant's "Home" (issue #19): what is ripe today, the plot(s) they are
+ * renting right now with this week's care task, and a pointer to the board.
+ * Plot search lives on its own tab (/search) — see issue #27.
+ *
+ * The rentals call must succeed; the care guide, inbox and board are extras,
+ * so a failing one (or a backend that doesn't have it yet) only drops its own
+ * block instead of the whole page — same stance as the inbox route.
  */
 export async function clientLoader() {
-  const rentals = await listMyRentals();
-  return { rentals };
+  const [rentals, guides, notifications, announcements] = await Promise.all([
+    listMyRentals(),
+    listCareGuide().catch(() => []),
+    listNotifications().catch(() => []),
+    listAnnouncements().catch(() => []),
+  ]);
+  return { rentals, guides, notifications, announcements };
+}
+
+/** A read-only map of one rented plot, framed on its own boundary. */
+function PlotMap({ rental }: { rental: RentalWithPlot }) {
+  const { t } = useTranslation("farmer");
+  const bbox = toBbox(rental.plot.coordinates);
+  const shapes: MapShape[] = [
+    { id: rental.plot.id, polygon: rental.plot.coordinates, variant: "plot", selected: true },
+  ];
+  return (
+    <div className="mt-4 overflow-hidden rounded-lg border border-beige" role="img" aria-label={t("mapAriaLabel")}>
+      <FieldMap
+        center={{ lat: (bbox.minLat + bbox.maxLat) / 2, lon: (bbox.minLon + bbox.maxLon) / 2 }}
+        shapes={shapes}
+        drawMode={null}
+        fitTo={bbox}
+      />
+    </div>
+  );
 }
 
 export default function CustomerHome({ loaderData }: Route.ComponentProps) {
-  const { rentals } = loaderData;
+  const { rentals, guides, notifications, announcements } = loaderData;
+  const account = useRouteLoaderData<typeof customerLayoutLoader>("customer-layout")?.account;
   const { t, i18n: i18nInstance } = useTranslation(["search", "customer", "common"]);
   const dateLocale = i18nInstance.language.startsWith("de") ? "de-DE" : "en-GB";
+  const timeFormatter = new Intl.DateTimeFormat(dateLocale, { hour: "2-digit", minute: "2-digit" });
+
+  const running = runningRentals(rentals);
+  const runningIds = new Set(running.map((rental) => rental.id));
+  const otherRentals = rentals.filter((rental) => !runningIds.has(rental.id));
+  const ripe = ripeToday(notifications);
+  const newPosts = recentAnnouncementCount(announcements);
+  // Several plots can run at once, so the care task names its plot then.
+  const fieldName = running.length === 1 ? careGuideForPlot(guides, running[0].plot.id)?.fieldName : undefined;
 
   return (
     <main className="mx-auto max-w-5xl p-4">
       <AccountTypeNotice />
-      <h1 className="text-3xl font-bold text-forest">{t("search:customerTitle")}</h1>
 
-      <section className="mt-6">
-        <h2 className="text-lg font-semibold text-forest">{t("search:myRentals")}</h2>
-        {rentals.length === 0 ? (
-          <p className="mt-2 text-wood">
-            {t("search:noRentalsYet")}{" "}
-            <Link to="/search" className="font-medium text-moss hover:underline">
-              {t("customer:findAPlot")}
-            </Link>
+      {fieldName && <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">{fieldName}</p>}
+      <h1 className="text-3xl font-bold text-forest">
+        {account ? t("customer:dashboardGreeting", { name: account.firstName }) : t("common:navHome")}
+      </h1>
+
+      {ripe && (
+        <Link
+          to="/customer/inbox"
+          className="mt-6 block rounded-2xl border border-beige bg-cream p-5 shadow-sm hover:bg-beige/30"
+        >
+          <p className="text-xs font-semibold tracking-wide text-warm-olive uppercase">{t("customer:ripeTodayLabel")}</p>
+          <p className="mt-1 text-lg font-semibold text-forest">
+            {ripe.cropName ? t("customer:inboxRipenessSubject", { crop: ripe.cropName }) : ripe.subject}
           </p>
-        ) : (
+          <p className="mt-2 text-sm text-warm-olive">
+            {t("customer:ripeFrom", { sender: ripe.sender, time: timeFormatter.format(new Date(ripe.createdAt)) })}
+          </p>
+        </Link>
+      )}
+
+      {running.map((rental) => {
+        const guide = careGuideForPlot(guides, rental.plot.id);
+        const [task] = guide ? splitInstructionsByWeek(guide.instructions, guide.currentWeek).thisWeek : [];
+        return (
+          <div key={rental.id}>
+            <section className="mt-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-forest">{rental.plot.name}</h2>
+                  <p className="mt-1 text-sm text-warm-olive">{getCropName(rental.crop, i18nInstance.language)}</p>
+                </div>
+                <span className="shrink-0 rounded-full bg-warm-olive/25 px-2.5 py-0.5 text-xs font-medium text-wood">
+                  {t("common:plotStatusRented")}
+                </span>
+              </div>
+              <PlotMap rental={rental} />
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <p className="text-sm text-warm-olive">{formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}</p>
+                <Link
+                  to={`/customer/plots/${rental.plot.id}`}
+                  className="flex items-center gap-1 text-sm font-medium text-moss hover:underline"
+                >
+                  {t("customer:openPlot")}
+                  <ArrowRight className="h-4 w-4" aria-hidden />
+                </Link>
+              </div>
+            </section>
+
+            {task && (
+              <section className="mt-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm">
+                <h2 className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
+                  {running.length > 1
+                    ? `${t("customer:careThisWeek")} · ${rental.plot.name}`
+                    : t("customer:careThisWeek")}
+                </h2>
+                <p className="mt-2 font-medium text-forest">{task.title}</p>
+                <p className="mt-1 text-sm text-wood">{task.body}</p>
+              </section>
+            )}
+          </div>
+        );
+      })}
+
+      {running.length === 0 && rentals.length === 0 && (
+        <p className="mt-6 text-wood">
+          {t("search:noRentalsYet")}{" "}
+          <Link to="/search" className="font-medium text-moss hover:underline">
+            {t("customer:findAPlot")}
+          </Link>
+        </p>
+      )}
+
+      <Link
+        to="/customer/board"
+        className="mt-4 flex items-center justify-between gap-3 rounded-2xl border border-beige bg-cream p-5 shadow-sm hover:bg-beige/30"
+      >
+        <div>
+          <p className="font-semibold text-forest">{t("common:navBoard")}</p>
+          <p className="mt-1 text-sm text-warm-olive">
+            {newPosts > 0 ? t("customer:boardNewFromFarm", { count: newPosts }) : t("customer:boardNoNewPosts")}
+          </p>
+        </div>
+        {newPosts > 0 && (
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-deep-olive text-sm font-semibold text-ivory">
+            {newPosts}
+          </span>
+        )}
+      </Link>
+
+      {otherRentals.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold text-forest">{t("search:myRentals")}</h2>
           <ul className="mt-2 divide-y divide-beige">
-            {rentals.map((rental) => (
+            {otherRentals.map((rental) => (
               <PlotCard
                 key={rental.id}
                 name={rental.plot.name}
                 meta={`${getCropName(rental.crop, i18nInstance.language)} · ${formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}`}
                 action={
-                  /* Badge and link together: the status is what Home says
-                     about the rental, the link is where the tenant acts on it.
-                     Only an approved rental gets the link — a plot that is
-                     still requested, or was declined, is not theirs to open,
-                     and its plot page would have nothing to show but the
-                     dates. */
-                  <span className="flex items-center gap-3">
-                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
-                      {t(STATUS_LABEL_KEY[rental.status])}
-                    </span>
-                    {rental.status === "approved" && (
-                      <Link
-                        to={`/customer/plots/${rental.plot.id}`}
-                        className="text-sm font-medium text-moss hover:underline"
-                      >
-                        {t("customer:openPlot")}
-                      </Link>
-                    )}
+                  /* Only the status here: a rental that isn't running is not
+                     one the tenant has a plot page for — a requested or
+                     declined one has nothing to show but its dates, and an
+                     ended or not-yet-started one has no care week. */
+                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[rental.status]}`}>
+                    {t(STATUS_LABEL_KEY[rental.status])}
                   </span>
                 }
               />
             ))}
           </ul>
-        )}
-      </section>
+        </section>
+      )}
     </main>
   );
 }

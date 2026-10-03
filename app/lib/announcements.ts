@@ -84,3 +84,13 @@ export async function createAnnouncement(input: CreateAnnouncementInput): Promis
   });
   return { ...fromResponse(res), recipients: res.recipients };
 }
+
+/**
+ * How many announcements were posted within the last `days` days. There is no
+ * read state on the backend, so "new" on the tenant's Home means recent, not
+ * unread.
+ */
+export function recentAnnouncementCount(announcements: Announcement[], now: Date = new Date(), days = 7): number {
+  const since = now.getTime() - days * 24 * 60 * 60 * 1000;
+  return announcements.filter((a) => new Date(a.createdAt).getTime() >= since).length;
+}

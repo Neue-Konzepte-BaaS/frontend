@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { earliestPendingRequest, groupPlotsByFarm, nextHandover, type NearbyPlot, type Rental } from "./rentals";
+import { earliestPendingRequest, groupPlotsByFarm, nextHandover, runningRentals, type NearbyPlot, type Rental } from "./rentals";
 
 /** A minimal NearbyPlot — only the fields groupPlotsByFarm reads matter to these tests. */
 function plot(overrides: Partial<NearbyPlot>): NearbyPlot {
@@ -92,5 +92,24 @@ describe("nextHandover", () => {
       rental({ startAt: "2026-08-01T00:00:00Z" }),
     ];
     expect(nextHandover(rentals, now)).toBeNull();
+  });
+});
+
+describe("runningRentals", () => {
+  const now = new Date("2026-07-01T12:00:00Z");
+
+  it("keeps only approved rentals covering now", () => {
+    const rentals = [
+      rental({ id: "running" }),
+      rental({ id: "requested", status: "requested" }),
+      rental({ id: "declined", status: "declined" }),
+      rental({ id: "ended", endAt: "2026-06-01T00:00:00Z" }),
+      rental({ id: "future", startAt: "2026-08-01T00:00:00Z" }),
+    ];
+    expect(runningRentals(rentals, now).map((r) => r.id)).toEqual(["running"]);
+  });
+
+  it("treats the end as exclusive", () => {
+    expect(runningRentals([rental({ endAt: "2026-07-01T12:00:00Z" })], now)).toEqual([]);
   });
 });

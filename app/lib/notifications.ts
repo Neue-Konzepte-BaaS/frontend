@@ -68,3 +68,20 @@ export async function listNotifications(): Promise<Notification[]> {
   const res = await apiClient.get<InboxItemResponse[]>("/inbox");
   return res.map(fromResponse);
 }
+
+/**
+ * The newest ripeness notice sent today (local calendar day), or null. The
+ * tenant's Home shows it as "ripe today"; `notifications` is newest-first as
+ * listNotifications returns it, but this doesn't rely on that order.
+ */
+export function ripeToday(notifications: Notification[], now: Date = new Date()): Notification | null {
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  let newest: Notification | null = null;
+  for (const notification of notifications) {
+    if (notification.kind !== "ripeness") continue;
+    const sentAt = new Date(notification.createdAt).getTime();
+    if (sentAt < startOfToday || sentAt > now.getTime()) continue;
+    if (!newest || sentAt > new Date(newest.createdAt).getTime()) newest = notification;
+  }
+  return newest;
+}
