@@ -3,9 +3,14 @@ import type { farmer as en } from "~/i18n/locales/en/farmer";
 type Shape = { [K in keyof typeof en]: string };
 
 export const farmer: Shape = {
-  dashboardMetaTitle: "Home · Farmland",
-  dashboardTitle: "Home",
-  dashboardBody: "Verwalte die Felder und Flurstücke, die dein Hof zur Selbsternte anbietet.",
+  dashboardMetaTitle: "Heute · Farmland",
+  dashboardTitle: "Heute",
+  dashboardMarkRipe: "Reife melden",
+  needsYouLabel: "Zu tun",
+  requestsWaiting_one: "{{count}} Parzellenanfrage wartet",
+  requestsWaiting_other: "{{count}} Parzellenanfragen warten",
+  dashboardNextRequestStart: "Nächster Start am {{date}}",
+  fieldRentedCount: "{{rented}} vermietet",
   yourFieldsTitle: "Deine Felder",
   yourFieldsBody: "Sieh dir deine Felder und Flurstücke an oder zeichne ein neues Feld auf der Karte.",
 

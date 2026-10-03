@@ -226,6 +226,40 @@ export function declineRental(rentalId: string): Promise<Rental> {
 }
 
 /**
+ * The still-requested rental starting soonest, or null if there are none.
+ * Used by the farmer's dashboard to point at the one request most worth
+ * looking at first among several pending ones (a Rental has no creation
+ * timestamp, so "oldest" isn't available — start date is the urgency signal).
+ */
+export function earliestPendingRequest<R extends Rental>(rentals: R[]): R | null {
+  let earliest: R | null = null;
+  for (const rental of rentals) {
+    if (rental.status !== "requested") continue;
+    if (!earliest || new Date(rental.startAt).getTime() < new Date(earliest.startAt).getTime()) {
+      earliest = rental;
+    }
+  }
+  return earliest;
+}
+
+/**
+ * The soonest end date among approved rentals running right now, or null if
+ * none are — the next day a plot changes hands. `endAt` is exclusive, so the
+ * last day tenants actually have is the day before.
+ */
+export function nextHandover(rentals: Rental[], now: Date = new Date()): Date | null {
+  const at = now.getTime();
+  let soonest: Date | null = null;
+  for (const rental of rentals) {
+    if (rental.status !== "approved") continue;
+    if (new Date(rental.startAt).getTime() > at || new Date(rental.endAt).getTime() <= at) continue;
+    const end = new Date(rental.endAt);
+    if (!soonest || end.getTime() < soonest.getTime()) soonest = end;
+  }
+  return soonest;
+}
+
+/**
  * Keeps only approved rentals covering right now, keyed by plot —
  * listFarmRentals returns historic and still-requested ones too, and a plot
  * can only have one *active* rental at a time (the backend rejects
