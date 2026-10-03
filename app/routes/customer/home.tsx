@@ -160,48 +160,50 @@ export default function CustomerHome({ loaderData }: Route.ComponentProps) {
         </Link>
       )}
 
-      {running.map((rental) => {
-        const guide = careGuideForPlot(guides, rental.plot.id);
-        const [task] = guide ? splitInstructionsByWeek(guide.instructions, guide.currentWeek).thisWeek : [];
-        return (
-          <div key={rental.id}>
-            <section className="mt-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-forest">{rental.plot.name}</h2>
-                  <p className="mt-1 text-sm text-warm-olive">{getCropName(rental.crop, i18nInstance.language)}</p>
+      <div className={`grid gap-4 ${running.length > 1 ? "sm:grid-cols-2" : ""}`}>
+        {running.map((rental) => {
+          const guide = careGuideForPlot(guides, rental.plot.id);
+          const [task] = guide ? splitInstructionsByWeek(guide.instructions, guide.currentWeek).thisWeek : [];
+          return (
+            <div key={rental.id} className="mt-4">
+              <section className="rounded-2xl border border-beige bg-cream p-5 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-semibold text-forest">{rental.plot.name}</h2>
+                    <p className="mt-1 text-sm text-warm-olive">{getCropName(rental.crop, i18nInstance.language)}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-warm-olive/25 px-2.5 py-0.5 text-xs font-medium text-wood">
+                    {t("common:plotStatusRented")}
+                  </span>
                 </div>
-                <span className="shrink-0 rounded-full bg-warm-olive/25 px-2.5 py-0.5 text-xs font-medium text-wood">
-                  {t("common:plotStatusRented")}
-                </span>
-              </div>
-              <PlotMap rental={rental} />
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <p className="text-sm text-warm-olive">{formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}</p>
-                <Link
-                  to={`/customer/plots/${rental.plot.id}`}
-                  className="flex items-center gap-1 text-sm font-medium text-moss hover:underline"
-                >
-                  {t("customer:openPlot")}
-                  <ArrowRight className="h-4 w-4" aria-hidden />
-                </Link>
-              </div>
-            </section>
-
-            {task && (
-              <section className="mt-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm">
-                <h2 className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
-                  {running.length > 1
-                    ? `${t("customer:careThisWeek")} · ${rental.plot.name}`
-                    : t("customer:careThisWeek")}
-                </h2>
-                <p className="mt-2 font-medium text-forest">{task.title}</p>
-                <p className="mt-1 text-sm text-wood">{task.body}</p>
+                <PlotMap rental={rental} />
+                <div className="mt-4 flex items-center justify-between gap-3">
+                  <p className="text-sm text-warm-olive">{formatRentalPeriod(rental.startAt, rental.endAt, dateLocale)}</p>
+                  <Link
+                    to={`/customer/plots/${rental.plot.id}`}
+                    className="flex items-center gap-1 text-sm font-medium text-moss hover:underline"
+                  >
+                    {t("customer:openPlot")}
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </Link>
+                </div>
               </section>
-            )}
-          </div>
-        );
-      })}
+
+              {task && (
+                <section className="mt-4 rounded-2xl border border-beige bg-cream p-5 shadow-sm">
+                  <h2 className="text-xs font-semibold tracking-wide text-warm-olive uppercase">
+                    {running.length > 1
+                      ? `${t("customer:careThisWeek")} · ${rental.plot.name}`
+                      : t("customer:careThisWeek")}
+                  </h2>
+                  <p className="mt-2 font-medium text-forest">{task.title}</p>
+                  <p className="mt-1 text-sm text-wood">{task.body}</p>
+                </section>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
       {running.length === 0 && rentals.length === 0 && (
         <p className="mt-6 text-wood">
