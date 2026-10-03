@@ -169,7 +169,7 @@ export function hasSeasonWindowInRange(
  * the year boundary (end before start), the occurrence starting in the
  * previous year is used when `at` falls before that year's own start date.
  */
-function seasonWindowContaining(
+export function seasonWindowContaining(
   season: Pick<Season, "startMonth" | "startDay" | "endMonth" | "endDay">,
   at: Date,
 ): { windowStart: Date; windowEnd: Date } {
@@ -192,6 +192,48 @@ function seasonWindowContaining(
   }
   const windowEnd = new Date(year + 1, season.endMonth - 1, season.endDay + 1);
   return { windowStart, windowEnd };
+}
+
+/**
+ * Where `now` sits inside the season's current occurrence: the 1-based day
+ * number and the total days in the window, or null if the season isn't
+ * running today. Calendar days, DST-safe (compares UTC-normalized dates).
+ */
+export function seasonProgress(
+  season: Pick<Season, "startMonth" | "startDay" | "endMonth" | "endDay">,
+  now: Date = new Date(),
+): { day: number; totalDays: number } | null {
+  const { windowStart, windowEnd } = seasonWindowContaining(season, now);
+  if (now.getTime() < windowStart.getTime() || now.getTime() >= windowEnd.getTime()) return null;
+  const utcDay = (d: Date) => Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return {
+    day: Math.round((utcDay(now) - utcDay(windowStart)) / msPerDay) + 1,
+    totalDays: Math.round((utcDay(windowEnd) - utcDay(windowStart)) / msPerDay),
+  };
+}
+
+/**
+ * The season to show as "the farm's current season" on the dashboard: among
+ * the seasons running today, the farm's own beat the platform defaults, and
+ * the one ending soonest wins a tie. Null when nothing is running.
+ */
+export function currentSeason<S extends Season>(
+  seasons: S[],
+  now: Date = new Date(),
+): { season: S; day: number; totalDays: number } | null {
+  let best: { season: S; day: number; totalDays: number; endsAt: number } | null = null;
+  for (const season of seasons) {
+    const progress = seasonProgress(season, now);
+    if (!progress) continue;
+    const endsAt = seasonWindowContaining(season, now).windowEnd.getTime();
+    const better =
+      !best ||
+      (season.farmId !== null && best.season.farmId === null) ||
+      ((season.farmId === null) === (best.season.farmId === null) && endsAt < best.endsAt);
+    if (better) best = { season, ...progress, endsAt };
+  }
+  return best && { season: best.season, day: best.day, totalDays: best.totalDays };
 }
 
 /** The 12 month names in order (index 0 = January), localized and capitalized as `Intl` renders them. */

@@ -1,7 +1,15 @@
 export const farmer = {
-  dashboardMetaTitle: "Home · Farmland",
-  dashboardTitle: "Home",
-  dashboardBody: "Manage the fields and land parcels your farm offers for self-harvest rental.",
+  dashboardMetaTitle: "Today · Farmland",
+  dashboardTitle: "Today",
+  dashboardMarkRipe: "Mark a crop ripe",
+  needsYouLabel: "Needs you",
+  requestsWaiting_one: "{{count}} plot request waiting",
+  requestsWaiting_other: "{{count}} plot requests waiting",
+  dashboardNextRequestStart: "Next starts {{date}}",
+  fieldRentedCount: "{{rented}} rented",
+  dashboardSeasonLabel: "Season",
+  seasonProgress: "{{name}} · day {{day}} of {{total}}",
+  nextHandover: "next handover {{date}}",
   yourFieldsTitle: "Your fields",
   yourFieldsBody: "View your fields and land parcels, or draw a new field on the map.",
 
