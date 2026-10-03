@@ -52,4 +52,14 @@ export const common: Shape = {
   plotStatusSelected: "Ausgewählt",
   plotStatusCount: "{{label}} ({{count}})",
   plotTileLabel: "Parzelle {{number}} · {{status}}",
+
+  deleteAccountHeading: "Konto löschen",
+  deleteAccountBody: "Damit werden deine persönlichen Daten entfernt und du wirst endgültig abgemeldet. Das kann nicht rückgängig gemacht werden.",
+  deleteAccountButton: "Mein Konto löschen",
+  deleteAccountConfirm: "Konto wirklich löschen?",
+  deleteAccountCancel: "Konto behalten",
+  deleteAccountDeleting: "Wird gelöscht…",
+  deleteAccountConflictCustomer: "Du hast noch eine laufende Miete. Diese muss erst enden, bevor du dein Konto löschen kannst.",
+  deleteAccountConflictFarmer: "Eine deiner Parzellen ist noch vermietet. Alle deine Mieten müssen erst enden, bevor du dein Konto löschen kannst.",
+  deleteAccountForbidden: "Dieses Konto kann auf diesem Weg nicht gelöscht werden.",
 };

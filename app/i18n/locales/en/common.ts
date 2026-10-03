@@ -50,4 +50,14 @@ export const common = {
   plotStatusSelected: "Selected",
   plotStatusCount: "{{label}} ({{count}})",
   plotTileLabel: "Plot {{number}} · {{status}}",
+
+  deleteAccountHeading: "Delete account",
+  deleteAccountBody: "This removes your personal data and signs you out for good. It cannot be undone.",
+  deleteAccountButton: "Delete my account",
+  deleteAccountConfirm: "Really delete my account?",
+  deleteAccountCancel: "Keep my account",
+  deleteAccountDeleting: "Deleting…",
+  deleteAccountConflictCustomer: "You still have a running rental. It needs to end before you can delete your account.",
+  deleteAccountConflictFarmer: "One of your plots is still rented. All of your rentals need to end before you can delete your account.",
+  deleteAccountForbidden: "This account can't be deleted this way.",
 } as const;

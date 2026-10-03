@@ -9,6 +9,7 @@ import { roleLabel } from "~/lib/auth";
 import { PlotCard, formatRentalPeriod } from "~/components/plot-card";
 import { Switch } from "~/components/switch";
 import { LogoutButton } from "~/components/logout-button";
+import { DeleteAccountSection } from "~/components/delete-account-section";
 import { useSimpleMode } from "~/lib/simple-mode";
 import i18n from "~/i18n";
 
@@ -152,6 +153,8 @@ export default function CustomerMe({ loaderData }: Route.ComponentProps) {
       <div className="mt-8">
         <LogoutButton className={logoutButtonClass} />
       </div>
+
+      <DeleteAccountSection role={account.role} />
     </main>
   );
 }
