@@ -199,6 +199,8 @@ export const farmer: Shape = {
   statRentals: "Mieten",
   statRentalsDetail: "{{active}} aktiv · {{last30}} in 30 T",
   statUpcomingStarts: "Bevorstehende Starts",
+  statRevenue: "Umsatz",
+  statRevenueDetail: "{{last30}} in 30 T. · {{perPlot}} pro Parzelle",
   statRequestFunnel: "Anfragen",
   statRequestsRequested: "Angefragt",
   statRequestsApproved: "Angenommen",
