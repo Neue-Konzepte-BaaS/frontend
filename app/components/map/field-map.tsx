@@ -67,6 +67,8 @@ export type FieldMapProps = {
   onShapeClick?: (id: string) => void;
   /** Bbox to fit the viewport to (e.g. on mount, or when shapes change). */
   fitTo?: Bbox | null;
+  /** Pixels of breathing room kept around `fitTo`. Lower it for a thumbnail, where the default would swallow the whole canvas. */
+  fitPadding?: number;
   className?: string;
 };
 
@@ -118,6 +120,7 @@ export function FieldMap({
   onRectangleDrawn,
   onShapeClick,
   fitTo,
+  fitPadding = 48,
   className,
 }: FieldMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -338,11 +341,11 @@ export function FieldMap({
     // and would never fire again, leaving the camera stuck on the first
     // search's bounds while the results list updated underneath it.
     if (sourceReadyRef.current) {
-      map.fitBounds(bounds, { padding: 48, duration: 0 });
+      map.fitBounds(bounds, { padding: fitPadding, duration: 0 });
     } else {
-      map.once("load", () => map.fitBounds(bounds, { padding: 48, duration: 0 }));
+      map.once("load", () => map.fitBounds(bounds, { padding: fitPadding, duration: 0 }));
     }
-  }, [fitKey]);
+  }, [fitKey, fitPadding]);
 
   const { t } = useTranslation("farmer");
 

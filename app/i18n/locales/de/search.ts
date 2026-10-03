@@ -8,7 +8,6 @@ export const search: Shape = {
   searchSubtitle: "Suche nach einer deutschen Postleitzahl oder Stadt, um verfügbare Selbsternte-Parzellen in der Nähe zu sehen.",
 
   customerMetaTitle: "Home · Farmland",
-  customerTitle: "Home",
   myRentals: "Meine Mieten",
   noRentalsYet: "Du hast noch keine Parzelle gemietet.",
   booked: "Gebucht",
