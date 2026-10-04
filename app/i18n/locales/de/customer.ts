@@ -40,7 +40,7 @@ export const customer: Shape = {
   inboxKindAnnouncement: "Pinnwand",
 
   inboxRipenessSubject: "{{crop}} ist reif",
-  inboxRipenessBody: "{{crop}} auf {{field}} ist bereit zur Ernte.",
+  inboxRipenessBody: "{{crop}} auf {{plot}} ist bereit zur Ernte.",
 
   plotMetaTitle: "Meine Parzelle · Farmland",
   openPlot: "Parzelle öffnen",

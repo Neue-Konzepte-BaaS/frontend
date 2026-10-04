@@ -35,7 +35,7 @@ export const customer = {
   inboxKindFarm: "Direct message",
   inboxKindAnnouncement: "Board",
   inboxRipenessSubject: "{{crop}} is ready to harvest",
-  inboxRipenessBody: "{{crop}} on {{field}} is ready to harvest.",
+  inboxRipenessBody: "{{crop}} on {{plot}} is ready to harvest.",
 
   plotMetaTitle: "My plot · Farmland",
   openPlot: "Open plot",

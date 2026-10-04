@@ -441,7 +441,7 @@ export default function FieldDetail({ loaderData }: Route.ComponentProps) {
             </div>
           </div>
           <div ref={panelRef} className="scroll-mt-4 lg:sticky lg:top-4">
-            <PlotDetailPanel fieldId={field.id} selection={selection} cropNames={cropNames} cropEditor={cropEditor} />
+            <PlotDetailPanel selection={selection} cropNames={cropNames} cropEditor={cropEditor} />
           </div>
         </div>
       ) : (

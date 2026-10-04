@@ -27,7 +27,10 @@ export type Notification = {
   createdAt: string;
   /** Set for ripeness and care notifications */
   cropName?: string;
+  /** Set only for care items */
   fieldName?: string;
+  /** Set only for ripeness items */
+  plotName?: string;
 };
 
 type InboxItemResponse = {
@@ -37,6 +40,7 @@ type InboxItemResponse = {
   body: string;
   farm_name?: string;
   field_name?: string;
+  plot_name?: string;
   crop_name?: string;
   created_at: string;
 };
@@ -50,7 +54,7 @@ export function kindFromResponse(
   return "farm";
 }
 
-function fromResponse(r: InboxItemResponse): Notification {
+export function fromResponse(r: InboxItemResponse): Notification {
   return {
     id: r.id,
     kind: kindFromResponse(r.kind),
@@ -60,6 +64,7 @@ function fromResponse(r: InboxItemResponse): Notification {
     createdAt: r.created_at,
     cropName: r.crop_name,
     fieldName: r.field_name,
+    plotName: r.plot_name,
   };
 }
 

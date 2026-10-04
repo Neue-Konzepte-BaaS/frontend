@@ -30,7 +30,6 @@ const STATUS_LABEL_KEY = {
 } as const;
 
 type PlotDetailPanelProps = {
-  fieldId: string;
   selection: SelectedPlot[];
   /** Crop id → name, for the "planted" row (a rental only carries the crop id). */
   cropNames: ReadonlyMap<string, string>;
@@ -39,7 +38,7 @@ type PlotDetailPanelProps = {
 };
 
 /** The right-hand panel of the farmer's plot planner: whatever is selected in the grid or on the map. */
-export function PlotDetailPanel({ fieldId, selection, cropNames, cropEditor }: PlotDetailPanelProps) {
+export function PlotDetailPanel({ selection, cropNames, cropEditor }: PlotDetailPanelProps) {
   const { t, i18n } = useTranslation(["farmer", "common"]);
   const locale = i18n.language.startsWith("de") ? "de-DE" : "en-GB";
 
@@ -101,7 +100,6 @@ export function PlotDetailPanel({ fieldId, selection, cropNames, cropEditor }: P
       {status === "rented" && rental && new Date(rental.startAt).getTime() <= Date.now() && (
         <RentedPlotActions
           key={rental.id}
-          fieldId={fieldId}
           plotId={plot.id}
           cropId={rental.cropId}
           cropName={plantedName!}
@@ -134,13 +132,11 @@ function Row({ label, value }: { label: string; value: string }) {
 type ActionState = { status: "idle" } | { status: "busy" } | { status: "done"; message: string } | { status: "error"; message: string };
 
 function RentedPlotActions({
-  fieldId,
   plotId,
   cropId,
   cropName,
   customerName,
 }: {
-  fieldId: string;
   plotId: string;
   cropId: string;
   cropName: string;
@@ -160,8 +156,8 @@ function RentedPlotActions({
   async function handleMarkRipe() {
     setState({ status: "busy" });
     try {
-      const notice = await createRipenessNotice(fieldId, cropId);
-      setState({ status: "done", message: t("farmer:markRipeSuccess", { count: notice.recipients }) });
+      await createRipenessNotice(plotId, cropId);
+      setState({ status: "done", message: t("farmer:markRipeSuccess", { name: customerName }) });
     } catch (err) {
       setState({ status: "error", message: errorMessage(err) });
     }

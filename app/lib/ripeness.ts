@@ -3,7 +3,7 @@ import { apiClient } from "~/lib/api-client";
 /**
  * Ripeness notice API wrapper. See backend/openapi.yml:
  *
- *   POST /api/fields/{fieldID}/ripeness -> CreatedRipenessNotice (farmer only)
+ *   POST /api/plots/{plotID}/ripeness -> CreatedRipenessNotice (farmer only)
  *
  * Unlike announcements.ts, this is create-only: a ripeness notice has no
  * board of its own — it appears in the recipients' inbox (`kind:
@@ -18,8 +18,8 @@ export type CreatedRipenessNotice = {
   id: string;
   farmer: string;
   farmName: string;
-  field: string;
-  fieldName: string;
+  plot: string;
+  plotName: string;
   crop: string;
   cropName: string;
   /** ISO 8601. Parse with `new Date(...)` at render time. */
@@ -32,8 +32,8 @@ type CreatedRipenessNoticeResponse = {
   id: string;
   farmer: string;
   farm_name: string;
-  field: string;
-  field_name: string;
+  plot: string;
+  plot_name: string;
   crop: string;
   crop_name: string;
   created_at: string;
@@ -41,19 +41,19 @@ type CreatedRipenessNoticeResponse = {
 };
 
 /**
- * Posts a ripeness notice for a field owned by the authenticated farmer,
- * mailing everyone currently renting a plot of it with the given crop.
+ * Posts a ripeness notice for a plot owned by the authenticated farmer,
+ * mailing everyone currently renting that plot with the given crop.
  */
-export async function createRipenessNotice(fieldId: string, cropId: string): Promise<CreatedRipenessNotice> {
-  const res = await apiClient.post<CreatedRipenessNoticeResponse>(`/fields/${fieldId}/ripeness`, {
+export async function createRipenessNotice(plotId: string, cropId: string): Promise<CreatedRipenessNotice> {
+  const res = await apiClient.post<CreatedRipenessNoticeResponse>(`/plots/${plotId}/ripeness`, {
     crop_id: cropId,
   });
   return {
     id: res.id,
     farmer: res.farmer,
     farmName: res.farm_name,
-    field: res.field,
-    fieldName: res.field_name,
+    plot: res.plot,
+    plotName: res.plot_name,
     crop: res.crop,
     cropName: res.crop_name,
     createdAt: res.created_at,
