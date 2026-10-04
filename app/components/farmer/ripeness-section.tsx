@@ -1,52 +1,61 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { createRipenessNotice } from "~/lib/ripeness";
 import { ApiError } from "~/lib/api-client";
-import { getCropName, type Crop, type FieldWithPlots } from "~/lib/fields";
+import { getCropName, type FieldWithPlots } from "~/lib/fields";
+import type { FarmRental } from "~/lib/rentals";
 import { FormError, FormSuccess, inputClass, submitClass } from "~/components/form";
 
 type RipenessSectionProps = {
   fields: FieldWithPlots[];
+  activeByPlot: Map<string, FarmRental>;
 };
 
-/** Every crop offered by at least one of the field's plots, deduped, sorted by name in the given language. */
-function cropsOfferedByField(field: FieldWithPlots, language: string): Crop[] {
-  const byId = new Map<string, Crop>();
-  for (const plot of field.plots) {
-    for (const crop of plot.crops) {
-      byId.set(crop.id, crop);
-    }
-  }
-  return [...byId.values()].sort((a, b) => getCropName(a, language).localeCompare(getCropName(b, language)));
+/** Every currently-rented plot, labeled with its field, plot name and tenant. */
+function rentedPlots(fields: FieldWithPlots[], activeByPlot: Map<string, FarmRental>) {
+  return fields.flatMap((field) =>
+    field.plots
+      .filter((plot) => activeByPlot.has(plot.id))
+      .map((plot) => {
+        const rental = activeByPlot.get(plot.id)!;
+        return {
+          id: plot.id,
+          label: `${field.name} – ${plot.name} (${rental.customer.firstName} ${rental.customer.lastName})`,
+          cropId: rental.cropId,
+          crop: plot.crops.find((c) => c.id === rental.cropId) ?? null,
+        };
+      })
+  );
 }
 
 /**
  * Ready-to-harvest notice compose form (issue #39 / backend issue #33): pick
- * a field and a crop it offers, mail everyone currently renting a plot of
- * that field with that crop. No history list here — unlike announcements, a
- * ripeness notice has no read-back endpoint of its own (see lib/ripeness.ts).
+ * a currently rented plot, mail its tenant that the crop they are growing is
+ * ready to pick. The crop is not a choice — a plot's active rental pins
+ * exactly one, and that is the only crop the audience query can ever match.
+ * No history list here — unlike announcements, a ripeness notice has no
+ * read-back endpoint of its own (see lib/ripeness.ts).
  */
-export function RipenessSection({ fields }: RipenessSectionProps) {
+export function RipenessSection({ fields, activeByPlot }: RipenessSectionProps) {
   const { t, i18n } = useTranslation("farmer");
-  const [fieldId, setFieldId] = useState(fields[0]?.id ?? "");
-  const [cropId, setCropId] = useState("");
+  const plots = rentedPlots(fields, activeByPlot);
+  const [plotId, setPlotId] = useState(plots[0]?.id ?? "");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const field = fields.find((f) => f.id === fieldId);
-  const crops = useMemo(() => (field ? cropsOfferedByField(field, i18n.language) : []), [field, i18n.language]);
-  const selectedCropId = crops.some((c) => c.id === cropId) ? cropId : (crops[0]?.id ?? "");
+  const plot = plots.find((p) => p.id === plotId) ?? plots[0];
+  const cropName = plot?.crop ? getCropName(plot.crop, i18n.language) : "";
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!field || !selectedCropId) return;
+    if (!plot) return;
     setError(null);
     setSuccess(null);
     setSending(true);
     try {
-      const result = await createRipenessNotice(field.id, selectedCropId);
-      setSuccess(t("ripenessSuccess", { recipients: result.recipients }));
+      await createRipenessNotice(plot.id, plot.cropId);
+      setSuccess(t("ripenessSuccess"));
     } catch (err) {
       setError(err instanceof ApiError ? err.message : String(err));
     } finally {
@@ -54,14 +63,14 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
     }
   }
 
-  const hasFields = fields.length > 0;
+  const hasPlots = plots.length > 0;
 
   return (
     <div id="ripeness" className="scroll-mt-4 rounded-xl border border-beige bg-paper-contrast p-5">
       <h2 className="text-lg font-semibold text-forest">{t("ripenessSectionTitle")}</h2>
 
-      {!hasFields ? (
-        <p className="mt-1 text-sm text-warm-olive">{t("ripenessNoFieldsYet")}</p>
+      {!hasPlots ? (
+        <p className="mt-1 text-sm text-warm-olive">{t("ripenessNoPlotsYet")}</p>
       ) : (
         <>
           <p className="mt-1 text-sm text-warm-olive">{t("ripenessSectionBody")}</p>
@@ -72,50 +81,25 @@ export function RipenessSection({ fields }: RipenessSectionProps) {
 
             <div className="flex flex-col gap-3">
               <select
-                aria-label={t("ripenessChooseField")}
-                value={fieldId}
-                onChange={(e) => {
-                  setFieldId(e.target.value);
-                  setCropId("");
-                }}
+                aria-label={t("ripenessChoosePlot")}
+                value={plotId}
+                onChange={(e) => setPlotId(e.target.value)}
                 disabled={sending}
                 className={`${inputClass} w-full py-2 bg-paper`}
               >
-                {fields.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.name}
+                {plots.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.label}
                   </option>
                 ))}
               </select>
 
-              {crops.length > 0 && (
-                <select
-                  aria-label={t("ripenessChooseCrop")}
-                  value={selectedCropId}
-                  onChange={(e) => setCropId(e.target.value)}
-                  disabled={sending}
-                  className={`${inputClass} w-full py-2 bg-paper`}
-                >
-                  {crops.map((crop) => (
-                    <option key={crop.id} value={crop.id}>
-                      {getCropName(crop, i18n.language)}
-                    </option>
-                  ))}
-                </select>
-              )}
+              {cropName && <p className="text-sm text-warm-olive">{t("ripenessCropLabel", { crop: cropName })}</p>}
 
-              <button
-                type="submit"
-                disabled={sending || crops.length === 0}
-                className={`${submitClass} w-full py-2 text-sm`}
-              >
+              <button type="submit" disabled={sending || !plot} className={`${submitClass} w-full py-2 text-sm`}>
                 {sending ? t("ripenessSending") : t("ripenessSend")}
               </button>
             </div>
-
-            {crops.length === 0 && (
-              <p className="text-sm text-warm-olive">{t("ripenessNoCropsForField")}</p>
-            )}
           </form>
         </>
       )}

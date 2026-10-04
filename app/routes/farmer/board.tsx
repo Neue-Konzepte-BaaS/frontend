@@ -82,7 +82,7 @@ function ComposeBox({
         fieldId: destination === "board" && boardScope === "field" ? fieldId : undefined,
         plotId: destination === "inbox" ? plotId : undefined,
       });
-      setSuccess(t("announceSuccess", { recipients: result.recipients }));
+      setSuccess(t("announceSuccess"));
       setSubject("");
       setBody("");
       onPosted(result);
@@ -262,7 +262,7 @@ export default function FarmerBoard({ loaderData }: Route.ComponentProps) {
             activeByPlot={activeByPlot}
             onPosted={(posted) => setAnnouncements((prev) => [posted, ...prev])}
           />
-          <RipenessSection fields={fields} />
+          <RipenessSection fields={fields} activeByPlot={activeByPlot} />
         </div>
       )}
 
