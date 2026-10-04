@@ -133,8 +133,8 @@ function NotificationCard({ notification, timeLabel: time }: { notification: Not
   const subject = notification.kind === "ripeness" && notification.cropName
     ? t("inboxRipenessSubject", { crop: notification.cropName })
     : notification.subject;
-  const body = notification.kind === "ripeness" && notification.cropName && notification.fieldName
-    ? t("inboxRipenessBody", { crop: notification.cropName, field: notification.fieldName })
+  const body = notification.kind === "ripeness" && notification.cropName && notification.plotName
+    ? t("inboxRipenessBody", { crop: notification.cropName, plot: notification.plotName })
     : notification.body;
 
   return (

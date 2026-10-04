@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { kindFromResponse, ripeToday, type Notification } from "./notifications";
+import { fromResponse, kindFromResponse, ripeToday, type Notification } from "./notifications";
 
 describe("kindFromResponse", () => {
   it("maps the backend's ripeness_notice kind to ripeness", () => {
@@ -16,6 +16,37 @@ describe("kindFromResponse", () => {
 
   it("maps announcement to announcement", () => {
     expect(kindFromResponse("announcement")).toBe("announcement");
+  });
+});
+
+describe("fromResponse", () => {
+  it("maps a ripeness notice's plot_name to plotName, leaving fieldName unset", () => {
+    const result = fromResponse({
+      id: "n1",
+      kind: "ripeness_notice",
+      subject: "Zucchini ist reif",
+      body: "Zucchini auf Parzelle 3 ist bereit zur Ernte.",
+      farm_name: "Hof Berger",
+      plot_name: "Parzelle 3",
+      crop_name: "Zucchini",
+      created_at: "2026-07-01T07:10:00",
+    });
+    expect(result.plotName).toBe("Parzelle 3");
+    expect(result.fieldName).toBeUndefined();
+  });
+
+  it("maps a care item's field_name to fieldName, leaving plotName unset", () => {
+    const result = fromResponse({
+      id: "n2",
+      kind: "care",
+      subject: "Woche 3: Gießen",
+      body: "Zweimal pro Woche",
+      field_name: "Feld Nord",
+      crop_name: "Zucchini",
+      created_at: "2026-07-01T07:10:00",
+    });
+    expect(result.fieldName).toBe("Feld Nord");
+    expect(result.plotName).toBeUndefined();
   });
 });
 
